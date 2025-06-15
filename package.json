@@ -7,15 +7,27 @@
     "data:download": "download -f - https://script.google.com/macros/s/AKfycbz92RtrJhgt9sl7QZIyfUPQBby-UIfaiH6H6KXTaJZtKEdw7DUNRMJ77H7wbCqSg8wVYg/exec > tmp/data.json",
     "data:process": "tsx build/processData.ts > src/generated/data.ts",
     "data": "npm run data:download && npm run data:process",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tsc --noEmit && prettier --check .",
+    "prepare": "husky",
+    "dev": "vite"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
     "download-cli": "^1.1.1",
+    "husky": "^9.1.7",
     "prettier": "^3.5.3",
-    "tsx": "^4.19.4"
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "ol": "^10.5.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   }
 }
