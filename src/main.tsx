@@ -1,6 +1,6 @@
 import React from "react";
-import {createRoot} from "react-dom/client";
+import { createRoot } from "react-dom/client";
 
-
-createRoot(document.getElementById("app")!)
-    .render(<h1>Chill, React! Chill!</h1>)
+createRoot(document.getElementById("app")!).render(
+  <h1>Chill, React! Chill!</h1>,
+);
