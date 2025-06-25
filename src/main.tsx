@@ -2,7 +2,15 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { data } from "./generated/data";
 
+import "./application.css";
+
 function Application() {
+  const oilFields = Object.keys(data);
+  const years = new Set<string>();
+  for (const oilField of oilFields) {
+    Object.keys(data[oilField]).forEach((y) => years.add(y));
+  }
+
   return (
     <div>
       <h1>Chill, baby! Chill!</h1>
@@ -11,21 +19,22 @@ function Application() {
         <thead>
           <tr>
             <th>År</th>
-            {Object.keys(data).map((oilField) => (
+            {oilFields.map((oilField) => (
               <th>{oilField}</th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {Object.keys(data["Aasta Hansteen"]).map((y) => (
+          {[...years].toSorted().map((y) => (
             <tr>
               <td>{y}</td>
-              {data["Aasta Hansteen"][y].productionOil}
+              {oilFields.map((f) => (
+                <td>{data[f][y]?.productionOil}</td>
+              ))}
             </tr>
           ))}
         </tbody>
       </table>
-      <pre>{JSON.stringify(Object.keys(data["Draugen"]), null, 2)}</pre>
     </div>
   );
 }
