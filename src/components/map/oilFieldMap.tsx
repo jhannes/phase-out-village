@@ -8,6 +8,7 @@ import "ol/ol.css";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import { GeoJSON } from "ol/format";
+import { Fill, Stroke, Style, Text } from "ol/style";
 
 useGeographic();
 
@@ -19,6 +20,15 @@ const map = new Map({
         url: "/geojson/oilfields.geojson",
         format: new GeoJSON(),
       }),
+      style: (f) =>
+        new Style({
+          fill: new Fill({ color: "red" }),
+          stroke: new Stroke({ color: "black", width: 2 }),
+          text: new Text({
+            font: "9pt sans-serif",
+            text: f.getProperties()["fldName"],
+          }),
+        }),
     }),
   ],
   view: new View({ center: [10, 65], zoom: 6 }),
