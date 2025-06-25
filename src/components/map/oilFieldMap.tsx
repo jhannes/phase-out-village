@@ -4,6 +4,8 @@ import { OSM } from "ol/source";
 import TileLayer from "ol/layer/Tile";
 import { useGeographic } from "ol/proj";
 
+import "ol/ol.css";
+
 useGeographic();
 
 const map = new Map({
@@ -17,5 +19,5 @@ export function OilFieldMap() {
     map.setTarget(mapRef.current!);
   }, []);
 
-  return <div ref={mapRef}>Here is a map</div>;
+  return <div ref={mapRef} style={{ width: "100%", height: "50vh" }}></div>;
 }
