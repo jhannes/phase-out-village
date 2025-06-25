@@ -27,6 +27,7 @@ const map = new Map({
           text: new Text({
             font: "9pt sans-serif",
             text: f.getProperties()["fldName"],
+            overflow: true,
           }),
         }),
     }),
