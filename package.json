@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "vite",
     "data:download": "download -f - https://script.google.com/macros/s/AKfycbz92RtrJhgt9sl7QZIyfUPQBby-UIfaiH6H6KXTaJZtKEdw7DUNRMJ77H7wbCqSg8wVYg/exec > tmp/data.json",
     "data:process": "tsx build/processData.ts > src/generated/data.ts",
     "data": "npm run data:download && npm run data:process",
@@ -16,6 +17,11 @@
   "devDependencies": {
     "download-cli": "^1.1.1",
     "prettier": "^3.5.3",
-    "tsx": "^4.19.4"
+    "tsx": "^4.19.4",
+    "vite": "^7.0.0"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   }
 }

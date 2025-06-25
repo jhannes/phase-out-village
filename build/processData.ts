@@ -26,7 +26,7 @@ const compactJson = JSON.stringify(result, null, 2).replace(
             .map(line => line.trim())
             .filter(Boolean)
             .join(' ')} }`
-);;
+);
 
 console.log(
   "export const data: Record<string, Record<string, { productionOil?: number; productionGas?: number; emission?: number }>> = " +
