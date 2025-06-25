@@ -28,6 +28,14 @@ export function OilFieldMap() {
   const mapRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     map.setTarget(mapRef.current!);
+    map.on("click", (e) => {
+      const features = map.getFeaturesAtPixel(e.pixel);
+      console.log({ features });
+      if (features.length === 1) {
+        const { geometry, ...properties } = features[0].getProperties();
+        alert(JSON.stringify(properties));
+      }
+    });
   }, []);
 
   return <div ref={mapRef} style={{ width: "100%", height: "50vh" }}></div>;
