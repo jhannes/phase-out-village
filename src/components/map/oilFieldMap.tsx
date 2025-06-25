@@ -5,11 +5,22 @@ import TileLayer from "ol/layer/Tile";
 import { useGeographic } from "ol/proj";
 
 import "ol/ol.css";
+import VectorLayer from "ol/layer/Vector";
+import VectorSource from "ol/source/Vector";
+import { GeoJSON } from "ol/format";
 
 useGeographic();
 
 const map = new Map({
-  layers: [new TileLayer({ source: new OSM() })],
+  layers: [
+    new TileLayer({ source: new OSM() }),
+    new VectorLayer({
+      source: new VectorSource({
+        url: "/geojson/oilfields.geojson",
+        format: new GeoJSON(),
+      }),
+    }),
+  ],
   view: new View({ center: [10, 65], zoom: 6 }),
 });
 
