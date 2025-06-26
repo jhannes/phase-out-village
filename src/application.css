@@ -5,3 +5,35 @@
 td {
   text-align: center;
 }
+
+.projected {
+  color: red;
+  font-style: italic;
+}
+
+.field-separator {
+  border-left: .05rem solid black;
+}
+
+.sub-separator {
+  border-right: 1px solid #ddd;
+}
+
+.production-view-toggle-button {
+  margin: 1rem;
+}
+
+.production-view-toggle-button button {
+  background-color: lightgray;
+  color: black;
+  padding: 6px 12px;
+  border: none;
+  margin-right: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.production-view-toggle-button button.active {
+  background-color: #333; /* dark gray */
+  color: white;
+}
