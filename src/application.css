@@ -12,7 +12,7 @@ td {
 }
 
 .field-separator {
-  border-left: .05rem solid black;
+  border-left: 0.05rem solid black;
 }
 
 .sub-separator {

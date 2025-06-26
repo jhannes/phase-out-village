@@ -3,9 +3,11 @@ import { OilFieldDataset } from "../types/types";
 
 export function isStillProducing(
   yearlyData: Record<
-    string, { productionOil?: number; productionGas?: number; emission?: number; }
+    string,
+    { productionOil?: number; productionGas?: number; emission?: number }
   >,
-  resourceKey: "productionOil" | "productionGas"): boolean {
+  resourceKey: "productionOil" | "productionGas",
+): boolean {
   const years = Object.keys(yearlyData)
     .map(Number)
     .sort((a, b) => b - a);
@@ -15,9 +17,11 @@ export function isStillProducing(
 
 export function calculateAverage(
   yearlyData: Record<
-    string, { productionOil?: number; productionGas?: number; emission?: number; }
+    string,
+    { productionOil?: number; productionGas?: number; emission?: number }
   >,
-  resourceKey: "productionOil" | "productionGas"): number | null {
+  resourceKey: "productionOil" | "productionGas",
+): number | null {
   const years = Object.keys(yearlyData)
     .map(Number)
     .filter((year) => yearlyData[year]?.[resourceKey] !== undefined)
@@ -53,8 +57,10 @@ export function productionProjections(data: OilFieldDataset): Projection[] {
       projections.push({
         oilFieldName: fieldName,
         year,
-        productionOil: projectedOil !== null ? parseFloat(projectedOil.toFixed(2)) : null,
-        productionGas: projectedGas !== null ? parseFloat(projectedGas.toFixed(2)) : null,
+        productionOil:
+          projectedOil !== null ? parseFloat(projectedOil.toFixed(2)) : null,
+        productionGas:
+          projectedGas !== null ? parseFloat(projectedGas.toFixed(2)) : null,
         emission: null,
       });
 
@@ -72,4 +78,3 @@ export function productionProjections(data: OilFieldDataset): Projection[] {
 
   return projections;
 }
-

@@ -1,4 +1,3 @@
-
 export interface Projection {
   oilFieldName: string;
   year: number;
