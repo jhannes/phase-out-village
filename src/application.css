@@ -37,3 +37,38 @@ td {
   background-color: #333; /* dark gray */
   color: white;
 }
+
+.price-controls {
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.slider-group {
+  margin-bottom: 1rem;
+}
+
+.slider-group label {
+  font-weight: bold;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.income-display {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.income-display ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+}
+
+.income-display canvas {
+  max-width: 100%;
+}

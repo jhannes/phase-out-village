@@ -1,4 +1,4 @@
-import { Projection } from "../types/interface";
+import { Projection, YearlyIncome } from "../types/interface";
 import { OilFieldDataset } from "../types/types";
 
 export function isStillProducing(
@@ -77,4 +77,70 @@ export function productionProjections(data: OilFieldDataset): Projection[] {
   }
 
   return projections;
+}
+
+export function generateCompleteData(data: OilFieldDataset): OilFieldDataset {
+  const projections = productionProjections(data);
+
+  const combined: OilFieldDataset = JSON.parse(JSON.stringify(data));
+
+  for (const proj of projections) {
+    const { oilFieldName, year, productionOil, productionGas, emission } = proj;
+
+    if (!combined[oilFieldName]) {
+      combined[oilFieldName] = {};
+    }
+
+    combined[oilFieldName][year.toString()] = {
+      productionOil:
+        productionOil !== null
+          ? parseFloat(productionOil.toFixed(2))
+          : undefined,
+      productionGas:
+        productionGas !== null
+          ? parseFloat(productionGas.toFixed(2))
+          : undefined,
+      emission: emission !== null ? emission : undefined,
+    };
+  }
+
+  return combined;
+}
+
+export function calculateTotalYearlyIncome(
+  data: OilFieldDataset,
+  oilPrice: number,
+  gasPrice: number,
+): YearlyIncome[] {
+  const yearlyTotals: Record<string, number> = {};
+
+  // https://www.norskpetroleum.no/en/calculator/about-energy-calculator/
+  const OIL_SM3_TO_BARREL = 6289800;
+
+  // https://ngc.equinor.com/
+  const GAS_GSM3_TO_SM3 = 1_000_000_000;
+  const GAS_SM3_TO_MMBTU = 0.037913;
+
+  for (const field of Object.values(data)) {
+    for (const [year, record] of Object.entries(field)) {
+      const oilMillionSm3 = record.productionOil ?? 0;
+      const gasMillionGSm3 = record.productionGas ?? 0;
+
+      const oilIncome = oilMillionSm3 * OIL_SM3_TO_BARREL * oilPrice;
+
+      const gasIncome =
+        gasMillionGSm3 * GAS_GSM3_TO_SM3 * GAS_SM3_TO_MMBTU * gasPrice;
+
+      const totalIncome = oilIncome + gasIncome;
+
+      yearlyTotals[year] = (yearlyTotals[year] ?? 0) + totalIncome;
+    }
+  }
+
+  return Object.entries(yearlyTotals)
+    .sort(([a], [b]) => Number(a) - Number(b))
+    .map(([year, income]) => ({
+      year,
+      totalIncome: parseFloat(income.toFixed(2)),
+    }));
 }

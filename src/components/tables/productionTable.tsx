@@ -22,6 +22,7 @@ export function ProductionTable() {
 
   return (
     <div>
+      <h2>Årlige produksjonstall</h2>
       <div className="production-view-toggle-button">
         <button
           className={view === "oil" ? "active" : ""}
