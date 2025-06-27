@@ -130,11 +130,16 @@ export function calculateTotalYearlyIncome(
 
       const oilMillionSm3 = record.productionOil ?? 0;
       const gasMillionGSm3 = record.productionGas ?? 0;
+      const priceMultiplier = Number(year) > 2022 ? 1 : 0;
 
-      const oilIncome = oilMillionSm3 * OIL_SM3_TO_BARREL * oilPrice;
+      const oilIncome =
+        oilMillionSm3 * OIL_SM3_TO_BARREL * (priceMultiplier ? oilPrice : 80);
 
       const gasIncome =
-        gasMillionGSm3 * GAS_GSM3_TO_SM3 * GAS_SM3_TO_MMBTU * gasPrice;
+        gasMillionGSm3 *
+        GAS_GSM3_TO_SM3 *
+        GAS_SM3_TO_MMBTU *
+        (priceMultiplier ? gasPrice : 50);
 
       const totalIncome = oilIncome + gasIncome;
 

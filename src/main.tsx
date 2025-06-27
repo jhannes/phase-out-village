@@ -64,12 +64,12 @@ function MainApp() {
           onPriceUpdate={handlePriceUpdate}
         />
         <div className="income-display">
-          <YearlyIncomeList data={incomeByYear} />
           <ShutdownControls
             data={fullData}
             shutdowns={shutdowns}
             onShutdownChange={handleShutdownChange}
           />
+          <YearlyIncomeList data={incomeByYear} />
           <IncomeChart data={incomeByYear} />
         </div>
       </div>

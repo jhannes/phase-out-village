@@ -12,7 +12,6 @@ import {
 import { Line } from "react-chartjs-2";
 import { YearlyIncome } from "../../types/interface";
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,

@@ -1,6 +1,5 @@
 import { ShutdownControlsProps } from "../../types/interface";
 import React from "react";
-import { ShutdownMap } from "../../types/types";
 
 export function ShutdownControls({
   data,
@@ -9,7 +8,7 @@ export function ShutdownControls({
 }: ShutdownControlsProps) {
   return (
     <div className="shutdown-controls">
-      <h2>Velge hvilke år oljefeltene skal stenge</h2>
+      <h3>Velge hvilke år oljefeltene skal stenge</h3>
       {Object.keys(data).map((fieldName) => (
         <div key={fieldName} className="shutdown-row">
           <label>{fieldName}</label>
