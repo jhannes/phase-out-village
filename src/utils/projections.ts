@@ -1,5 +1,5 @@
 import { Projection, YearlyIncome } from "../types/interface";
-import { OilFieldDataset } from "../types/types";
+import { OilFieldDataset, ShutdownMap } from "../types/types";
 
 export function isStillProducing(
   yearlyData: Record<
@@ -111,6 +111,7 @@ export function calculateTotalYearlyIncome(
   data: OilFieldDataset,
   oilPrice: number,
   gasPrice: number,
+  shutdowns: ShutdownMap,
 ): YearlyIncome[] {
   const yearlyTotals: Record<string, number> = {};
 
@@ -121,8 +122,12 @@ export function calculateTotalYearlyIncome(
   const GAS_GSM3_TO_SM3 = 1_000_000_000;
   const GAS_SM3_TO_MMBTU = 0.037913;
 
-  for (const field of Object.values(data)) {
+  for (const [fieldName, field] of Object.entries(data)) {
+    const shutdownYear = shutdowns[fieldName] ?? 2040;
+
     for (const [year, record] of Object.entries(field)) {
+      if (parseInt(year) > shutdownYear) continue;
+
       const oilMillionSm3 = record.productionOil ?? 0;
       const gasMillionGSm3 = record.productionGas ?? 0;
 

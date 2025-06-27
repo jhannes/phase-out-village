@@ -5,3 +5,5 @@ export type OilFieldDataset = Record<
     { productionOil?: number; productionGas?: number; emission?: number }
   >
 >;
+
+export type ShutdownMap = Record<string, number>;

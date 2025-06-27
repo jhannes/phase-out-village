@@ -1,3 +1,5 @@
+import { OilFieldDataset, ShutdownMap } from "./types";
+
 export interface Projection {
   oilFieldName: string;
   year: number;
@@ -15,4 +17,10 @@ export interface PriceControlsProps {
 export interface YearlyIncome {
   year: string;
   totalIncome: number;
+}
+
+export interface ShutdownControlsProps {
+  data: OilFieldDataset;
+  shutdowns: ShutdownMap;
+  onShutdownChange: (fieldName: string, year: number) => void;
 }

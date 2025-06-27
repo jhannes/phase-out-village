@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { createRoot } from "react-dom/client";
 
 import "./application.css";
@@ -13,17 +13,40 @@ import {
   generateCompleteData,
 } from "./utils/projections";
 import { IncomeChart } from "./components/charts/yearlyIncomeChart";
+import { ShutdownMap } from "./types/types";
+import { ShutdownControls } from "./components/controls/shutdownControls";
+import { YearlyIncomeList } from "./components/lists/yearlyIncomeList";
 
 function MainApp() {
   const [price, setPrice] = useState({ oil: 80, gas: 50 });
   const [incomeByYear, setIncomeByYear] = useState<YearlyIncome[]>([]);
+  const [shutdowns, setShutdowns] = useState<ShutdownMap>({});
 
-  const fullData = generateCompleteData(data);
+  const fullData = useMemo(() => generateCompleteData(data), [data]);
 
   const handlePriceUpdate = () => {
-    const income = calculateTotalYearlyIncome(fullData, price.oil, price.gas);
+    const income = calculateTotalYearlyIncome(
+      fullData,
+      price.oil,
+      price.gas,
+      shutdowns,
+    );
     setIncomeByYear(income);
   };
+
+  function handleShutdownChange(fieldName: string, year: number) {
+    setShutdowns((prev) => {
+      const updated = { ...prev, [fieldName]: year };
+      const income = calculateTotalYearlyIncome(
+        fullData,
+        price.oil,
+        price.gas,
+        updated,
+      );
+      setIncomeByYear(income);
+      return updated;
+    });
+  }
 
   useEffect(() => {
     handlePriceUpdate();
@@ -34,21 +57,19 @@ function MainApp() {
       <h1>Chill, baby! Chill!</h1>
       <OilFieldMap />
       <div>
-        <h1>Inntektsberegning</h1>
+        <h2>Inntektsberegning</h2>
         <PriceControls
           price={price}
           setPrice={setPrice}
           onPriceUpdate={handlePriceUpdate}
         />
         <div className="income-display">
-          <ul>
-            <h3>Total inntekt</h3>
-            {incomeByYear.map(({ year, totalIncome }) => (
-              <li key={year}>
-                {year}: ${totalIncome.toLocaleString("en-US")}
-              </li>
-            ))}
-          </ul>
+          <YearlyIncomeList data={incomeByYear} />
+          <ShutdownControls
+            data={fullData}
+            shutdowns={shutdowns}
+            onShutdownChange={handleShutdownChange}
+          />
           <IncomeChart data={incomeByYear} />
         </div>
       </div>

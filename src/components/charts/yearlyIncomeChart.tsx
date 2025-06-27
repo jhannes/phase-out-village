@@ -54,6 +54,11 @@ export function IncomeChart({ data }: IncomeChartProps) {
       },
     },
     scales: {
+      // if chart should start earlier, change the min value
+      x: {
+        min: "2015",
+        max: "2040",
+      },
       y: {
         beginAtZero: true,
         min: 0,
