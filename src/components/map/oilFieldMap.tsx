@@ -17,7 +17,7 @@ const map = new Map({
     new TileLayer({ source: new OSM() }),
     new VectorLayer({
       source: new VectorSource({
-        url: "/geojson/oilfields.geojson",
+        url: "/phase-out-village/geojson/oilfields.geojson",
         format: new GeoJSON(),
       }),
       style: (f) =>
