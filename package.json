@@ -10,6 +10,7 @@
     "data": "npm run data:download && npm run data:process",
     "test": "tsc --noEmit && prettier --check .",
     "prepare": "husky"
+    "build": "vite build"
   },
   "keywords": [],
   "author": "",
@@ -19,15 +20,12 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "download-cli": "^1.1.1",
-    "husky": "^9.1.7",
-    "prettier": "^3.6.1",
-    "tsx": "^4.19.4",
-    "typescript": "^5.8.3",
-    "vite": "^7.0.0"
+    "husky": "^9.1.7"
   },
   "dependencies": {
     "chart.js": "^4.5.0",
     "ol": "^10.6.1",
+    "ol": "^10.5.0",
     "react": "^19.1.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.1.0"
