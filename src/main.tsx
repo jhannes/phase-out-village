@@ -13,6 +13,7 @@ import {
   generateCompleteData,
 } from "./utils/projections";
 import { IncomeChart } from "./components/charts/yearlyIncomeChart";
+import TestPage from "./pages/TestPage/TestPage";
 
 function MainApp() {
   const [price, setPrice] = useState({ oil: 80, gas: 50 });

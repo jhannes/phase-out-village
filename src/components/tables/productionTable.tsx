@@ -64,7 +64,7 @@ export function ProductionTable() {
                 const emission = raw?.emission ?? proj?.emission ?? "-";
 
                 return (
-                  <>
+                  <React.Fragment key={field}>
                     <td
                       className={`${idx > 0 ? "field-separator" : ""} sub-separator ${
                         Number(year) >= 2023 &&
@@ -80,7 +80,7 @@ export function ProductionTable() {
                     >
                       {production}
                     </td>
-                  </>
+                  </React.Fragment>
                 );
               })}
             </tr>
