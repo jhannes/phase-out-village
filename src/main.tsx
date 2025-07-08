@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { createRoot } from "react-dom/client";
 
 import "./application.css";
@@ -7,26 +7,66 @@ import { OilFieldMap } from "./components/map/oilFieldMap";
 import { useState } from "react";
 import { data } from "./generated/data";
 import { PriceControls } from "./components/sliders/priceControlSliders";
-import { YearlyIncome } from "./types/interface";
 import {
+  EmissionIntensity,
+  YearlyEmission,
+  YearlyIncome,
+} from "./types/interface";
+import {
+  calculateTotalYearlyEmission,
   calculateTotalYearlyIncome,
+  extractEmissionIntensities,
   generateCompleteData,
 } from "./utils/projections";
 import { IncomeChart } from "./components/charts/yearlyIncomeChart";
+import { ShutdownMap } from "./types/types";
+import { ShutdownControls } from "./components/controls/shutdownControls";
+import { YearlyIncomeList } from "./components/lists/yearlyIncomeList";
+import { YearlyEmissionChart } from "./components/charts/yearlyEmissionChart";
+import { EmissionIntensityChart } from "./components/charts/emissionIntensityYear";
+import { EmissionEfficiencyScatterChart } from "./components/charts/emissionEfficiencyScatter";
 
 function MainApp() {
   const [price, setPrice] = useState({ oil: 80, gas: 50 });
   const [incomeByYear, setIncomeByYear] = useState<YearlyIncome[]>([]);
+  const [shutdowns, setShutdowns] = useState<ShutdownMap>({});
+  const [emission, setEmission] = useState<YearlyEmission[]>([]);
+  const [intensityData, setIntensityData] = useState<EmissionIntensity[]>([]);
+  const [selectedYear, setSelectedYear] = useState<number>(2023);
 
-  const fullData = generateCompleteData(data);
+  const fullData = useMemo(() => generateCompleteData(data), [data]);
 
   const handlePriceUpdate = () => {
-    const income = calculateTotalYearlyIncome(fullData, price.oil, price.gas);
+    const income = calculateTotalYearlyIncome(
+      fullData,
+      price.oil,
+      price.gas,
+      shutdowns,
+    );
     setIncomeByYear(income);
   };
 
+  function handleShutdownChange(fieldName: string, year: number) {
+    setShutdowns((prev) => {
+      const updated = { ...prev, [fieldName]: year };
+      const income = calculateTotalYearlyIncome(
+        fullData,
+        price.oil,
+        price.gas,
+        updated,
+      );
+      const newEmission = calculateTotalYearlyEmission(fullData, updated);
+      setIncomeByYear(income);
+      setEmission(newEmission);
+
+      return updated;
+    });
+  }
+
   useEffect(() => {
     handlePriceUpdate();
+    setEmission(calculateTotalYearlyEmission(fullData, shutdowns));
+    setIntensityData(extractEmissionIntensities(fullData));
   }, []);
 
   return (
@@ -34,25 +74,30 @@ function MainApp() {
       <h1>Chill, baby! Chill!</h1>
       <OilFieldMap />
       <div>
-        <h1>Inntektsberegning</h1>
+        <h2>Inntektsberegning</h2>
         <PriceControls
           price={price}
           setPrice={setPrice}
           onPriceUpdate={handlePriceUpdate}
         />
         <div className="income-display">
-          <ul>
-            <h3>Total inntekt</h3>
-            {incomeByYear.map(({ year, totalIncome }) => (
-              <li key={year}>
-                {year}: ${totalIncome.toLocaleString("en-US")}
-              </li>
-            ))}
-          </ul>
-          <IncomeChart data={incomeByYear} />
+          <ShutdownControls
+            data={fullData}
+            shutdowns={shutdowns}
+            onShutdownChange={handleShutdownChange}
+          />
+          {/*<IncomeChart data={incomeByYear} />*/}
+          {/*<YearlyIncomeList data={incomeByYear} /> */}
+          <YearlyEmissionChart data={emission} />
+        </div>
+        <div className="totalEmission-chart">
+          <EmissionIntensityChart data={intensityData} />
+        </div>
+        <div className="emission-scatterChart">
+          <EmissionEfficiencyScatterChart data={intensityData} />
         </div>
       </div>
-      <ProductionTable />
+      {/*<ProductionTable /> */}
     </div>
   );
 }

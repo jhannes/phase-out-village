@@ -8,7 +8,12 @@ const result: Record<
   string,
   Record<
     number,
-    { productionOil?: number; productionGas?: number; emission?: number }
+    {
+      productionOil?: number;
+      productionGas?: number;
+      emission?: number;
+      emissionIntensity?: number;
+    }
   >
 > = {};
 
@@ -20,8 +25,15 @@ for (const [
   productionGas,
   _,
   emission,
+  _2,
+  emissionIntensity,
 ] of rows) {
-  const dataPoint = { productionOil, productionGas, emission };
+  const dataPoint = {
+    productionOil,
+    productionGas,
+    emission,
+    emissionIntensity,
+  };
   for (const k of Object.keys(dataPoint)) {
     if (!(dataPoint as any)[k]) delete (dataPoint as any)[k];
   }
@@ -39,6 +51,6 @@ const compactJson = JSON.stringify(result, null, 2).replace(
 );
 
 console.log(
-  "export const data: Record<string, Record<string, { productionOil?: number; productionGas?: number; emission?: number }>> = " +
+  "export const data: Record<string, Record<string, { productionOil?: number; productionGas?: number; emission?: number; emissionIntensity?: number; }>> = " +
     compactJson,
 );
