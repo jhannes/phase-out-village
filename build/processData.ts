@@ -1,4 +1,6 @@
-import data from "../tmp/data.json";
+import fs from "fs";
+
+const data = JSON.parse(fs.readFileSync("tmp/data.json") as any);
 
 const [firstHeader, secondHeader, ...rows] = data as (number | string)[][];
 

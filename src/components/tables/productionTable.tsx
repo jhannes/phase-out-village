@@ -64,23 +64,22 @@ export function ProductionTable() {
                 const emission = raw?.emission ?? proj?.emission ?? "-";
 
                 return (
-                  <>
-                    <td
-                      className={`${idx > 0 ? "field-separator" : ""} sub-separator ${
-                        Number(year) >= 2023 &&
-                        raw?.[
-                          view === "oil" ? "productionOil" : "productionGas"
-                        ] === undefined &&
-                        proj?.[
-                          view === "oil" ? "productionOil" : "productionGas"
-                        ] !== null
-                          ? "projected"
-                          : ""
-                      }`}
-                    >
-                      {production}
-                    </td>
-                  </>
+                  <td
+                    key={field}
+                    className={`${idx > 0 ? "field-separator" : ""} sub-separator ${
+                      Number(year) >= 2023 &&
+                      raw?.[
+                        view === "oil" ? "productionOil" : "productionGas"
+                      ] === undefined &&
+                      proj?.[
+                        view === "oil" ? "productionOil" : "productionGas"
+                      ] !== null
+                        ? "projected"
+                        : ""
+                    }`}
+                  >
+                    {production}
+                  </td>
                 );
               })}
             </tr>
