@@ -51,6 +51,14 @@ export function YearlyEmissionChart({ data }: YearlyEmissionProps) {
         display: true,
         text: "Årlig utslipp fra norske oljefelt",
       },
+      tooltip: {
+        callbacks: {
+          label: function (context: any) {
+            const value = context.parsed.y;
+            return `Utslipp: ${value.toLocaleString("nb-NO")} tonn CO₂`;
+          },
+        },
+      },
     },
     scales: {
       // if chart should start earlier, change the min value

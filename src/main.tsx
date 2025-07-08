@@ -7,10 +7,15 @@ import { OilFieldMap } from "./components/map/oilFieldMap";
 import { useState } from "react";
 import { data } from "./generated/data";
 import { PriceControls } from "./components/sliders/priceControlSliders";
-import { YearlyEmission, YearlyIncome } from "./types/interface";
+import {
+  EmissionIntensity,
+  YearlyEmission,
+  YearlyIncome,
+} from "./types/interface";
 import {
   calculateTotalYearlyEmission,
   calculateTotalYearlyIncome,
+  extractEmissionIntensities,
   generateCompleteData,
 } from "./utils/projections";
 import { IncomeChart } from "./components/charts/yearlyIncomeChart";
@@ -18,12 +23,16 @@ import { ShutdownMap } from "./types/types";
 import { ShutdownControls } from "./components/controls/shutdownControls";
 import { YearlyIncomeList } from "./components/lists/yearlyIncomeList";
 import { YearlyEmissionChart } from "./components/charts/yearlyEmissionChart";
+import { EmissionIntensityChart } from "./components/charts/emissionIntensityYear";
+import { EmissionEfficiencyScatterChart } from "./components/charts/emissionEfficiencyScatter";
 
 function MainApp() {
   const [price, setPrice] = useState({ oil: 80, gas: 50 });
   const [incomeByYear, setIncomeByYear] = useState<YearlyIncome[]>([]);
   const [shutdowns, setShutdowns] = useState<ShutdownMap>({});
   const [emission, setEmission] = useState<YearlyEmission[]>([]);
+  const [intensityData, setIntensityData] = useState<EmissionIntensity[]>([]);
+  const [selectedYear, setSelectedYear] = useState<number>(2023);
 
   const fullData = useMemo(() => generateCompleteData(data), [data]);
 
@@ -49,7 +58,7 @@ function MainApp() {
       const newEmission = calculateTotalYearlyEmission(fullData, updated);
       setIncomeByYear(income);
       setEmission(newEmission);
-      console.log(newEmission);
+
       return updated;
     });
   }
@@ -57,6 +66,7 @@ function MainApp() {
   useEffect(() => {
     handlePriceUpdate();
     setEmission(calculateTotalYearlyEmission(fullData, shutdowns));
+    setIntensityData(extractEmissionIntensities(fullData));
   }, []);
 
   return (
@@ -80,8 +90,14 @@ function MainApp() {
           {/*<YearlyIncomeList data={incomeByYear} /> */}
           <YearlyEmissionChart data={emission} />
         </div>
+        <div className="totalEmission-chart">
+          <EmissionIntensityChart data={intensityData} />
+        </div>
+        <div className="emission-scatterChart">
+          <EmissionEfficiencyScatterChart data={intensityData} />
+        </div>
       </div>
-      <ProductionTable />
+      {/*<ProductionTable /> */}
     </div>
   );
 }

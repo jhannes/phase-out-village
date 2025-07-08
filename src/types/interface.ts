@@ -6,6 +6,7 @@ export interface Projection {
   productionOil: number | null;
   productionGas: number | null;
   emission: number | null;
+  emissionIntensity: number | null;
 }
 
 export interface PriceControlsProps {
@@ -22,6 +23,13 @@ export interface YearlyIncome {
 export interface YearlyEmission {
   year: string;
   totalEmission: number;
+}
+
+export interface EmissionIntensity {
+  fieldName: string;
+  year: number;
+  totalProduction: number;
+  emissionIntensity: number;
 }
 
 export interface ShutdownControlsProps {
