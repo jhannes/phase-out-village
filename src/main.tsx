@@ -1,61 +1,29 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
-
 import "./application.css";
-import { ProductionTable } from "./components/tables/productionTable";
-import { OilFieldMap } from "./components/map/oilFieldMap";
-import { useState } from "react";
-import { data } from "./generated/data";
-import { PriceControls } from "./components/sliders/priceControlSliders";
-import { YearlyIncome } from "./types/interface";
-import {
-  calculateTotalYearlyIncome,
-  generateCompleteData,
-} from "./utils/projections";
-import { IncomeChart } from "./components/charts/yearlyIncomeChart";
-import TestPage from "./pages/TestPage/TestPage";
+import { createRouter, RouterProvider } from "@tanstack/react-router";
+// Import the generated route tree
+import { routeTree } from "./routeTree.gen";
 
-function MainApp() {
-  const [price, setPrice] = useState({ oil: 80, gas: 50 });
-  const [incomeByYear, setIncomeByYear] = useState<YearlyIncome[]>([]);
+// Set up a Router instance
+const router = createRouter({
+  routeTree,
+  basepath: "/phase-out-village",
+});
 
-  const fullData = generateCompleteData(data);
-
-  const handlePriceUpdate = () => {
-    const income = calculateTotalYearlyIncome(fullData, price.oil, price.gas);
-    setIncomeByYear(income);
-  };
-
-  useEffect(() => {
-    handlePriceUpdate();
-  }, []);
-
-  return (
-    <div>
-      <h1>Chill, baby! Chill!</h1>
-      <OilFieldMap />
-      <div>
-        <h1>Inntektsberegning</h1>
-        <PriceControls
-          price={price}
-          setPrice={setPrice}
-          onPriceUpdate={handlePriceUpdate}
-        />
-        <div className="income-display">
-          <ul>
-            <h3>Total inntekt</h3>
-            {incomeByYear.map(({ year, totalIncome }) => (
-              <li key={year}>
-                {year}: ${totalIncome.toLocaleString("en-US")}
-              </li>
-            ))}
-          </ul>
-          <IncomeChart data={incomeByYear} />
-        </div>
-      </div>
-      <ProductionTable />
-    </div>
-  );
+// Register the router instance for type safety
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
+  }
 }
 
-createRoot(document.getElementById("app")!).render(<MainApp />);
+const rootElement = document.getElementById("app")!;
+if (!rootElement.innerHTML) {
+  const root = createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <RouterProvider router={router} />
+    </React.StrictMode>
+  );
+}
