@@ -7,8 +7,9 @@ import { OilFieldMap } from "./components/map/oilFieldMap";
 import { useState } from "react";
 import { data } from "./generated/data";
 import { PriceControls } from "./components/sliders/priceControlSliders";
-import { YearlyIncome } from "./types/interface";
+import { YearlyEmission, YearlyIncome } from "./types/interface";
 import {
+  calculateTotalYearlyEmission,
   calculateTotalYearlyIncome,
   generateCompleteData,
 } from "./utils/projections";
@@ -16,11 +17,13 @@ import { IncomeChart } from "./components/charts/yearlyIncomeChart";
 import { ShutdownMap } from "./types/types";
 import { ShutdownControls } from "./components/controls/shutdownControls";
 import { YearlyIncomeList } from "./components/lists/yearlyIncomeList";
+import { YearlyEmissionChart } from "./components/charts/yearlyEmissionChart";
 
 function MainApp() {
   const [price, setPrice] = useState({ oil: 80, gas: 50 });
   const [incomeByYear, setIncomeByYear] = useState<YearlyIncome[]>([]);
   const [shutdowns, setShutdowns] = useState<ShutdownMap>({});
+  const [emission, setEmission] = useState<YearlyEmission[]>([]);
 
   const fullData = useMemo(() => generateCompleteData(data), [data]);
 
@@ -43,13 +46,17 @@ function MainApp() {
         price.gas,
         updated,
       );
+      const newEmission = calculateTotalYearlyEmission(fullData, updated);
       setIncomeByYear(income);
+      setEmission(newEmission);
+      console.log(newEmission);
       return updated;
     });
   }
 
   useEffect(() => {
     handlePriceUpdate();
+    setEmission(calculateTotalYearlyEmission(fullData, shutdowns));
   }, []);
 
   return (
@@ -69,8 +76,9 @@ function MainApp() {
             shutdowns={shutdowns}
             onShutdownChange={handleShutdownChange}
           />
-          <YearlyIncomeList data={incomeByYear} />
-          <IncomeChart data={incomeByYear} />
+          {/*<IncomeChart data={incomeByYear} />*/}
+          {/*<YearlyIncomeList data={incomeByYear} /> */}
+          <YearlyEmissionChart data={emission} />
         </div>
       </div>
       <ProductionTable />

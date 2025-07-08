@@ -19,6 +19,11 @@ export interface YearlyIncome {
   totalIncome: number;
 }
 
+export interface YearlyEmission {
+  year: string;
+  totalEmission: number;
+}
+
 export interface ShutdownControlsProps {
   data: OilFieldDataset;
   shutdowns: ShutdownMap;

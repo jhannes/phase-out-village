@@ -1,4 +1,4 @@
-import { Projection, YearlyIncome } from "../types/interface";
+import { Projection, YearlyEmission, YearlyIncome } from "../types/interface";
 import { OilFieldDataset, ShutdownMap } from "../types/types";
 
 export function isStillProducing(
@@ -20,7 +20,7 @@ export function calculateAverage(
     string,
     { productionOil?: number; productionGas?: number; emission?: number }
   >,
-  resourceKey: "productionOil" | "productionGas",
+  resourceKey: "productionOil" | "productionGas" | "emission",
 ): number | null {
   const years = Object.keys(yearlyData)
     .map(Number)
@@ -41,16 +41,21 @@ export function productionProjections(data: OilFieldDataset): Projection[] {
   const projectionStart = 2023;
   const projectionEnd = 2040;
   const annualDeclineRate = 0.1;
+  const constantIncrease = 0.03;
 
   for (const [fieldName, yearlyData] of Object.entries(data)) {
     const oilActive = isStillProducing(yearlyData, "productionOil");
     const gasActive = isStillProducing(yearlyData, "productionGas");
+    const shouldProjectEmission = oilActive || gasActive;
 
     let projectedOil = oilActive
       ? calculateAverage(yearlyData, "productionOil")
       : null;
     let projectedGas = gasActive
       ? calculateAverage(yearlyData, "productionGas")
+      : null;
+    let projectedEmission = shouldProjectEmission
+      ? calculateAverage(yearlyData, "emission")
       : null;
 
     for (let year = projectionStart; year <= projectionEnd; year++) {
@@ -61,7 +66,10 @@ export function productionProjections(data: OilFieldDataset): Projection[] {
           projectedOil !== null ? parseFloat(projectedOil.toFixed(2)) : null,
         productionGas:
           projectedGas !== null ? parseFloat(projectedGas.toFixed(2)) : null,
-        emission: null,
+        emission:
+          projectedEmission !== null
+            ? parseFloat(projectedEmission.toFixed(2))
+            : null,
       });
 
       if (projectedOil !== null) {
@@ -72,6 +80,11 @@ export function productionProjections(data: OilFieldDataset): Projection[] {
       if (projectedGas !== null) {
         projectedGas *= 1 - annualDeclineRate;
         if (projectedGas < 0.01) projectedGas = 0;
+      }
+
+      if (projectedEmission !== null) {
+        projectedEmission *= 1 + constantIncrease;
+        if (projectedEmission < 0.01) projectedEmission = 0;
       }
     }
   }
@@ -100,7 +113,7 @@ export function generateCompleteData(data: OilFieldDataset): OilFieldDataset {
         productionGas !== null
           ? parseFloat(productionGas.toFixed(2))
           : undefined,
-      emission: emission !== null ? emission : undefined,
+      emission: emission !== null ? parseFloat(emission.toFixed(2)) : undefined,
     };
   }
 
@@ -152,5 +165,30 @@ export function calculateTotalYearlyIncome(
     .map(([year, income]) => ({
       year,
       totalIncome: parseFloat(income.toFixed(2)),
+    }));
+}
+
+export function calculateTotalYearlyEmission(
+  data: OilFieldDataset,
+  shutdowns: ShutdownMap,
+): YearlyEmission[] {
+  const yearlyTotals: Record<string, number> = {};
+
+  for (const [fieldname, field] of Object.entries(data)) {
+    const shutdownYear = shutdowns[fieldname] ?? 2040;
+
+    for (const [year, record] of Object.entries(field)) {
+      if (parseInt(year) > shutdownYear) continue;
+
+      const emission = record.emission ?? 0;
+      yearlyTotals[year] = (yearlyTotals[year] ?? 0) + emission;
+    }
+  }
+
+  return Object.entries(yearlyTotals)
+    .sort(([a], [b]) => Number(a) - Number(b))
+    .map(([year, emission]) => ({
+      year,
+      totalEmission: parseFloat(emission.toFixed(2)),
     }));
 }

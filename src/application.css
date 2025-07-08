@@ -34,7 +34,7 @@ td {
 }
 
 .production-view-toggle-button button.active {
-  background-color: #333; /* dark gray */
+  background-color: #333;
   color: white;
 }
 
@@ -57,7 +57,7 @@ td {
 
 .income-display {
   display: grid;
-  grid-template-columns: 1fr 1fr 3fr;
+  grid-template-columns: 1fr 3fr 1fr;
   gap: 1rem;
   align-items: start;
 }
