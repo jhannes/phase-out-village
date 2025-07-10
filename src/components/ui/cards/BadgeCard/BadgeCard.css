@@ -15,31 +15,40 @@
   --text-color-info: #0000ff;
 }
 
+.badge-card-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 1rem;
+  min-width: 0;
+}
+
 .badge-card {
   width: 200px;
-  height: 300px;
+  height: auto;
+  aspect-ratio: 1 / 1;
   border-radius: 10px;
   background-color: var(--bg-color-primary);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 20px;
-  border: 5px solid var(--bg-color-primary);
-  padding: 9px;
+  /* max-width: 300px; */
+  margin: 0;
 }
 
 .badge-card img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  border-radius: inherit;
 }
 
 .badge-card-content {
   text-align: center;
 }
 
-.badge-card-content h2 {
+.badge-card-content h3 {
   font-size: 1.5rem;
   margin-bottom: 10px;
 }
@@ -49,10 +58,29 @@
   color: var(--color-text-secondary);
 }
 
+/* @media (min-width: 900px) { */
+/*   .badge-card-list { */
+/*     grid-template-columns: repeat(3, 1fr); */
+/*   } */
+/* } */
+
 @media (max-width: 768px) {
   .badge-card {
     width: 100%;
-    height: auto;
-    margin: 10px;
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
+    margin: 10px auto;
+  }
+}
+
+@media (min-width: 600px) {
+  .badge-card-list {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .badge-card-list {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 }

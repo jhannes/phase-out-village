@@ -54,7 +54,7 @@ const badgeData = [
 
 const TestPage = () => {
   return (
-    <div className="container">
+    <div className="badge-card-list">
       {badgeData.map((badge, idx) => (
         <BadgeCard
           key={idx}
