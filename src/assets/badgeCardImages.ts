@@ -5,7 +5,17 @@ import img4 from "./badge-images/004-badge-image.png";
 import img5 from "./badge-images/005-badge-image.png";
 import img6 from "./badge-images/006-badge-image.png";
 import img7 from "./badge-images/007-badge-image.png";
+import img8 from "./badge-images/008-badge-image.png";
 
-const badgeCardImages: string[] = [img1, img2, img3, img4, img5, img6, img7];
+const badgeCardImages: string[] = [
+  img1,
+  img2,
+  img3,
+  img4,
+  img5,
+  img6,
+  img7,
+  img8,
+];
 
 export default badgeCardImages;

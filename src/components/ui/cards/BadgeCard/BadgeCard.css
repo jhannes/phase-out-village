@@ -1,6 +1,18 @@
+/* TODO: Move color variables to a separate file */
 :root {
   --bg-color-primary: #f0f0f0;
   --bg-color-secondary: #e0e0e0;
+  --bg-color-warning: #ff0000;
+  --bg-color-success: #00ff00;
+  --bg-color-error: #ff0000;
+  --bg-color-info: #0000ff;
+  --bg-color-secondary: #e0e0e0;
+  --text-color-primary: #000000;
+  --text-color-secondary: #ffffff;
+  --text-color-warning: #ff0000;
+  --text-color-success: #00ff00;
+  --text-color-error: #ff0000;
+  --text-color-info: #0000ff;
 }
 
 .badge-card {
@@ -20,7 +32,7 @@
 .badge-card img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .badge-card-content {

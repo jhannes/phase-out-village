@@ -1,6 +1,7 @@
 import React from "react";
 import BadgeCard from "../../components/ui/cards/BadgeCard/BadgeCard";
 import badgeCardImages from "../../assets/badgeCardImages";
+import "./TestPage.css";
 
 type BadgeCardProps = {
   image: string;
@@ -53,7 +54,7 @@ const badgeData = [
 
 const TestPage = () => {
   return (
-    <div>
+    <div className="container">
       {badgeData.map((badge, idx) => (
         <BadgeCard
           key={idx}
