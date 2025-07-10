@@ -1,105 +1,28 @@
-import React, { useEffect, useMemo } from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
-
+import { createRouter, RouterProvider } from "@tanstack/react-router";
+// Import the generated route tree
+import { routeTree } from "./routeTree.gen";
 import "./application.css";
-import { ProductionTable } from "./components/tables/productionTable";
-import { OilFieldMap } from "./components/map/oilFieldMap";
-import { useState } from "react";
-import { data } from "./generated/data";
-import { PriceControls } from "./components/sliders/priceControlSliders";
-import {
-  EmissionIntensity,
-  YearlyEmission,
-  YearlyIncome,
-} from "./types/interface";
-import {
-  calculateTotalYearlyEmission,
-  calculateTotalYearlyIncome,
-  extractEmissionIntensities,
-  generateCompleteData,
-} from "./utils/projections";
-import { IncomeChart } from "./components/charts/yearlyIncomeChart";
-import { ShutdownMap } from "./types/types";
-import { ShutdownControls } from "./components/controls/shutdownControls";
-import { YearlyIncomeList } from "./components/lists/yearlyIncomeList";
-import { YearlyEmissionChart } from "./components/charts/yearlyEmissionChart";
-import { EmissionIntensityChart } from "./components/charts/emissionIntensityYear";
-import { EmissionEfficiencyScatterChart } from "./components/charts/emissionEfficiencyScatter";
 
-function MainApp() {
-  const [price, setPrice] = useState({ oil: 80, gas: 50 });
-  const [incomeByYear, setIncomeByYear] = useState<YearlyIncome[]>([]);
-  const [shutdowns, setShutdowns] = useState<ShutdownMap>({});
-  const [emission, setEmission] = useState<YearlyEmission[]>([]);
-  const [intensityData, setIntensityData] = useState<EmissionIntensity[]>([]);
-  const [selectedYear, setSelectedYear] = useState<number>(2023);
-
-  const fullData = useMemo(() => generateCompleteData(data), [data]);
-
-  const handlePriceUpdate = () => {
-    const income = calculateTotalYearlyIncome(
-      fullData,
-      price.oil,
-      price.gas,
-      shutdowns,
-    );
-    setIncomeByYear(income);
-  };
-
-  function handleShutdownChange(fieldName: string, year: number) {
-    setShutdowns((prev) => {
-      const updated = { ...prev, [fieldName]: year };
-      const income = calculateTotalYearlyIncome(
-        fullData,
-        price.oil,
-        price.gas,
-        updated,
-      );
-      const newEmission = calculateTotalYearlyEmission(fullData, updated);
-      setIncomeByYear(income);
-      setEmission(newEmission);
-
-      return updated;
-    });
+// Register the router instance for type safety
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
   }
-
-  useEffect(() => {
-    handlePriceUpdate();
-    setEmission(calculateTotalYearlyEmission(fullData, shutdowns));
-    setIntensityData(extractEmissionIntensities(fullData));
-  }, []);
-
-  return (
-    <div>
-      <h1>Chill, baby! Chill!</h1>
-      <OilFieldMap />
-      <div>
-        <h2>Inntektsberegning</h2>
-        <PriceControls
-          price={price}
-          setPrice={setPrice}
-          onPriceUpdate={handlePriceUpdate}
-        />
-        <div className="income-display">
-          <ShutdownControls
-            data={fullData}
-            shutdowns={shutdowns}
-            onShutdownChange={handleShutdownChange}
-          />
-          {/*<IncomeChart data={incomeByYear} />*/}
-          {/*<YearlyIncomeList data={incomeByYear} /> */}
-          <YearlyEmissionChart data={emission} />
-        </div>
-        <div className="totalEmission-chart">
-          <EmissionIntensityChart data={intensityData} />
-        </div>
-        <div className="emission-scatterChart">
-          <EmissionEfficiencyScatterChart data={intensityData} />
-        </div>
-      </div>
-      {/*<ProductionTable /> */}
-    </div>
-  );
 }
 
-createRoot(document.getElementById("app")!).render(<MainApp />);
+const router = createRouter({
+  routeTree,
+  basepath: "/phase-out-village",
+});
+
+const rootElement = document.getElementById("app")!;
+if (!rootElement.innerHTML) {
+  const root = createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <RouterProvider router={router} />
+    </React.StrictMode>
+  );
+}

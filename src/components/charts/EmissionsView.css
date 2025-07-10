@@ -1,0 +1,105 @@
+.emissions-view {
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.emissions-title {
+  color: #1f2937;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.emissions-chart {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.chart-header h3 {
+  color: #374151;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.chart-bars {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 250px;
+  padding: 10px 0;
+}
+
+.chart-bar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+
+.chart-bar {
+  width: 40px;
+  background: #ef4444;
+  border-radius: 4px 4px 0 0;
+  margin-bottom: 5px;
+  transition: all 0.3s ease;
+}
+
+.chart-value {
+  font-size: 12px;
+  font-weight: bold;
+  color: #374151;
+  margin-bottom: 5px;
+}
+
+.chart-label {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.emissions-fields {
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.emissions-fields h3 {
+  color: #374151;
+  margin-bottom: 15px;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.field-item {
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  border-left: 4px solid #ef4444;
+}
+
+.field-item.closed {
+  border-left-color: #10b981;
+  background: #f0fdf4;
+}
+
+.field-name {
+  font-size: 12px;
+  font-weight: bold;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.field-emission {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.field-item.closed .field-emission {
+  color: #059669;
+}

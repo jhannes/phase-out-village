@@ -1,0 +1,411 @@
+:root {
+  --modal-bg: #fff;
+  --modal-text: #222;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --modal-bg: #18181b;
+    --modal-text: #f3f4f6;
+  }
+}
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  display: flex; /* Make container a flex container */
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center items horizontally */
+  gap: 20px; /* Space between main sections */
+}
+
+.header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%; /* Take full width within its flex context */
+  max-width: 900px; /* Max width as seen in screenshot */
+  /* Remove margin-bottom here as container's gap will handle spacing */
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px; /* Keep this for spacing within header */
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1e40af;
+}
+
+.year-badge {
+  font-size: 18px;
+  font-weight: bold;
+  color: #d97706;
+}
+
+.progress-bar {
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  height: 24px;
+  margin-bottom: 20px; /* Space after progress bar */
+}
+
+.progress-fill {
+  background: linear-gradient(to right, #4ade80, #16a34a);
+  height: 24px;
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 16px; /* Space before stats grid */
+}
+
+.stat-card {
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+
+.stat-card-green {
+  background-color: #dcfce7;
+}
+
+.stat-card-yellow {
+  background-color: #fef3c7;
+}
+
+.stat-card-blue {
+  background-color: #dbeafe;
+}
+
+.stat-emoji {
+  font-size: 24px;
+}
+
+.stat-value {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.stat-label {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* New: Main content area to hold map/view and dashboard */
+.main-content-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px; /* Space between map/view and dashboard */
+  width: 100%;
+  max-width: 900px; /* Match header width */
+}
+
+.map-container,
+.view-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%; /* Take full width of main-content-area */
+  /* Removed margin-bottom here */
+}
+
+.map-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #374151;
+}
+
+.map-div {
+  height: 400px; /* Changed height to match image */
+  width: 100%;
+  border-radius: 8px;
+  border: 4px solid #bfdbfe;
+  overflow: hidden; /* Ensure content respects border-radius */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Added box shadow */
+}
+
+.map-hint {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%; /* Take full width of main-content-area */
+  /* Removed margin-bottom here */
+}
+
+.dashboard-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-title {
+  font-weight: bold;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.dashboard-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #dc2626;
+}
+
+.dashboard-value-orange {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ea580c;
+}
+
+.dashboard-label {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.achievement-card {
+  background-color: #fef3c7;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px; /* Keep this for spacing from bottom of page if no modal */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 900px; /* Match other content width */
+}
+
+.achievement-title {
+  font-weight: bold;
+  color: #92400e;
+  margin-bottom: 8px;
+}
+
+.achievement-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.achievement-badge {
+  background-color: #fde68a;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #92400e;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 50;
+  filter: none;
+  height: 100vh;
+}
+
+.modal-content {
+  background-color: var(--modal-bg);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  color: var(--modal-text);
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.modal-stats {
+  margin-bottom: 16px;
+}
+
+.modal-stat-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.modal-stat-value {
+  font-weight: bold;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.button-phase-out {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.button-phase-out-enabled {
+  background-color: #ef4444;
+}
+
+.button-phase-out-disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.button-cancel {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.button-ok {
+  width: 100%;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.closed-message {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.closed-emoji {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.closed-text {
+  color: #059669;
+  font-weight: bold;
+}
+
+.closed-subtext {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 4px;
+  margin: 20px auto; /* Center the toggle buttons */
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  max-width: fit-content; /* Make it only as wide as its content */
+}
+
+.view-button {
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.view-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.view-button-active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.view-button-active:hover {
+  background: rgba(
+    255,
+    255,
+    255,
+    0.3
+  ); /* Slightly darker on hover for active */
+  border-color: transparent; /* No border for active */
+}
+
+.game-impact-summary {
+  background: #f0f9ff;
+  border: 1px solid #0ea5e9;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+  width: 100%; /* Take full width of view-container */
+}
+
+.game-impact-summary h3 {
+  color: #0369a1;
+  margin-bottom: 10px;
+}
+
+.game-impact-summary p {
+  color: #0f172a;
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+@media (max-height: 600px) {
+  .modal-content {
+    max-height: 80vh;
+  }
+}

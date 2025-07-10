@@ -9,25 +9,28 @@
     "data:process": "tsx build/processData.ts > src/generated/data.ts",
     "data": "npm run data:download && npm run data:process",
     "test": "tsc --noEmit && prettier --check .",
-    "prepare": "husky",
-    "build": "npm test && vite build"
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@tanstack/router-devtools": "^1.125.6",
+    "@tanstack/router-vite-plugin": "^1.125.6",
     "@types/node": "^24.0.10",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "download-cli": "^1.0.1",
+    "@vitejs/plugin-react": "^4.6.0",
+    "download-cli": "^1.1.1",
     "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "vite": "^7.0.0"
+    "vite": "^7.0.2"
   },
   "dependencies": {
+    "@tanstack/react-router": "^1.126.2",
     "chart.js": "^4.5.0",
     "chartjs": "^0.3.24",
     "chartjs-plugin-annotation": "^3.1.0",
