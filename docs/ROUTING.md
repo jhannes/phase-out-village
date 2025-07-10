@@ -9,23 +9,22 @@ First, you need to install the necessary packages:
 
 ```bash
 npm install @tanstack/react-router
-npm install -D @tanstack/router-vite-plugin
+npm install -D @tanstack/router-vite-plugin @vitejs/plugin-react
 ```
-````
 
 ## 2. Vite Configuration
 
-Next, configure Vite to use the TanStack Router plugin. This plugin automatically generates the route tree based on your file structure.
+Next, configure Vite to use the TanStack Router and React plugins.
 
 **`vite.config.ts`**
 
 ```typescript
 import { defineConfig } from "vite";
-import { tanstackRouter } from "@tanstack/router-vite-plugin";
+import { TanStackRouterVite } from "@tanstack/router-vite-plugin";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  plugins: [react(), tanstackRouter()],
+  plugins: [react(), TanStackRouterVite()],
 });
 ```
 
@@ -38,8 +37,8 @@ src/
   routes/
     __root.tsx
     index.lazy.tsx
-    posts.tsx
-    posts/$postId.tsx
+    about.tsx
+    test.tsx
 ```
 
 ## 4. Creating Routes
@@ -52,6 +51,7 @@ The `__root.tsx` file defines the root layout of your application. All other rou
 
 ```tsx
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import React from "react";
 
 export const Route = createRootRoute({
   component: () => (
@@ -60,11 +60,12 @@ export const Route = createRootRoute({
         <Link to="/" className="&.active:font-bold">
           Home
         </Link>
-        {
-          <Link to="/posts" className="&.active:font-bold">
-            Posts
-          </Link>
-        }
+        <Link to="/about" className="&.active:font-bold">
+          About
+        </Link>
+        <Link to="/test" className="&.active:font-bold">
+          Test
+        </Link>
       </div>
       <hr />
       <Outlet />
@@ -81,39 +82,50 @@ The `index.lazy.tsx` file corresponds to the root URL (`/`). The `.lazy` extensi
 
 ```tsx
 import { createLazyFileRoute } from "@tanstack/react-router";
+import React from "react";
 
 export const Route = createLazyFileRoute("/")({
-  component: () => <div>Hello from the index route!</div>,
-});
-```
-
-### Nested Routes
-
-You can create nested routes by creating subdirectories or using the `.` naming convention. For dynamic routes, use the `$` prefix.
-
-**`src/routes/posts.tsx`**
-
-```tsx
-import { createFileRoute } from "@tanstack/react-router";
-
-export const Route = createFileRoute("/posts")({
-  component: () => <div>Select a post</div>,
-});
-```
-
-**`src/routes/posts/$postId.tsx`**
-
-```tsx
-import { createFileRoute } from "@tanstack/react-router";
-
-export const Route = createFileRoute("/posts/$postId")({
-  component: PostComponent,
+  component: Index,
 });
 
-function PostComponent() {
-  const { postId } = Route.useParams();
-  return <div>Post ID: {postId}</div>;
+function Index() {
+  return (
+    <div className="p-2">
+      <h3>Welcome Home!</h3>
+    </div>
+  );
 }
+```
+
+### Static Routes
+
+Static routes are created by adding files to the `routes` directory. For example, `about.tsx` creates the `/about` route.
+
+**`src/routes/about.tsx`**
+
+```tsx
+import { createFileRoute } from "@tanstack/react-router";
+import React from "react";
+
+export const Route = createFileRoute("/about")({
+  component: About,
+});
+
+function About() {
+  return <div className="p-2">Hello from About!</div>;
+}
+```
+
+**`src/routes/test.tsx`**
+This route imports and renders the `TestPage` component.
+
+```tsx
+import { createFileRoute } from "@tanstack/react-router";
+import TestPage from "../pages/TestPage/TestPage";
+
+export const Route = createFileRoute("/test")({
+  component: TestPage,
+});
 ```
 
 ## 5. Main Application File
@@ -133,6 +145,7 @@ import { routeTree } from "./routeTree.gen";
 // Set up a Router instance
 const router = createRouter({
   routeTree,
+  basepath: "/phase-out-village",
 });
 
 // Register the router instance for type safety
@@ -153,37 +166,5 @@ if (!rootElement.innerHTML) {
 }
 ```
 
-## 6. Basic Usage
-
-### Navigation
-
-Use the `<Link>` component from `@tanstack/react-router` for client-side navigation.
-
-```tsx
-<Link to="/posts" params={{ postId: "123" }}>
-  View Post 123
-</Link>
-```
-
-### Accessing Route Parameters
-
-Use the `useParams` hook from the current route to access dynamic route parameters.
-
-```tsx
-import { createFileRoute } from "@tanstack/react-router";
-
-export const Route = createFileRoute("/posts/$postId")({
-  component: PostComponent,
-});
-
-function PostComponent() {
-  const { postId } = Route.useParams();
-  return <div>Post ID: {postId}</div>;
-}
-```
-
 This setup provides a powerful and type-safe way to handle routing in your React application.
-
-```
-
-```
+````
