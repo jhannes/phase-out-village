@@ -29,7 +29,11 @@ export const Route = createRootRoute({
           Production Table
         </Link>
         {/* Example of a TanStack Router dynamic route: */}
-        <Link to="/$dynamic" className="&.active:font-bold" params={{ dynamic: "001" }}>
+        <Link
+          to="/$dynamic"
+          className="&.active:font-bold"
+          params={{ dynamic: "001" }}
+        >
           Dynamic
         </Link>
       </div>

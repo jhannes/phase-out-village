@@ -54,9 +54,16 @@ export const EmissionsView: React.FC<EmissionsViewProps> = ({ data }) => {
             const isActive = currentEmission > 0;
 
             return (
-              <div key={field.name} className={`field-item ${isActive ? "active" : "closed"}`}>
+              <div
+                key={field.name}
+                className={`field-item ${isActive ? "active" : "closed"}`}
+              >
                 <div className="field-name">{field.name}</div>
-                <div className="field-emission">{isActive ? `${currentEmission.toFixed(1)} Mt` : "🌱 Faset ut"}</div>
+                <div className="field-emission">
+                  {isActive
+                    ? `${currentEmission.toFixed(1)} Mt`
+                    : "🌱 Faset ut"}
+                </div>
               </div>
             );
           })}
