@@ -84,10 +84,18 @@ type GameAction =
   | { type: "ADVANCE_YEAR"; payload?: number }
   | { type: "SET_VIEW_MODE"; payload: ViewMode }
   | { type: "MAKE_INVESTMENT"; payload: { type: Investment; amount: number } }
-  | { type: "TRANSITION_FIELD"; payload: { fieldName: string; newType: "wind" | "solar" | "data_center" | "research_hub" } }
+  | {
+      type: "TRANSITION_FIELD";
+      payload: {
+        fieldName: string;
+        newType: "wind" | "solar" | "data_center" | "research_hub";
+      };
+    }
   | { type: "UPDATE_CLIMATE_METRICS" }
   | { type: "ADVANCE_TUTORIAL" }
-  | { type: "SKIP_TUTORIAL" };
+  | { type: "SKIP_TUTORIAL" }
+  | { type: "RESTART_GAME" }
+  | { type: "RESET_TUTORIAL" };
 
 // --- Constants ---
 const LOCAL_STORAGE_KEY = "phaseOutGameState";
@@ -238,7 +246,7 @@ const loadGameState = (): GameState => {
         return {
           ...defaultState,
           ...parsed,
-          realData,
+          realData, // Always use fresh real data
           gameFields: gameFields.map((field) => {
             const savedField = parsed.gameFields.find((f: Field) => f.name === field.name);
             return savedField ? { ...field, status: savedField.status } : field;
@@ -251,6 +259,13 @@ const loadGameState = (): GameState => {
           climateDamage: parsed.climateDamage ?? defaultState.climateDamage,
           sustainabilityScore: parsed.sustainabilityScore ?? defaultState.sustainabilityScore,
           playerChoices: parsed.playerChoices || defaultState.playerChoices,
+          dataLayerUnlocked: parsed.dataLayerUnlocked || defaultState.dataLayerUnlocked,
+          saturationLevel: parsed.saturationLevel ?? defaultState.saturationLevel,
+          gamePhase: parsed.gamePhase || defaultState.gamePhase,
+          tutorialStep: parsed.tutorialStep ?? defaultState.tutorialStep,
+          shownFacts: parsed.shownFacts || defaultState.shownFacts,
+          badChoiceCount: parsed.badChoiceCount ?? defaultState.badChoiceCount,
+          goodChoiceStreak: parsed.goodChoiceStreak ?? defaultState.goodChoiceStreak,
         };
       }
     }
@@ -259,6 +274,47 @@ const loadGameState = (): GameState => {
   }
 
   return defaultState;
+};
+
+// Game restart utility
+const createFreshGameState = (): GameState => {
+  const realData = generateCompleteData(data);
+  const gameFields = Object.keys(realData).map((fieldName) => createFieldFromRealData(fieldName, realData));
+
+  return {
+    gameFields,
+    budget: INITIAL_BUDGET,
+    score: INITIAL_SCORE,
+    year: INITIAL_YEAR,
+    selectedField: null,
+    showFieldModal: false,
+    achievements: [],
+    totalEmissions: 0,
+    totalProduction: 0,
+    shutdowns: {},
+    realData,
+    currentView: "map",
+    investments: {
+      green_tech: 0,
+      ai_research: 0,
+      renewable_energy: 0,
+      carbon_capture: 0,
+      foreign_cloud: 0,
+    },
+    globalTemperature: 1.1,
+    norwayTechRank: 0,
+    foreignDependency: 0,
+    climateDamage: 0,
+    sustainabilityScore: 100,
+    playerChoices: [],
+    dataLayerUnlocked: "basic",
+    saturationLevel: 100,
+    gamePhase: "learning",
+    tutorialStep: 0,
+    shownFacts: [],
+    badChoiceCount: 0,
+    goodChoiceStreak: 0,
+  };
 };
 
 const getColorForIntensity = (intensity: number, status: Field["status"]): string => {
@@ -272,19 +328,63 @@ const getColorForIntensity = (intensity: number, status: Field["status"]): strin
 
 // Enhanced badge system with educational messages
 const ACHIEVEMENT_BADGES = {
-  FIRST_STEPS: { emoji: "👶", title: "Første Skritt", desc: "Faset ut ditt første oljefelt" },
-  CLIMATE_AWARE: { emoji: "🌡️", title: "Klimabevisst", desc: "Holdt temperaturstigningen under 1.5°C" },
-  TECH_PIONEER: { emoji: "🚀", title: "Tech-Pioner", desc: "Investerte 100+ mrd i norsk teknologi" },
-  GREEN_TRANSITION: { emoji: "🌱", title: "Grønn Omstilling", desc: "Konverterte 5+ felt til fornybar energi" },
-  INDEPENDENCE_HERO: { emoji: "🇳🇴", title: "Uavhengighets-Helt", desc: "Nådde 80%+ teknologisk selvstendighet" },
-  PLANET_SAVER: { emoji: "🌍", title: "Planet-Redder", desc: "Hindret 500+ Mt CO₂ fra å bli brent" },
-  ECONOMIC_GENIUS: { emoji: "💰", title: "Økonomi-Geni", desc: "Opprettholdt 1000+ mrd i budsjett" },
-  FUTURE_BUILDER: { emoji: "🏗️", title: "Fremtidsbygger", desc: "Vant spillet med perfekt balanse" },
+  FIRST_STEPS: {
+    emoji: "👶",
+    title: "Første Skritt",
+    desc: "Faset ut ditt første oljefelt",
+  },
+  CLIMATE_AWARE: {
+    emoji: "🌡️",
+    title: "Klimabevisst",
+    desc: "Holdt temperaturstigningen under 1.5°C",
+  },
+  TECH_PIONEER: {
+    emoji: "🚀",
+    title: "Tech-Pioner",
+    desc: "Investerte 100+ mrd i norsk teknologi",
+  },
+  GREEN_TRANSITION: {
+    emoji: "🌱",
+    title: "Grønn Omstilling",
+    desc: "Konverterte 5+ felt til fornybar energi",
+  },
+  INDEPENDENCE_HERO: {
+    emoji: "🇳🇴",
+    title: "Uavhengighets-Helt",
+    desc: "Nådde 80%+ teknologisk selvstendighet",
+  },
+  PLANET_SAVER: {
+    emoji: "🌍",
+    title: "Planet-Redder",
+    desc: "Hindret 500+ Mt CO₂ fra å bli brent",
+  },
+  ECONOMIC_GENIUS: {
+    emoji: "💰",
+    title: "Økonomi-Geni",
+    desc: "Opprettholdt 1000+ mrd i budsjett",
+  },
+  FUTURE_BUILDER: {
+    emoji: "🏗️",
+    title: "Fremtidsbygger",
+    desc: "Vant spillet med perfekt balanse",
+  },
 
   // Failure badges (consequences)
-  CLIMATE_FAILURE: { emoji: "🔥", title: "Klimakatastrofe", desc: "Lot temperaturen stige over 2°C" },
-  TECH_DEPENDENT: { emoji: "🔗", title: "Tech-Avhengig", desc: "Ble for avhengig av utenlandsk teknologi" },
-  SHORT_SIGHTED: { emoji: "💸", title: "Kortsiktig", desc: "Prioriterte profitt over planet" },
+  CLIMATE_FAILURE: {
+    emoji: "🔥",
+    title: "Klimakatastrofe",
+    desc: "Lot temperaturen stige over 2°C",
+  },
+  TECH_DEPENDENT: {
+    emoji: "🔗",
+    title: "Tech-Avhengig",
+    desc: "Ble for avhengig av utenlandsk teknologi",
+  },
+  SHORT_SIGHTED: {
+    emoji: "💸",
+    title: "Kortsiktig",
+    desc: "Prioriterte profitt over planet",
+  },
 };
 
 // Environmental consequences system
@@ -293,16 +393,43 @@ const calculateEnvironmentalState = (gameState: GameState) => {
   const activeFields = gameState.gameFields.filter((f) => f.status === "active").length;
   const totalFields = gameState.gameFields.length;
 
-  if (temp > 2.5) return { phase: "crisis", saturation: 20, message: "🔥 KLIMAKATASTROFE! Verden brenner!" };
-  if (temp > 2.0) return { phase: "danger", saturation: 40, message: "⚠️ KRITISK! Temperaturen stiger farlig!" };
-  if (temp > 1.5) return { phase: "warning", saturation: 70, message: "⚡ ADVARSEL! Klimamålene er i fare!" };
-  if (activeFields / totalFields < 0.3) return { phase: "victory", saturation: 100, message: "🌟 FANTASTISK! Du redder verden!" };
+  if (temp > 2.5)
+    return {
+      phase: "crisis",
+      saturation: 20,
+      message: "🔥 KLIMAKATASTROFE! Verden brenner!",
+    };
+  if (temp > 2.0)
+    return {
+      phase: "danger",
+      saturation: 40,
+      message: "⚠️ KRITISK! Temperaturen stiger farlig!",
+    };
+  if (temp > 1.5)
+    return {
+      phase: "warning",
+      saturation: 70,
+      message: "⚡ ADVARSEL! Klimamålene er i fare!",
+    };
+  if (activeFields / totalFields < 0.3)
+    return {
+      phase: "victory",
+      saturation: 100,
+      message: "🌟 FANTASTISK! Du redder verden!",
+    };
 
-  return { phase: "normal", saturation: 85, message: "🎯 Fortsett arbeidet for klimaet!" };
+  return {
+    phase: "normal",
+    saturation: 85,
+    message: "🎯 Fortsett arbeidet for klimaet!",
+  };
 };
 
 // Progressive UI component that reveals data based on player progress
-const ProgressiveDataPanel: React.FC<{ gameState: GameState; layer: DataLayer }> = ({ gameState, layer }) => {
+const ProgressiveDataPanel: React.FC<{
+  gameState: GameState;
+  layer: DataLayer;
+}> = ({ gameState, layer }) => {
   const showBasic = ["basic", "intermediate", "advanced", "expert"].includes(layer);
   const showIntermediate = ["intermediate", "advanced", "expert"].includes(layer);
   const showAdvanced = ["advanced", "expert"].includes(layer);
@@ -332,13 +459,7 @@ const ProgressiveDataPanel: React.FC<{ gameState: GameState; layer: DataLayer }>
           <div className="data-grid">
             <div className="data-item">
               <span>Utslippsintensitet gjennomsnitt:</span>
-              <span>
-                {(
-                  gameState.gameFields.reduce((sum, f) => sum + f.intensity, 0) /
-                  gameState.gameFields.length
-                ).toFixed(1)}{" "}
-                kg/boe
-              </span>
+              <span>{(gameState.gameFields.reduce((sum, f) => sum + f.intensity, 0) / gameState.gameFields.length).toFixed(1)} kg/boe</span>
             </div>
             <div className="data-item">
               <span>Fremtidig forbrenning:</span>
@@ -364,9 +485,7 @@ const ProgressiveDataPanel: React.FC<{ gameState: GameState; layer: DataLayer }>
             </div>
             <div className="data-item">
               <span>Utenlandsavhengighet:</span>
-              <span className={gameState.foreignDependency > 50 ? "warning" : "good"}>
-                {gameState.foreignDependency}%
-              </span>
+              <span className={gameState.foreignDependency > 50 ? "warning" : "good"}>{gameState.foreignDependency}%</span>
             </div>
           </div>
         </div>
@@ -376,19 +495,9 @@ const ProgressiveDataPanel: React.FC<{ gameState: GameState; layer: DataLayer }>
         <div className="data-layer expert">
           <h4>🎓 Ekspert-Innsikt</h4>
           <div className="expert-insights">
-            <p>
-              💡 Med nåværende tempo vil Norge nå karbon-nøytralitet i{" "}
-              {2040 + Math.floor(gameState.totalEmissions / 10)} år
-            </p>
-            <p>
-              🏭 Gjennomsnittlig felt har{" "}
-              {(gameState.gameFields.reduce((sum, f) => sum + f.workers, 0) / gameState.gameFields.length).toFixed(0)}{" "}
-              arbeidere
-            </p>
-            <p>
-              ⚡ Overgangspotensialet kan skape{" "}
-              {gameState.gameFields.filter((f) => f.status === "closed").length * 200} nye grønne jobber
-            </p>
+            <p>💡 Med nåværende tempo vil Norge nå karbon-nøytralitet i {2040 + Math.floor(gameState.totalEmissions / 10)} år</p>
+            <p>🏭 Gjennomsnittlig felt har {(gameState.gameFields.reduce((sum, f) => sum + f.workers, 0) / gameState.gameFields.length).toFixed(0)} arbeidere</p>
+            <p>⚡ Overgangspotensialet kan skape {gameState.gameFields.filter((f) => f.status === "closed").length * 200} nye grønne jobber</p>
           </div>
         </div>
       )}
@@ -396,14 +505,74 @@ const ProgressiveDataPanel: React.FC<{ gameState: GameState; layer: DataLayer }>
   );
 };
 
-// Enhanced tutorial system
-const TutorialOverlay: React.FC<{ step: number; onNext: () => void; onSkip: () => void }> = ({ step, onNext, onSkip }) => {
+// Game Control Panel Component
+const GameControlPanel: React.FC<{ gameState: GameState; dispatch: Function }> = ({ gameState, dispatch }) => {
+  const [showRestartConfirm, setShowRestartConfirm] = useState(false);
+
+  const handleRestart = () => {
+    if (window.confirm("Er du sikker på at du vil starte spillet på nytt? All fremgang vil gå tapt.")) {
+      // Clear localStorage
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      // Restart game
+      dispatch({ type: "RESTART_GAME" });
+      setShowRestartConfirm(false);
+    }
+  };
+
+  const handleResetTutorial = () => {
+    dispatch({ type: "RESET_TUTORIAL" });
+  };
+
+  return (
+    <div className="game-control-panel">
+      <h3>⚙️ Spillinnstillinger</h3>
+      <div className="control-buttons">
+        <button onClick={handleRestart} className="control-button restart-button">
+          🔄 Start på nytt
+        </button>
+        <button onClick={handleResetTutorial} className="control-button tutorial-button">
+          📚 Vis tutorial igjen
+        </button>
+        <div className="game-info">
+          <small>Spillfremgang lagres automatisk</small>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Enhanced tutorial system with better state management
+const TutorialOverlay: React.FC<{
+  step: number;
+  onNext: () => void;
+  onSkip: () => void;
+}> = ({ step, onNext, onSkip }) => {
   const tutorials = [
-    { title: "Velkommen til Phase Out Village! 🌍", text: "Du skal hjelpe Norge med å fase ut olje og bygge en bærekraftig fremtid.", highlight: ".header" },
-    { title: "Se oljefeltene 🛢️", text: "Røde felt har høy utslippsintensitet. Grønne er 'renere'. Men husk: 98% av utslippene kommer fra FORBRENNING!", highlight: ".map-container" },
-    { title: "Klikk for å fase ut 🌱", text: "Hver gang du faser ut et felt, hindrer du LIVSTID med CO₂-utslipp fra forbrenning!", highlight: ".map-div" },
-    { title: "Invester i fremtiden 🚀", text: "Bruk pengene på norsk teknologi, ikke utenlandske sky-tjenester!", highlight: ".investment-panel" },
-    { title: "Følg med på konsekvensene 🌡️", text: "Dårlige valg fører til temperaturstigning og visuell 'fade out'.", highlight: ".climate-dashboard" },
+    {
+      title: "Velkommen til Phase Out Village! 🌍",
+      text: "Du skal hjelpe Norge med å fase ut olje og bygge en bærekraftig fremtid.",
+      highlight: ".header",
+    },
+    {
+      title: "Se oljefeltene 🛢️",
+      text: "Røde felt har høy utslippsintensitet. Grønne er 'renere'. Men husk: 98% av utslippene kommer fra FORBRENNING!",
+      highlight: ".map-container",
+    },
+    {
+      title: "Klikk for å fase ut 🌱",
+      text: "Hver gang du faser ut et felt, hindrer du LIVSTID med CO₂-utslipp fra forbrenning!",
+      highlight: ".map-div",
+    },
+    {
+      title: "Invester i fremtiden 🚀",
+      text: "Bruk pengene på norsk teknologi, ikke utenlandske sky-tjenester!",
+      highlight: ".investment-panel",
+    },
+    {
+      title: "Følg med på konsekvensene 🌡️",
+      text: "Dårlige valg fører til temperaturstigning og visuell 'fade out'.",
+      highlight: ".climate-dashboard",
+    },
   ];
 
   if (step >= tutorials.length) return null;
@@ -413,13 +582,18 @@ const TutorialOverlay: React.FC<{ step: number; onNext: () => void; onSkip: () =
   return (
     <div className="tutorial-overlay">
       <div className="tutorial-popup">
+        <div className="tutorial-progress">
+          Steg {step + 1} av {tutorials.length}
+        </div>
         <h3>{current.title}</h3>
         <p>{current.text}</p>
         <div className="tutorial-buttons">
           <button onClick={onNext} className="tutorial-next">
             {step < tutorials.length - 1 ? "Neste" : "Start spillet!"}
           </button>
-          <button onClick={onSkip} className="tutorial-skip">Hopp over</button>
+          <button onClick={onSkip} className="tutorial-skip">
+            Hopp over
+          </button>
         </div>
       </div>
     </div>
@@ -433,34 +607,49 @@ const GameFeedback: React.FC<{ gameState: GameState }> = ({ gameState }) => {
   return (
     <div className={`game-feedback ${envState.phase}`}>
       <div className="feedback-message">{envState.message}</div>
-      {gameState.goodChoiceStreak > 3 && (
-        <div className="streak-bonus">🔥 {gameState.goodChoiceStreak} gode valg på rad!</div>
-      )}
-      {gameState.badChoiceCount > 2 && (
-        <div className="warning-streak">⚠️ {gameState.badChoiceCount} dårlige valg - vær forsiktig!</div>
-      )}
+      {gameState.goodChoiceStreak > 3 && <div className="streak-bonus">🔥 {gameState.goodChoiceStreak} gode valg på rad!</div>}
+      {gameState.badChoiceCount > 2 && <div className="warning-streak">⚠️ {gameState.badChoiceCount} dårlige valg - vær forsiktig!</div>}
     </div>
   );
 };
 
-// --- Reducer ---
+// --- Reducer with restart functionality ---
 const gameReducer = (state: GameState, action: GameAction): GameState => {
+  let newState: GameState;
+
   switch (action.type) {
+    case "RESTART_GAME":
+      return createFreshGameState();
+    
+    case "RESET_TUTORIAL":
+      return { ...state, tutorialStep: 0 };
+
     case "LOAD_GAME_STATE":
       return { ...state, ...action.payload };
+
     case "PHASE_OUT_FIELD": {
       const fieldName = action.payload;
       const field = state.gameFields.find((f) => f.name === fieldName);
-      if (!field || state.budget < field.phaseOutCost) return state;
+      
+      // Prevent phasing out if field doesn't exist, already closed, or insufficient budget
+      if (!field || field.status === "closed" || state.budget < field.phaseOutCost) {
+        return state;
+      }
 
       // Calculate environmental impact
       const envState = calculateEnvironmentalState(state);
       const newDataLayer = state.score > 500 ? "expert" : state.score > 300 ? "advanced" : state.score > 100 ? "intermediate" : "basic";
 
-      return {
+      // Add achievement for first phase out
+      let newAchievements = state.achievements;
+      if (!newAchievements.includes(ACHIEVEMENT_FIRST_PHASE_OUT)) {
+        newAchievements = [...newAchievements, ACHIEVEMENT_FIRST_PHASE_OUT];
+      }
+
+      newState = {
         ...state,
         budget: state.budget - field.phaseOutCost,
-        score: state.score + Math.floor(field.totalLifetimeEmissions / 1000), // Bonus for preventing burning
+        score: state.score + Math.floor(field.totalLifetimeEmissions / 1000),
         globalTemperature: Math.max(1.1, state.globalTemperature - field.totalLifetimeEmissions / 1000000),
         gameFields: state.gameFields.map((f) => (f.name === fieldName ? { ...f, status: "closed" as const, production: 0 } : f)),
         playerChoices: [...state.playerChoices, `Faset ut ${fieldName} - Hindret ${(field.totalLifetimeEmissions / 1000).toFixed(0)} tonn CO2 fra å bli brent`],
@@ -470,7 +659,12 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         badChoiceCount: Math.max(0, state.badChoiceCount - 1),
         saturationLevel: envState.saturation,
         gamePhase: envState.phase as any,
+        shutdowns: { ...state.shutdowns, [fieldName]: state.year },
+        achievements: newAchievements,
+        showFieldModal: false, // Close modal after phase out
+        selectedField: null, // Clear selected field
       };
+      break;
     }
     case "SET_SELECTED_FIELD":
       return { ...state, selectedField: action.payload };
@@ -503,7 +697,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
 
       const isBadChoice = type === "foreign_cloud";
 
-      return {
+      newState = {
         ...state,
         budget: state.budget - amount,
         badChoiceCount: isBadChoice ? state.badChoiceCount + 1 : state.badChoiceCount,
@@ -512,7 +706,9 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         sustainabilityScore: isBadChoice ? state.sustainabilityScore - 10 : state.sustainabilityScore + 10,
         foreignDependency: isBadChoice ? state.foreignDependency + 15 : Math.max(0, state.foreignDependency - 10),
         playerChoices: [...state.playerChoices, `Investerte ${amount} mrd i ${type === "foreign_cloud" ? "utenlandsk cloud" : type === "ai_research" ? "AI-forskning" : "grønn teknologi"}`],
+        investments: { ...state.investments, [type]: state.investments[type] + amount },
       };
+      break;
     }
     case "UPDATE_CLIMATE_METRICS": {
       // Calculate climate damage costs
@@ -532,6 +728,18 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
     default:
       return state;
   }
+
+  // Always save to localStorage after state changes (except for RESTART_GAME which clears it)
+  if (newState) {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newState));
+    } catch (error) {
+      console.error("Failed to save game state:", error);
+    }
+    return newState;
+  }
+
+  return state;
 };
 
 // --- Field Modal Component ---
@@ -545,8 +753,7 @@ interface FieldModalProps {
 const FieldModal: React.FC<FieldModalProps> = ({ selectedField, budget, onPhaseOut, onClose }) => {
   if (!selectedField) return null;
 
-  const canPhaseOut = budget >= selectedField.phaseOutCost;
-  const [showTransitionOptions, setShowTransitionOptions] = useState(false);
+  const canPhaseOut = selectedField.status === "active" && budget >= selectedField.phaseOutCost;
 
   return (
     <div className="modal">
@@ -569,6 +776,12 @@ const FieldModal: React.FC<FieldModalProps> = ({ selectedField, budget, onPhaseO
                 </span>
               </div>
               <div className="modal-stat-row">
+                <span>💰 Kostnad å fase ut:</span>
+                <span className="modal-stat-value" style={{ color: "#2563EB" }}>
+                  {selectedField.phaseOutCost} mrd NOK
+                </span>
+              </div>
+              <div className="modal-stat-row">
                 <span>Overgangs-potensial:</span>
                 <span className="modal-stat-value" style={{ color: "#10B981" }}>
                   {selectedField.transitionPotential === "wind" ? "🌬️ Vindkraft" : selectedField.transitionPotential === "data_center" ? "💻 Datasenter" : selectedField.transitionPotential === "research_hub" ? "🧠 Forskningshub" : "☀️ Solkraft"}
@@ -579,11 +792,23 @@ const FieldModal: React.FC<FieldModalProps> = ({ selectedField, budget, onPhaseO
             <div className="climate-warning">
               <p>⚠️ Hver dag dette feltet er aktivt, brennes mer olje og slipper ut CO₂!</p>
               <p>🌡️ Hindre forbrenning = redd klimaet</p>
+              {budget < selectedField.phaseOutCost && (
+                <p style={{ color: "#DC2626", fontWeight: "bold" }}>
+                  💸 Du mangler {selectedField.phaseOutCost - budget} mrd NOK!
+                </p>
+              )}
             </div>
 
             <div className="modal-buttons">
-              <button onClick={() => onPhaseOut(selectedField.name)} disabled={!canPhaseOut} className={`button-phase-out ${canPhaseOut ? "button-phase-out-enabled" : "button-phase-out-disabled"}`}>
-                🌱 FASE UT & REDDE KLIMA
+              <button 
+                onClick={() => onPhaseOut(selectedField.name)} 
+                disabled={!canPhaseOut} 
+                className={`button-phase-out ${canPhaseOut ? "button-phase-out-enabled" : "button-phase-out-disabled"}`}
+              >
+                {!canPhaseOut && budget < selectedField.phaseOutCost ? 
+                  `💰 IKKE RÅD (${selectedField.phaseOutCost} mrd)` : 
+                  `🌱 FASE UT (${selectedField.phaseOutCost} mrd)`
+                }
               </button>
               <button onClick={onClose} className="button-cancel">
                 AVBRYT
@@ -591,13 +816,13 @@ const FieldModal: React.FC<FieldModalProps> = ({ selectedField, budget, onPhaseO
             </div>
           </>
         ) : (
-          // Show transition success and options
+          // Show transition success - this field is already closed
           <div className="transition-success">
             <div className="closed-emoji">🌱</div>
-            <p className="closed-text">Gratulerer! Du reddet klimaet!</p>
+            <p className="closed-text">Dette feltet er allerede faset ut!</p>
             <p className="closed-subtext">Hindret {(selectedField.totalLifetimeEmissions / 1000).toFixed(0)} Mt CO₂ fra å bli brent! 🎉</p>
             <button onClick={onClose} className="button-ok">
-              FORTSETT Å REDDE VERDEN
+              OK
             </button>
           </div>
         )}
@@ -607,24 +832,54 @@ const FieldModal: React.FC<FieldModalProps> = ({ selectedField, budget, onPhaseO
 };
 
 // --- Investment Panel Component ---
-const InvestmentPanel: React.FC<{ gameState: GameState; dispatch: Function }> = ({ gameState, dispatch }) => {
+const InvestmentPanel: React.FC<{
+  gameState: GameState;
+  dispatch: Function;
+}> = ({ gameState, dispatch }) => {
   const budget = gameState.budget ?? 0;
 
   return (
     <div className="investment-panel">
       <h3>🏦 Invester Norges Fremtid</h3>
       <div className="investment-options">
-        <button onClick={() => dispatch({ type: "MAKE_INVESTMENT", payload: { type: "ai_research", amount: 50 } })} disabled={budget < 50} className="investment-button good-choice">
+        <button
+          onClick={() =>
+            dispatch({
+              type: "MAKE_INVESTMENT",
+              payload: { type: "ai_research", amount: 50 },
+            })
+          }
+          disabled={budget < 50}
+          className="investment-button good-choice"
+        >
           🧠 AI-Forskning (50 mrd)
           <br />
           <small>Bygg lokal kompetanse</small>
         </button>
-        <button onClick={() => dispatch({ type: "MAKE_INVESTMENT", payload: { type: "green_tech", amount: 30 } })} disabled={budget < 30} className="investment-button good-choice">
+        <button
+          onClick={() =>
+            dispatch({
+              type: "MAKE_INVESTMENT",
+              payload: { type: "green_tech", amount: 30 },
+            })
+          }
+          disabled={budget < 30}
+          className="investment-button good-choice"
+        >
           ⚡ Grønn Tech (30 mrd)
           <br />
           <small>Fornybar energi</small>
         </button>
-        <button onClick={() => dispatch({ type: "MAKE_INVESTMENT", payload: { type: "foreign_cloud", amount: 20 } })} disabled={budget < 20} className="investment-button bad-choice">
+        <button
+          onClick={() =>
+            dispatch({
+              type: "MAKE_INVESTMENT",
+              payload: { type: "foreign_cloud", amount: 20 },
+            })
+          }
+          disabled={budget < 20}
+          className="investment-button bad-choice"
+        >
           ☁️ Utenlandsk Cloud (20 mrd)
           <br />
           <small>⚠️ Øker avhengighet</small>
@@ -665,11 +920,6 @@ const PhaseOutMapPage: React.FC = () => {
 
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<Map | null>(null);
-
-  // Save game state
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gameState));
-  }, [gameState]);
 
   // Update totals
   useEffect(() => {
@@ -924,10 +1174,13 @@ const PhaseOutMapPage: React.FC = () => {
           </div>
         )}
 
-        {/* Climate Dashboard - New component showing climate metrics */}
+        {/* Game Control Panel - New */}
+        <GameControlPanel gameState={gameState} dispatch={dispatch} />
+
+        {/* Climate Dashboard */}
         <ClimateDashboard gameState={gameState} />
 
-        {/* Investment Panel - New component for making investments */}
+        {/* Investment Panel */}
         <InvestmentPanel gameState={gameState} dispatch={dispatch} />
       </div>
 
