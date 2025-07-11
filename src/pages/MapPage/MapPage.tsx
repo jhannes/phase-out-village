@@ -742,10 +742,21 @@ const GameFeedback: React.FC<{ gameState: GameState }> = ({ gameState }) => {
 const checkAndAwardAchievements = (state: GameState): string[] => {
   const newAchievements: string[] = [];
   const phasedOutFields = Object.keys(state.shutdowns).length;
-  const totalTechInvestment = Object.values(state.investments).reduce((sum, inv) => sum + inv, 0);
-  const totalEmissionsSaved = state.gameFields.filter((f) => f.status === "closed").reduce((sum, f) => sum + f.totalLifetimeEmissions, 0) / 1000;
+  const totalTechInvestment = Object.values(state.investments).reduce(
+    (sum, inv) => sum + inv,
+    0,
+  );
+  const totalEmissionsSaved =
+    state.gameFields
+      .filter((f) => f.status === "closed")
+      .reduce((sum, f) => sum + f.totalLifetimeEmissions, 0) / 1000;
 
-  console.log("Checking achievements:", { phasedOutFields, totalTechInvestment, totalEmissionsSaved, currentTemp: state.globalTemperature });
+  console.log("Checking achievements:", {
+    phasedOutFields,
+    totalTechInvestment,
+    totalEmissionsSaved,
+    currentTemp: state.globalTemperature,
+  });
 
   // FØRSTE SKRITT - Umiddelbart når du faser ut første felt
   if (phasedOutFields >= 1 && !state.achievements.includes("Første Skritt")) {
@@ -754,48 +765,74 @@ const checkAndAwardAchievements = (state: GameState): string[] => {
   }
 
   // KLIMABEVISST - Holdt temperatur under 1.5°C og faset ut 3+ felt
-  if (state.globalTemperature <= 1.5 && phasedOutFields >= 3 && !state.achievements.includes("Klimabevisst")) {
+  if (
+    state.globalTemperature <= 1.5 &&
+    phasedOutFields >= 3 &&
+    !state.achievements.includes("Klimabevisst")
+  ) {
     newAchievements.push("Klimabevisst");
     console.log("🏆 Klimabevisst unlocked!");
   }
 
   // TECH-PIONER - 100+ milliarder i tech-investeringer
-  if (totalTechInvestment >= 100 && !state.achievements.includes("Tech-Pioner")) {
+  if (
+    totalTechInvestment >= 100 &&
+    !state.achievements.includes("Tech-Pioner")
+  ) {
     newAchievements.push("Tech-Pioner");
     console.log("🏆 Tech-Pioner unlocked!");
   }
 
   // GRØNN OMSTILLING - 5+ felt faset ut
-  if (phasedOutFields >= 5 && !state.achievements.includes("Grønn Omstilling")) {
+  if (
+    phasedOutFields >= 5 &&
+    !state.achievements.includes("Grønn Omstilling")
+  ) {
     newAchievements.push("Grønn Omstilling");
     console.log("🏆 Grønn Omstilling unlocked!");
   }
 
   // UAVHENGIGHETS-HELT - 80%+ tech-uavhengighet
-  if (state.norwayTechRank >= 80 && !state.achievements.includes("Uavhengighets-Helt")) {
+  if (
+    state.norwayTechRank >= 80 &&
+    !state.achievements.includes("Uavhengighets-Helt")
+  ) {
     newAchievements.push("Uavhengighets-Helt");
     console.log("🏆 Uavhengighets-Helt unlocked!");
   }
 
   // PLANET-REDDER - 500+ Mt CO₂ hindret (justert ned for testing)
-  if (totalEmissionsSaved >= 50 && !state.achievements.includes("Planet-Redder")) {
+  if (
+    totalEmissionsSaved >= 50 &&
+    !state.achievements.includes("Planet-Redder")
+  ) {
     newAchievements.push("Planet-Redder");
     console.log("🏆 Planet-Redder unlocked!");
   }
 
   // ØKONOMI-GENI - 1000+ mrd i budsjett og 10+ felt faset ut
-  if (state.budget >= 1000 && phasedOutFields >= 10 && !state.achievements.includes("Økonomi-Geni")) {
+  if (
+    state.budget >= 1000 &&
+    phasedOutFields >= 10 &&
+    !state.achievements.includes("Økonomi-Geni")
+  ) {
     newAchievements.push("Økonomi-Geni");
     console.log("🏆 Økonomi-Geni unlocked!");
   }
 
   // NEGATIVE ACHIEVEMENTS (konsekvenser)
-  if (state.globalTemperature > 2.0 && !state.achievements.includes("Klimakatastrofe")) {
+  if (
+    state.globalTemperature > 2.0 &&
+    !state.achievements.includes("Klimakatastrofe")
+  ) {
     newAchievements.push("Klimakatastrofe");
     console.log("💀 Klimakatastrofe unlocked!");
   }
 
-  if (state.foreignDependency > 75 && !state.achievements.includes("Tech-Avhengig")) {
+  if (
+    state.foreignDependency > 75 &&
+    !state.achievements.includes("Tech-Avhengig")
+  ) {
     newAchievements.push("Tech-Avhengig");
     console.log("💀 Tech-Avhengig unlocked!");
   }
@@ -855,7 +892,11 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       const fieldName = action.payload;
       const field = state.gameFields.find((f) => f.name === fieldName);
 
-      if (!field || field.status === "closed" || state.budget < field.phaseOutCost) {
+      if (
+        !field ||
+        field.status === "closed" ||
+        state.budget < field.phaseOutCost
+      ) {
         return state;
       }
 
@@ -867,9 +908,19 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         budget: state.budget - field.phaseOutCost,
         score: state.score + Math.floor(field.totalLifetimeEmissions / 1000),
         // Fix temperature calculation - phasing out should REDUCE temperature
-        globalTemperature: Math.max(1.1, state.globalTemperature - (field.emissions[0] * 0.001)),
-        gameFields: state.gameFields.map((f) => f.name === fieldName ? { ...f, status: "closed" as const, production: 0 } : f),
-        playerChoices: [...state.playerChoices, `Faset ut ${fieldName} - Hindret ${(field.totalLifetimeEmissions / 1000).toFixed(0)} Mt CO2`],
+        globalTemperature: Math.max(
+          1.1,
+          state.globalTemperature - field.emissions[0] * 0.001,
+        ),
+        gameFields: state.gameFields.map((f) =>
+          f.name === fieldName
+            ? { ...f, status: "closed" as const, production: 0 }
+            : f,
+        ),
+        playerChoices: [
+          ...state.playerChoices,
+          `Faset ut ${fieldName} - Hindret ${(field.totalLifetimeEmissions / 1000).toFixed(0)} Mt CO2`,
+        ],
         year: state.year + 1,
         goodChoiceStreak: state.goodChoiceStreak + 1,
         badChoiceCount: Math.max(0, state.badChoiceCount - 1),
@@ -881,7 +932,10 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       // Immediately check for achievements after phase out
       const immediateAchievements = checkAndAwardAchievements(newState);
       if (immediateAchievements.length > 0) {
-        newState.achievements = [...newState.achievements, ...immediateAchievements];
+        newState.achievements = [
+          ...newState.achievements,
+          ...immediateAchievements,
+        ];
       }
       break;
     }
@@ -968,19 +1022,39 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       newState = {
         ...state,
         budget: state.budget - amount,
-        badChoiceCount: isBadChoice ? state.badChoiceCount + 1 : state.badChoiceCount,
+        badChoiceCount: isBadChoice
+          ? state.badChoiceCount + 1
+          : state.badChoiceCount,
         goodChoiceStreak: isBadChoice ? 0 : state.goodChoiceStreak + 1,
-        norwayTechRank: isBadChoice ? Math.max(0, state.norwayTechRank - 3) : Math.min(100, state.norwayTechRank + (type === "ai_research" ? 8 : 5)),
-        sustainabilityScore: isBadChoice ? Math.max(0, state.sustainabilityScore - 10) : Math.min(100, state.sustainabilityScore + 10),
-        foreignDependency: isBadChoice ? Math.min(100, state.foreignDependency + 15) : Math.max(0, state.foreignDependency - 10),
-        playerChoices: [...state.playerChoices, `Investerte ${amount} mrd i ${type === "foreign_cloud" ? "utenlandsk cloud" : type === "ai_research" ? "AI-forskning" : "grønn teknologi"}`],
-        investments: { ...state.investments, [type]: state.investments[type] + amount },
+        norwayTechRank: isBadChoice
+          ? Math.max(0, state.norwayTechRank - 3)
+          : Math.min(
+              100,
+              state.norwayTechRank + (type === "ai_research" ? 8 : 5),
+            ),
+        sustainabilityScore: isBadChoice
+          ? Math.max(0, state.sustainabilityScore - 10)
+          : Math.min(100, state.sustainabilityScore + 10),
+        foreignDependency: isBadChoice
+          ? Math.min(100, state.foreignDependency + 15)
+          : Math.max(0, state.foreignDependency - 10),
+        playerChoices: [
+          ...state.playerChoices,
+          `Investerte ${amount} mrd i ${type === "foreign_cloud" ? "utenlandsk cloud" : type === "ai_research" ? "AI-forskning" : "grønn teknologi"}`,
+        ],
+        investments: {
+          ...state.investments,
+          [type]: state.investments[type] + amount,
+        },
       };
 
       // Check achievements after investment
       const immediateAchievements = checkAndAwardAchievements(newState);
       if (immediateAchievements.length > 0) {
-        newState.achievements = [...newState.achievements, ...immediateAchievements];
+        newState.achievements = [
+          ...newState.achievements,
+          ...immediateAchievements,
+        ];
       }
       break;
     }
@@ -1007,7 +1081,10 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
   if (newState) {
     const finalAchievements = checkAndAwardAchievements(newState);
     if (finalAchievements.length > 0) {
-      newState = { ...newState, achievements: [...newState.achievements, ...finalAchievements] };
+      newState = {
+        ...newState,
+        achievements: [...newState.achievements, ...finalAchievements],
+      };
     }
 
     // Update environmental state
@@ -1016,7 +1093,14 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       ...newState,
       saturationLevel: envState.saturation,
       gamePhase: envState.phase as any,
-      dataLayerUnlocked: newState.score > 500 ? "expert" : newState.score > 300 ? "advanced" : newState.score > 100 ? "intermediate" : "basic",
+      dataLayerUnlocked:
+        newState.score > 500
+          ? "expert"
+          : newState.score > 300
+            ? "advanced"
+            : newState.score > 100
+              ? "intermediate"
+              : "basic",
     };
 
     // Save to localStorage
@@ -1295,12 +1379,24 @@ const AchievementNotification: React.FC<{ achievements: string[] }> = ({
 };
 
 // Debug Achievement Display
-const AchievementDebugPanel: React.FC<{ gameState: GameState }> = ({ gameState }) => {
+const AchievementDebugPanel: React.FC<{ gameState: GameState }> = ({
+  gameState,
+}) => {
   const phasedOutFields = Object.keys(gameState.shutdowns).length;
-  const totalTechInvestment = Object.values(gameState.investments).reduce((sum, inv) => sum + inv, 0);
+  const totalTechInvestment = Object.values(gameState.investments).reduce(
+    (sum, inv) => sum + inv,
+    0,
+  );
 
   return (
-    <div style={{ background: "#f0f0f0", padding: "10px", margin: "10px", fontSize: "12px" }}>
+    <div
+      style={{
+        background: "#f0f0f0",
+        padding: "10px",
+        margin: "10px",
+        fontSize: "12px",
+      }}
+    >
       <h4>🐛 Achievement Debug</h4>
       <p>Felt faset ut: {phasedOutFields}</p>
       <p>Tech-investeringer: {totalTechInvestment} mrd</p>
@@ -1601,17 +1697,28 @@ const PhaseOutMapPage: React.FC = () => {
 
         {/* Enhanced achievements display - always show even if empty */}
         <div className="achievement-card">
-          <h3 className="achievement-title">🏆 Dine Prestasjoner ({achievements.length})</h3>
+          <h3 className="achievement-title">
+            🏆 Dine Prestasjoner ({achievements.length})
+          </h3>
           {achievements.length === 0 ? (
             <div className="no-achievements">
-              <p>Ingen prestasjoner ennå. Fase ut ditt første oljefelt for å få "Første Skritt"!</p>
+              <p>
+                Ingen prestasjoner ennå. Fase ut ditt første oljefelt for å få
+                "Første Skritt"!
+              </p>
             </div>
           ) : (
             <div className="achievement-list">
               {achievements.map((achievement, index) => {
-                const badge = Object.values(ACHIEVEMENT_BADGES).find((b) => b.title === achievement);
+                const badge = Object.values(ACHIEVEMENT_BADGES).find(
+                  (b) => b.title === achievement,
+                );
                 return (
-                  <div key={index} className="achievement-badge enhanced" title={badge?.desc}>
+                  <div
+                    key={index}
+                    className="achievement-badge enhanced"
+                    title={badge?.desc}
+                  >
                     {badge?.emoji} {badge?.title || achievement}
                   </div>
                 );
@@ -1631,7 +1738,10 @@ const PhaseOutMapPage: React.FC = () => {
       </div>
 
       {/* Progressive data panel */}
-      <ProgressiveDataPanel gameState={gameState} layer={gameState.dataLayerUnlocked} />
+      <ProgressiveDataPanel
+        gameState={gameState}
+        layer={gameState.dataLayerUnlocked}
+      />
 
       {/* Field Modal */}
       {showFieldModal && (
@@ -1639,7 +1749,9 @@ const PhaseOutMapPage: React.FC = () => {
           selectedField={selectedField}
           budget={budget}
           onPhaseOut={phaseOutField}
-          onClose={() => dispatch({ type: "TOGGLE_FIELD_MODAL", payload: false })}
+          onClose={() =>
+            dispatch({ type: "TOGGLE_FIELD_MODAL", payload: false })
+          }
         />
       )}
     </div>
