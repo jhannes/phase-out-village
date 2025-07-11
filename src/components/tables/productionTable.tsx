@@ -83,7 +83,6 @@ export function ProductionTable() {
                     </td>
                   );
                 })}
-                ;
               </tr>
             ))}
           </tbody>
