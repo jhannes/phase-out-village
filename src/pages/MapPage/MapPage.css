@@ -375,12 +375,7 @@
 }
 
 .view-button-active:hover {
-  background: rgba(
-    255,
-    255,
-    255,
-    0.3
-  ); /* Slightly darker on hover for active */
+  background: rgba(255, 255, 255, 0.3); /* Slightly darker on hover for active */
   border-color: transparent; /* No border for active */
 }
 
