@@ -239,162 +239,171 @@
   z-index: 50;
   filter: none;
   height: 100vh;
+  width: 100vw;
+  backdrop-filter: blur(4px);
+  /* Remove overflow-y: auto from here */
 }
 
 .modal-content {
   background-color: var(--modal-bg);
   border-radius: 12px;
   padding: 24px;
-  max-width: 400px;
-  width: 100%;
+  max-width: 500px;
+  width: 90%;
   max-height: 90vh;
-  overflow-y: auto;
   color: var(--modal-text);
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* Add overflow and scrolling to content only */
+  overflow-y: auto;
+  /* Ensure modal appears immediately */
+  transform: translateY(0);
+  animation: modalSlideIn 0.2s ease-out;
 }
 
-.modal-title {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 16px;
-  text-align: center;
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-.modal-stats {
-  margin-bottom: 16px;
+/* Ensure modal content is centered even on small screens */
+@media (max-width: 640px) {
+  .modal-content {
+    width: 95%;
+    max-width: none;
+    padding: 20px;
+    max-height: 85vh;
+  }
 }
 
-.modal-stat-row {
+@media (max-height: 600px) {
+  .modal-content {
+    max-height: 80vh;
+  }
+}
+
+/* Modal close button positioning */
+.modal-close-button {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: var(--modal-text);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  z-index: 10;
+}
+
+.modal-close-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Field modal specific styles */
+.field-modal .modal-content {
+  max-width: 600px;
+}
+
+.field-details {
+  margin: 20px 0;
+  line-height: 1.6;
+}
+
+.field-details p {
+  margin: 8px 0;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 12px;
+  align-items: center;
 }
 
-.modal-stat-value {
+.field-details hr {
+  margin: 16px 0;
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.cost {
+  font-size: 1.1em;
   font-weight: bold;
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  margin: 16px 0;
 }
 
-.modal-buttons {
+.modal-actions {
+  margin-top: 24px;
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.button-phase-out {
-  flex: 1;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: bold;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-.button-phase-out-enabled {
-  background-color: #ef4444;
-}
-
-.button-phase-out-disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
-}
-
-.button-cancel {
-  flex: 1;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: bold;
-  background-color: #6b7280;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-.button-ok {
+.phase-out-button {
   width: 100%;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: bold;
-  background-color: #10b981;
-  color: white;
+  padding: 16px 24px;
   border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(45deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-.closed-message {
+.phase-out-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+}
+
+.phase-out-button:disabled {
+  background: #9ca3af;
+  color: #6b7280;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.budget-warning {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 8px;
   text-align: center;
-  margin-bottom: 16px;
+  font-weight: 500;
+  border: 1px solid #fecaca;
 }
 
-.closed-emoji {
-  font-size: 48px;
-  margin-bottom: 8px;
-}
-
-.closed-text {
+/* Status indicators */
+.status-active {
   color: #059669;
   font-weight: bold;
 }
 
-.closed-subtext {
-  font-size: 14px;
-  color: #6b7280;
-  margin-top: 8px;
+.status-closed {
+  color: #10b981;
+  font-weight: bold;
 }
 
-.view-toggle {
-  display: flex;
-  gap: 4px;
-  margin: 20px auto; /* Center the toggle buttons */
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 4px;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  max-width: fit-content; /* Make it only as wide as its content */
-}
-
-.view-button {
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.view-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.view-button-active {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.view-button-active:hover {
-  background: rgba(
-    255,
-    255,
-    255,
-    0.3
-  ); /* Slightly darker on hover for active */
-  border-color: transparent; /* No border for active */
-}
-
-.game-impact-summary {
-  background: #f0f9ff;
-  border: 1px solid #0ea5e9;
-  border-radius: 8px;
-  padding: 15px;
-  margin-top: 20px;
-  width: 100%; /* Take full width of view-container */
+.status-transitioning {
+  color: #f59e0b;
+  font-weight: bold;
 }
 
 .game-impact-summary h3 {
