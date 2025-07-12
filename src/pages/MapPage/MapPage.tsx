@@ -24,7 +24,8 @@ import { data } from "../../generated/data";
 import { generateCompleteData } from "../../utils/projections";
 import { OilFieldDataset, ShutdownMap } from "../../types/types";
 import { EmissionsView } from "../../components/charts/EmissionsView";
-// import { FieldModal } from "../../components/modals/FieldModal";
+import { type } from "os";
+//import { FieldModal } from "../../components/modals/FieldModal";
 // import of badge components removed due to missing module and unused imports
 
 // Placeholder for FieldModal to resolve import error
@@ -2266,6 +2267,45 @@ const PhaseOutMapPage: React.FC = () => {
           </div>
         </div>
       </div>
+      {/* Stats Grid */}
+      <div className="stats-grid">
+        <div className="stat-card stat-card-green">
+          <div className="stat-emoji">🌱</div>
+          <div className="stat-value" style={{ color: "#166534" }}>
+            {score}
+          </div>
+          <div className="stat-label" style={{ color: "#16A34A" }}>
+            Klimapoeng
+          </div>
+        </div>
+        <div className="stat-card stat-card-yellow">
+          <div className="stat-emoji">💰</div>
+          <div className="stat-value" style={{ color: "#92400E" }}>
+            {budget} mrd
+          </div>
+          <div className="stat-label" style={{ color: "#D97706" }}>
+            Budsjett
+          </div>
+        </div>
+        <div className="stat-card stat-card-blue">
+          <div className="stat-emoji">📅</div>
+          <div className="stat-value" style={{ color: "#1E40AF" }}>
+            {year}
+          </div>
+          <div className="stat-label" style={{ color: "#2563EB" }}>
+            År
+          </div>
+        </div>
+        <div className="stat-card stat-card-purple">
+          <div className="stat-emoji">🚀</div>
+          <div className="stat-value" style={{ color: "#7C3AED" }}>
+            {gameState.norwayTechRank}%
+          </div>
+          <div className="stat-label" style={{ color: "#8B5CF6" }}>
+            Tech-rank
+          </div>
+        </div>
+      </div>
 
       {/* View Toggle */}
       <div className="view-toggle">
@@ -2490,15 +2530,71 @@ const MultiSelectControls: React.FC<{
   );
 };
 
+// const InvestmentPanel: React.FC<{
+//   gameState: GameState;
+//   dispatch: Function;
+// }> = ({ gameState, dispatch }) => {
+//   // This is a placeholder for an investment UI panel.
+//   return (
+//     <div className="investment-panel">
+//       <h4>Invest</h4>
+//       {/* Add investment buttons here */}
+//     </div>
+//   );
+// };
+
 const InvestmentPanel: React.FC<{
   gameState: GameState;
   dispatch: Function;
 }> = ({ gameState, dispatch }) => {
-  // This is a placeholder for an investment UI panel.
+  const investments: { type: Investment; label: string; color: string }[] = [
+    { type: "green_tech", label: "Grønn Teknologi", color: "#22C55E" },
+    { type: "ai_research", label: "AI Forskning", color: "#6366F1" },
+    { type: "renewable_energy", label: "Fornybar Energi", color: "#F59E0B" },
+    { type: "carbon_capture", label: "Karbonfangst", color: "#0EA5E9" },
+    { type: "foreign_cloud", label: "Utenlandsk Sky", color: "#EF4444" },
+  ];
+
+  const handleInvest = (type: Investment, amount: number) => {
+    dispatch({ type: "MAKE_INVESTMENT", payload: { type, amount } });
+  };
+
   return (
     <div className="investment-panel">
-      <h4>Invest</h4>
-      {/* Add investment buttons here */}
+      <h4>Investeringer</h4>
+      <div className="investment-buttons">
+        {investments.map((inv) => (
+          <button
+            key={inv.type}
+            style={{
+              background: inv.color,
+              color: "#fff",
+              margin: "4px",
+              padding: "8px 12px",
+              borderRadius: "6px",
+              border: "none",
+              cursor: gameState.budget >= 100 ? "pointer" : "not-allowed",
+              opacity: gameState.budget >= 100 ? 1 : 0.5,
+            }}
+            disabled={gameState.budget < 100}
+            onClick={() => handleInvest(inv.type, 100)}
+            title={`Invester 100 mrd i ${inv.label}`}
+          >
+            +100 mrd {inv.label}
+          </button>
+        ))}
+      </div>
+      <div className="investment-summary">
+        <h5>Din portefølje:</h5>
+        <ul>
+          {investments.map((inv) => (
+            <li key={inv.type}>
+              <span style={{ color: inv.color }}>{inv.label}:</span>{" "}
+              {gameState.investments[inv.type]} mrd
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
