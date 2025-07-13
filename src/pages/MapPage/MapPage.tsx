@@ -591,7 +591,7 @@ const loadGameState = (): GameState => {
               : defaultState.shutdowns,
           investments:
             parsed.investments && typeof parsed.investments === "object"
-              ? parsed.investments
+              ? { ...defaultState.investments, ...parsed.investments }
               : defaultState.investments,
           globalTemperature:
             typeof parsed.globalTemperature === "number"
@@ -1707,6 +1707,21 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
           ...state.investments,
           [investmentType]: state.investments[investmentType] + amount,
         },
+        norwayTechRank: Math.min(
+          100,
+          Math.max(
+            0,
+            (state.investments.green_tech +
+              state.investments.ai_research +
+              state.investments.renewable_energy +
+              (investmentType === "green_tech" ? amount : 0) +
+              (investmentType === "ai_research" ? amount : 0) +
+              (investmentType === "renewable_energy" ? amount : 0) -
+              state.investments.foreign_cloud -
+              (investmentType === "foreign_cloud" ? amount : 0)) /
+              10,
+          ),
+        ),
       };
 
       // Update tech rank based on investments
@@ -2529,19 +2544,6 @@ const MultiSelectControls: React.FC<{
     </div>
   );
 };
-
-// const InvestmentPanel: React.FC<{
-//   gameState: GameState;
-//   dispatch: Function;
-// }> = ({ gameState, dispatch }) => {
-//   // This is a placeholder for an investment UI panel.
-//   return (
-//     <div className="investment-panel">
-//       <h4>Invest</h4>
-//       {/* Add investment buttons here */}
-//     </div>
-//   );
-// };
 
 const InvestmentPanel: React.FC<{
   gameState: GameState;
