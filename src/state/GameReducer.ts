@@ -1,4 +1,5 @@
 import { GameState, GameAction } from "../interfaces/GameState";
+import { checkAndAwardAchievements } from "../achievements";
 
 // Local utility functions
 const calculateYearlyConsequences = (state: GameState) => {
@@ -26,11 +27,6 @@ const calculateYearlyConsequences = (state: GameState) => {
 const getRandomEvent = (state: GameState) => {
   // Simplified random event logic
   return null;
-};
-
-const checkAndAwardAchievements = (state: GameState): string[] => {
-  // Simplified achievement logic
-  return [];
 };
 
 const calculatePhaseOutCapacity = (state: GameState): number => {
