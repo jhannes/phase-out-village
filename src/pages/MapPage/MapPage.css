@@ -15,10 +15,10 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  display: flex; /* Make container a flex container */
-  flex-direction: column; /* Stack items vertically */
-  align-items: center; /* Center items horizontally */
-  gap: 20px; /* Space between main sections */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
 .header {
@@ -30,9 +30,8 @@
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  width: 100%; /* Take full width within its flex context */
-  max-width: 900px; /* Max width as seen in screenshot */
-  /* Remove margin-bottom here as container's gap will handle spacing */
+  width: 100%;
+  max-width: 900px;
 }
 
 .header-top {
@@ -70,7 +69,7 @@
 /* TODO: Better colors for the stats */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-top: 16px; /* Space before stats grid */
 }
@@ -129,8 +128,8 @@
   padding: 24px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  width: 100%; /* Take full width of main-content-area */
-  /* Removed margin-bottom here */
+  width: 100%;
+  max-width: 900px;
 }
 
 .map-title {
@@ -141,12 +140,19 @@
 }
 
 .map-div {
-  height: 400px; /* Changed height to match image */
+  height: 600px;
   width: 100%;
   border-radius: 8px;
-  border: 4px solid #bfdbfe;
-  overflow: hidden; /* Ensure content respects border-radius */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Added box shadow */
+  border: 2px solid #bfdbfe;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+@media (max-width: 1200px) {
+  .map-div {
+    height: 400px;
+  }
 }
 
 .map-hint {
@@ -158,6 +164,15 @@
   background: rgba(255, 255, 255, 0.8);
   border-radius: 8px;
   font-weight: 500;
+}
+
+.map-legend {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .dashboard-grid {
@@ -918,4 +933,71 @@
 .capacity-warning {
   background: #fff3e0;
   color: #e65100;
+}
+
+/* Investment Panel Styling */
+.investment-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+  max-width: 900px;
+}
+
+.investment-panel h4 {
+  margin: 0 0 16px 0;
+  color: #1e40af;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.investment-panel h5 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.investment-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.investment-buttons button {
+  transition: all 0.2s ease;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.investment-buttons button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.investment-buttons button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.investment-summary {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.investment-summary ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.investment-summary li {
+  padding: 2px 0;
+  font-size: 12px;
 }

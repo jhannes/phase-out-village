@@ -1,0 +1,193 @@
+.multi-phaseout-summary {
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.multi-phaseout-summary.can-afford {
+  border: 2px solid #22c55e;
+}
+
+.multi-phaseout-summary.cannot-afford {
+  border: 2px solid #ef4444;
+}
+
+.multi-phaseout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 12px;
+}
+
+.multi-phaseout-title {
+  margin: 0;
+  color: #22c55e;
+  font-size: 1.1em;
+}
+
+.multi-phaseout-status {
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+.multi-phaseout-status.can-afford {
+  color: #22c55e;
+}
+
+.multi-phaseout-status.cannot-afford {
+  color: #ef4444;
+}
+
+.multi-phaseout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.multi-phaseout-section-title {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.multi-phaseout-section-content {
+  font-size: 0.85em;
+  margin-top: 8px;
+}
+
+.multi-phaseout-section-content > div {
+  margin-bottom: 4px;
+}
+
+.multi-phaseout-production-value {
+  color: #fbbf24;
+}
+
+.multi-phaseout-emissions-value {
+  color: #ef4444;
+  font-weight: bold;
+}
+
+.multi-phaseout-jobs-value {
+  color: #fbbf24;
+}
+
+.multi-phaseout-new-jobs-value {
+  color: #22c55e;
+}
+
+.multi-phaseout-positive-change {
+  color: #22c55e;
+}
+
+.multi-phaseout-negative-change {
+  color: #ef4444;
+}
+
+.multi-phaseout-economics {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.multi-phaseout-economics-title {
+  font-size: 0.9em;
+  opacity: 0.8;
+  margin-bottom: 8px;
+}
+
+.multi-phaseout-economics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.multi-phaseout-economics-content {
+  font-size: 0.85em;
+}
+
+.multi-phaseout-economics-content > div {
+  margin-bottom: 4px;
+}
+
+.multi-phaseout-cost-affordable {
+  color: #fbbf24;
+}
+
+.multi-phaseout-cost-unaffordable {
+  color: #ef4444;
+}
+
+.multi-phaseout-lost-revenue {
+  color: #ef4444;
+}
+
+.multi-phaseout-shortfall {
+  color: #ef4444;
+  font-size: 0.8em;
+  margin-top: 4px;
+}
+
+.multi-phaseout-new-revenue {
+  color: #22c55e;
+}
+
+.multi-phaseout-climate {
+  background: rgba(34, 197, 94, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.multi-phaseout-climate-title {
+  font-size: 0.9em;
+  color: #22c55e;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.multi-phaseout-climate-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  font-size: 0.85em;
+}
+
+.multi-phaseout-climate-reduction {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+.multi-phaseout-climate-lifetime {
+  color: #22c55e;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.multi-phaseout-climate-note {
+  font-size: 0.75em;
+  opacity: 0.8;
+  margin-top: 6px;
+}
+
+.multi-phaseout-transition {
+  font-size: 0.85em;
+}
+
+.multi-phaseout-transition-title {
+  margin-bottom: 6px;
+}
+
+.multi-phaseout-transition-content {
+  background: rgba(34, 197, 94, 0.1);
+  padding: 8px;
+  border-radius: 6px;
+  color: #22c55e;
+}

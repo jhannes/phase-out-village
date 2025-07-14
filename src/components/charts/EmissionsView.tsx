@@ -8,9 +8,13 @@ interface EmissionsData {
 
 interface EmissionsViewProps {
   data: EmissionsData[];
+  onFieldClick?: (fieldName: string) => void;
 }
 
-export const EmissionsView: React.FC<EmissionsViewProps> = ({ data }) => {
+export const EmissionsView: React.FC<EmissionsViewProps> = ({
+  data,
+  onFieldClick,
+}) => {
   const years = Array.from({ length: 6 }, (_, i) => 2020 + i);
   const maxEmission = Math.max(...data.flatMap((field) => field.data));
 
@@ -47,7 +51,14 @@ export const EmissionsView: React.FC<EmissionsViewProps> = ({ data }) => {
 
       {/* Field List */}
       <div className="emissions-fields">
-        <h3>Felt Status</h3>
+        <h3>
+          Felt Status{" "}
+          {onFieldClick && (
+            <span style={{ fontSize: "12px", color: "#6b7280" }}>
+              - Klikk for å gå til kartet
+            </span>
+          )}
+        </h3>
         <div className="field-grid">
           {data.map((field) => {
             const currentEmission = field.data[field.data.length - 1] || 0;
@@ -56,9 +67,23 @@ export const EmissionsView: React.FC<EmissionsViewProps> = ({ data }) => {
             return (
               <div
                 key={field.name}
-                className={`field-item ${isActive ? "active" : "closed"}`}
+                className={`field-item ${isActive ? "active" : "closed"} ${onFieldClick ? "clickable" : ""}`}
+                onClick={() => onFieldClick?.(field.name)}
+                style={{ cursor: onFieldClick ? "pointer" : "default" }}
+                title={
+                  onFieldClick
+                    ? `Klikk for å gå til ${field.name} på kartet`
+                    : undefined
+                }
               >
-                <div className="field-name">{field.name}</div>
+                <div className="field-name">
+                  {field.name}
+                  {onFieldClick && (
+                    <span style={{ marginLeft: "8px", fontSize: "10px" }}>
+                      🗺️
+                    </span>
+                  )}
+                </div>
                 <div className="field-emission">
                   {isActive
                     ? `${currentEmission.toFixed(1)} Mt`

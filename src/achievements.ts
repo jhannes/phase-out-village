@@ -31,9 +31,7 @@ export const achievementRules: {
   },
   {
     name: "Tech-Pioner",
-    condition: (state) =>
-      Object.values(state.investments).reduce((sum, inv) => sum + inv, 0) >=
-      200,
+    condition: (state) => state.norwayTechRank >= 100,
   },
   {
     name: "Grønn Omstilling",

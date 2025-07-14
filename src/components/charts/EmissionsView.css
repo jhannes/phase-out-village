@@ -103,3 +103,49 @@
 .field-item.closed .field-emission {
   color: #059669;
 }
+
+.field-item.clickable {
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.field-item.clickable::after {
+  content: "👆 Klikk for kart";
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #3b82f6;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 12px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.field-item.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-left-width: 6px;
+  background: #fafafa;
+}
+
+.field-item.clickable:hover::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.field-item.clickable:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.field-item.clickable.closed:hover {
+  background: #f0fdf4;
+}
+
+.field-item.clickable.closed::after {
+  background: #10b981;
+}

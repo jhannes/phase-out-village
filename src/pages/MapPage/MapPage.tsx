@@ -6,6 +6,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
+import MultiPhaseOutSummary from "../../components/MultiPhaseOutSummary/MultiPhaseOutSummary";
 import { gameReducer } from "../../state/GameReducer";
 import OlMap from "ol/Map";
 import View from "ol/View";
@@ -17,6 +18,7 @@ import VectorSource from "ol/source/Vector";
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
 import Circle from "ol/style/Circle";
+import Overlay from "ol/Overlay";
 import Style from "ol/style/Style";
 import { Fill, Stroke, Text } from "ol/style";
 import "ol/ol.css";
@@ -232,7 +234,14 @@ type Investment =
   | "ai_research"
   | "renewable_energy"
   | "carbon_capture"
-  | "foreign_cloud";
+  | "hydrogen_tech"
+  | "quantum_computing"
+  | "battery_tech"
+  | "offshore_wind"
+  | "foreign_cloud"
+  | "fossil_subsidies"
+  | "crypto_mining"
+  | "fast_fashion";
 
 type Field = {
   name: string;
@@ -355,26 +364,28 @@ const FIELD_COORDINATES: Record<string, { lon: number; lat: number }> = {
   Gjøa: { lon: 3.9, lat: 61.0 },
   Goliat: { lon: 22.2, lat: 71.1 },
   Grane: { lon: 2.8, lat: 59.1 },
-  Gullfaks: { lon: 2.5, lat: 61.2 },
-  Heidrun: { lon: 7.3, lat: 65.3 },
-  "Johan Castberg": { lon: 19.0, lat: 71.6 },
-  "Johan Sverdrup": { lon: 2.8, lat: 56.1 },
+  Gudrun: { lon: 3.4, lat: 59.2 },
+  Gullfaks: { lon: 2.3, lat: 61.2 },
+  Heidrun: { lon: 6.6, lat: 65.3 },
+  Ivar: { lon: 2.0, lat: 58.9 },
+  "Johan Castberg": { lon: 10.8, lat: 71.6 },
+  "Johan Sverdrup": { lon: 3.3, lat: 58.9 },
   Kristin: { lon: 6.6, lat: 65.0 },
-  Kvitebjørn: { lon: 2.5, lat: 61.1 },
-  "Martin Linge": { lon: 3.3, lat: 60.8 },
-  Njord: { lon: 6.6, lat: 64.8 },
+  Kvitebjørn: { lon: 2.1, lat: 61.0 },
+  "Martin Linge": { lon: 5.1, lat: 60.8 },
+  Njord: { lon: 6.4, lat: 64.8 },
   Norne: { lon: 8.1, lat: 66.0 },
-  "Ormen Lange": { lon: 6.3, lat: 63.4 },
-  Oseberg: { lon: 2.8, lat: 60.8 },
-  Skarv: { lon: 7.5, lat: 65.5 },
-  Sleipner: { lon: 2.9, lat: 58.4 },
-  Snorre: { lon: 2.2, lat: 61.4 },
-  Snøhvit: { lon: 21.3, lat: 71.6 },
-  Statfjord: { lon: 1.8, lat: 61.8 },
+  Oseberg: { lon: 2.8, lat: 60.5 },
+  Sleipner: { lon: 4.7, lat: 58.4 },
+  Snorre: { lon: 2.1, lat: 61.4 },
+  Statfjord: { lon: 1.9, lat: 61.3 },
   Troll: { lon: 3.7, lat: 60.6 },
-  Ula: { lon: 2.8, lat: 57.1 },
+  Ula: { lon: 2.9, lat: 57.1 },
+  Visund: { lon: 2.3, lat: 61.4 },
+  "Ormen Lange": { lon: 8.1, lat: 64.7 },
+  Skarv: { lon: 7.5, lat: 65.5 },
+  Snøhvit: { lon: 21.3, lat: 71.6 },
   Valhall: { lon: 3.4, lat: 56.3 },
-  Visund: { lon: 2.4, lat: 61.4 },
   Yme: { lon: 2.2, lat: 58.1 },
   Åsgard: { lon: 7.0, lat: 65.2 },
 };
@@ -382,10 +393,49 @@ const FIELD_COORDINATES: Record<string, { lon: number; lat: number }> = {
 const INITIAL_BUDGET = 15000; // 15 trillion NOK (closer to actual Oil Fund size)
 const INITIAL_SCORE = 0; // Start from zero
 const INITIAL_YEAR = 2025;
-const DEFAULT_MAP_CENTER = [5, 62];
+const DEFAULT_MAP_CENTER = [6, 63];
 const DEFAULT_MAP_ZOOM = 6;
 
 // --- Utility Functions ---
+const getFieldAbbreviation = (fieldName: string): string => {
+  const abbreviations: Record<string, string> = {
+    "Aasta Hansteen": "AH",
+    Alvheim: "AL",
+    Balder: "BD",
+    Brage: "BR",
+    Draugen: "DR",
+    "Edvard Grieg": "EG",
+    Ekofisk: "EK",
+    Eldfisk: "EL",
+    Gjøa: "GJ",
+    Goliat: "GO",
+    Grane: "GR",
+    Gullfaks: "GF",
+    Heidrun: "HE",
+    "Johan Castberg": "JC",
+    "Johan Sverdrup": "JS",
+    Kristin: "KR",
+    Kvitebjørn: "KV",
+    "Martin Linge": "ML",
+    Njord: "NJ",
+    Norne: "NO",
+    "Ormen Lange": "OL",
+    Oseberg: "OS",
+    Skarv: "SK",
+    Sleipner: "SL",
+    Snorre: "SN",
+    Snøhvit: "SH",
+    Statfjord: "ST",
+    Troll: "TR",
+    Ula: "UL",
+    Valhall: "VH",
+    Visund: "VI",
+    Yme: "YM",
+    Åsgard: "ÅS",
+  };
+  return abbreviations[fieldName] || fieldName.substring(0, 2).toUpperCase();
+};
+
 const createFieldFromRealData = (
   fieldName: string,
   realData: OilFieldDataset,
@@ -394,7 +444,13 @@ const createFieldFromRealData = (
   const latestYear = Math.max(...Object.keys(yearlyData).map(Number));
   const latestData = yearlyData[latestYear.toString()];
 
-  const coordinates = FIELD_COORDINATES[fieldName] || { lon: 5, lat: 62 };
+  const coordinates = FIELD_COORDINATES[fieldName] || {
+    lon: 5,
+    lat: 62,
+  };
+  if (!FIELD_COORDINATES[fieldName]) {
+    console.warn(`Missing coordinates for field: ${fieldName}, using fallback`);
+  }
 
   // Calculate emissions history (last 5 years)
   const emissionsHistory = Object.keys(yearlyData)
@@ -466,8 +522,13 @@ const loadGameState = (): GameState => {
   }
 
   const realData = generateCompleteData(data);
+  console.log("Available fields in realData:", Object.keys(realData));
   const gameFields = Object.keys(realData).map((fieldName) =>
     createFieldFromRealData(fieldName, realData),
+  );
+  console.log(
+    "Created gameFields:",
+    gameFields.map((f) => `${f.name} [${f.lon}, ${f.lat}]`),
   );
 
   const defaultState: GameState = {
@@ -488,7 +549,14 @@ const loadGameState = (): GameState => {
       ai_research: 0,
       renewable_energy: 0,
       carbon_capture: 0,
+      hydrogen_tech: 0,
+      quantum_computing: 0,
+      battery_tech: 0,
+      offshore_wind: 0,
       foreign_cloud: 0,
+      fossil_subsidies: 0,
+      crypto_mining: 0,
+      fast_fashion: 0,
     },
     globalTemperature: 1.1,
     norwayTechRank: 0,
@@ -733,7 +801,14 @@ const createFreshGameState = (): GameState => {
       ai_research: 0,
       renewable_energy: 0,
       carbon_capture: 0,
+      hydrogen_tech: 0,
+      quantum_computing: 0,
+      battery_tech: 0,
+      offshore_wind: 0,
       foreign_cloud: 0,
+      fossil_subsidies: 0,
+      crypto_mining: 0,
+      fast_fashion: 0,
     },
     globalTemperature: 1.1,
     norwayTechRank: 0,
@@ -759,17 +834,17 @@ const createFreshGameState = (): GameState => {
     yearlyPhaseOutCapacity: 0,
   };
 };
-
+// Colors for the oilfields in the map, shows intensity level of production
 const getColorForIntensity = (
   intensity: number,
   status: Field["status"],
 ): string => {
-  if (status === "closed") return "#10B981";
-  if (status === "transitioning") return "#F59E0B";
-  if (intensity > 15) return "#EF4444";
-  if (intensity > 8) return "#F97316";
-  if (intensity > 3) return "#EAB308";
-  return "#22C55E";
+  if (status === "closed") return "#10B981"; // Bright green for phased out
+  if (status === "transitioning") return "#F59E0B"; // Orange for transitioning
+  if (intensity > 15) return "#DC2626"; // Dark red for very high intensity
+  if (intensity > 8) return "#EF4444"; // Red for high intensity
+  if (intensity > 3) return "#F97316"; // Orange for medium intensity
+  return "#64748B"; // Gray for low intensity (not green!)
 };
 
 // Enhanced badge system with educational messages
@@ -1603,11 +1678,149 @@ const PhaseOutMapPage: React.FC = () => {
         view: new View({
           center: fromLonLat(DEFAULT_MAP_CENTER),
           zoom: DEFAULT_MAP_ZOOM,
+          minZoom: 4,
+          maxZoom: 10,
+          constrainResolution: true,
+          smoothResolutionConstraint: false,
         }),
         controls: [],
       });
 
-      mapInstanceRef.current.on("singleclick", function (evt: any) {
+      // Force initial render
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.updateSize();
+          mapInstanceRef.current.renderSync();
+        }
+      }, 100);
+    }
+
+    // Update map size when switching to map view
+    setTimeout(() => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.updateSize();
+        mapInstanceRef.current.renderSync();
+      }
+    }, 150);
+
+    return () => {
+      if (mapInstanceRef.current && !mapRef.current) {
+        mapInstanceRef.current.setTarget(undefined);
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [currentView]);
+
+  // Separate effect for map rendering updates
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    const map = mapInstanceRef.current;
+    let vectorLayer = map
+      .getLayers()
+      .getArray()
+      .find((layer) => layer instanceof VectorLayer) as VectorLayer | undefined;
+
+    // Enhanced map rendering with multi-select visual feedback
+    console.log("Rendering fields on map:", gameFields.length);
+    console.log(
+      "Field names:",
+      gameFields.map((f) => f.name),
+    );
+
+    const vectorSource = new VectorSource({
+      features: gameFields.map((field) => {
+        console.log(
+          `Rendering field: ${field.name} at [${field.lon}, ${field.lat}] status: ${field.status}`,
+        );
+
+        const feature = new Feature({
+          geometry: new Point(fromLonLat([field.lon, field.lat])),
+          name: field.name,
+          fieldData: field,
+        });
+
+        let color = getColorForIntensity(field.intensity, field.status);
+        let strokeColor = "#FFFFFF";
+        let strokeWidth = 2;
+
+        // Multi-select visual feedback
+        if (gameState.multiPhaseOutMode) {
+          const isSelected = gameState.selectedFields.some(
+            (f) => f.name === field.name,
+          );
+          if (isSelected) {
+            strokeColor = "#FFD700"; // Gold border for selected
+            strokeWidth = 4;
+          } else if (field.status === "active") {
+            strokeColor = "#00FF00"; // Green border for selectable
+            strokeWidth = 3;
+          }
+        }
+
+        const size =
+          field.status === "closed"
+            ? 16
+            : Math.max(16, Math.min(24, field.production * 1.2));
+
+        feature.setStyle(
+          new Style({
+            image: new Circle({
+              radius: size,
+              fill: new Fill({ color }),
+              stroke: new Stroke({
+                color: strokeColor,
+                width: strokeWidth,
+              }),
+            }),
+          }),
+        );
+
+        // Debug logging for icon rendering
+        console.log(
+          `Rendered ${field.name}: status=${field.status}, icon=${field.status === "closed" ? "🌱" : "🛢️"}`,
+        );
+
+        return feature;
+      }),
+    });
+
+    if (vectorLayer) {
+      vectorLayer.setSource(vectorSource);
+    } else {
+      vectorLayer = new VectorLayer({ source: vectorSource });
+      map.addLayer(vectorLayer);
+    }
+
+    return () => {
+      if (mapInstanceRef.current && !mapRef.current) {
+        mapInstanceRef.current.setTarget(undefined);
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [
+    currentView,
+    gameFields,
+    gameState.multiPhaseOutMode,
+    gameState.selectedFields,
+  ]);
+
+  // Separate effect for click handler that updates with game state
+  useEffect(() => {
+    if (!mapInstanceRef.current || currentView !== "map") return;
+
+    // Add a small delay to ensure map is fully ready after view switching
+    const setupClickHandler = () => {
+      if (!mapInstanceRef.current) return;
+
+      // Clear existing click events
+      const existingHandler = mapInstanceRef.current.get("currentClickHandler");
+      if (existingHandler) {
+        mapInstanceRef.current.un("singleclick", existingHandler);
+      }
+
+      // Add new click handler with current game state
+      const clickHandler = function (evt: any) {
         mapInstanceRef.current?.forEachFeatureAtPixel(
           evt.pixel,
           function (feature: any) {
@@ -1617,17 +1830,23 @@ const PhaseOutMapPage: React.FC = () => {
             }
           },
         );
-      });
-    }
+      };
 
-    // Update map size when switching to map view
-    setTimeout(() => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.updateSize();
-      }
-    }, 100);
+      mapInstanceRef.current.on("singleclick", clickHandler);
+      mapInstanceRef.current.set("currentClickHandler", clickHandler);
+      console.log("Click handler setup completed for map view");
+    };
+
+    // Small delay to ensure map rendering is complete
+    setTimeout(setupClickHandler, 100);
+  }, [gameState.multiPhaseOutMode, gameState.selectedFields, currentView]);
+
+  // Separate effect for map rendering updates
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
 
     const map = mapInstanceRef.current;
+
     let vectorLayer = map
       .getLayers()
       .getArray()
@@ -1662,23 +1881,36 @@ const PhaseOutMapPage: React.FC = () => {
 
         const size =
           field.status === "closed"
-            ? 8
-            : Math.max(8, Math.min(16, field.production * 0.5));
+            ? 12
+            : Math.max(12, Math.min(20, field.production * 1.2));
 
         feature.setStyle(
           new Style({
             image: new Circle({
               radius: size,
-              fill: new Fill({ color: color }),
-              stroke: new Stroke({ color: strokeColor, width: strokeWidth }),
+              fill: new Fill({ color }),
+              stroke: new Stroke({
+                color: strokeColor,
+                width: strokeWidth,
+              }),
             }),
             text: new Text({
-              text: field.status === "closed" ? "🌱" : "🛢️",
-              offsetY: -25,
-              font: "16px sans-serif",
+              text: getFieldAbbreviation(field.name),
+              offsetY: 0,
+              font: "bold 10px Arial, sans-serif",
+              fill: new Fill({
+                color: "#FFFFFF",
+              }),
+              stroke: new Stroke({
+                color: "#000000",
+                width: 2,
+              }),
+              textAlign: "center",
+              textBaseline: "middle",
             }),
           }),
         );
+
         return feature;
       }),
     });
@@ -1690,22 +1922,121 @@ const PhaseOutMapPage: React.FC = () => {
       map.addLayer(vectorLayer);
     }
 
-    return () => {
-      if (mapInstanceRef.current && !mapRef.current) {
-        mapInstanceRef.current.setTarget(undefined);
-        mapInstanceRef.current = null;
+    // Force map refresh after updating features
+
+    setTimeout(() => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.updateSize();
+        mapInstanceRef.current.renderSync();
       }
-    };
-  }, [
-    gameFields,
-    currentView,
-    gameState.multiPhaseOutMode,
-    gameState.selectedFields,
-  ]);
+    }, 50);
+  }, [gameFields, gameState.multiPhaseOutMode, gameState.selectedFields]);
 
   const phaseOutField = useCallback((fieldName: string) => {
     dispatch({ type: "PHASE_OUT_FIELD", payload: fieldName });
   }, []);
+
+  const navigateToField = useCallback(
+    (fieldName: string) => {
+      console.log(`NavigateToField called for: ${fieldName}`);
+
+      // Switch to map view
+      dispatch({ type: "SET_VIEW_MODE", payload: "map" });
+
+      // Find the field
+      const field = gameFields.find((f) => f.name === fieldName);
+      if (!field) {
+        console.log(`Field not found: ${fieldName}`);
+        return;
+      }
+
+      console.log(`Found field: ${field.name} at [${field.lon}, ${field.lat}]`);
+
+      // Function to animate to field once map is ready
+      const animateToField = () => {
+        if (mapInstanceRef.current) {
+          console.log("Map instance found, starting animation");
+
+          // Ensure map size is correct before animation
+          mapInstanceRef.current.updateSize();
+
+          // Force map to render completely
+          mapInstanceRef.current.renderSync();
+
+          // Add a small delay to ensure map is properly rendered
+          setTimeout(() => {
+            const view = mapInstanceRef.current?.getView();
+            if (view) {
+              const currentCenter = view.getCenter();
+              const targetCenter = fromLonLat([field.lon, field.lat]);
+
+              console.log(
+                `Animating to field: ${field.name} at [${field.lon}, ${field.lat}]`,
+                `Current center: ${currentCenter}, Target: ${targetCenter}`,
+              );
+
+              // First zoom out a bit to make animation more visible
+              view.animate(
+                {
+                  zoom: 5,
+                  duration: 500,
+                },
+                () => {
+                  // Then animate to field location
+                  view.animate({
+                    center: targetCenter,
+                    zoom: 8,
+                    duration: 1000,
+                  });
+                },
+              );
+
+              // Select the field and show modal after animation
+              setTimeout(() => {
+                console.log("Opening modal for field:", field.name);
+                dispatch({ type: "SET_SELECTED_FIELD", payload: field });
+                dispatch({ type: "TOGGLE_FIELD_MODAL", payload: true });
+              }, 1500);
+            } else {
+              console.log("Map view not available");
+            }
+          }, 300);
+        } else {
+          console.log("Map instance not available for animation");
+        }
+      };
+
+      // Wait a bit longer for map to be properly initialized after view switch
+      setTimeout(() => {
+        console.log("Checking map initialization...");
+        if (mapInstanceRef.current) {
+          console.log("Map is ready, animating");
+          animateToField();
+        } else {
+          console.log("Map not ready yet, waiting...");
+          // Wait for map to be initialized, then animate
+          const checkMapInterval = setInterval(() => {
+            console.log("Checking map instance...");
+            if (mapInstanceRef.current) {
+              console.log("Map instance found after waiting");
+              clearInterval(checkMapInterval);
+              setTimeout(animateToField, 200);
+            }
+          }, 100);
+
+          // Clear interval after 5 seconds to prevent infinite waiting
+          setTimeout(() => {
+            clearInterval(checkMapInterval);
+            console.log("Map animation timed out, showing modal only");
+            // Fallback: just show the modal if map doesn't initialize
+            dispatch({ type: "SET_SELECTED_FIELD", payload: field });
+            dispatch({ type: "TOGGLE_FIELD_MODAL", payload: true });
+          }, 5000);
+        }
+      }, 500);
+    },
+    [gameFields],
+  );
 
   const emissionsData = useMemo(() => {
     // Transform game data for emissions chart
@@ -1729,7 +2060,10 @@ const PhaseOutMapPage: React.FC = () => {
       case "emissions":
         return (
           <div className="view-container">
-            <EmissionsView data={emissionsData} />
+            <EmissionsView
+              data={emissionsData}
+              onFieldClick={navigateToField}
+            />
             <div className="game-impact-summary">
               <h3>🎮 Din påvirkning</h3>
               <p>
@@ -1746,10 +2080,154 @@ const PhaseOutMapPage: React.FC = () => {
           <div className="map-container">
             <h2 className="map-title">🗺️ Norske Oljeområder</h2>
             <div ref={mapRef} className="map-div" />
+
+            {/* Map Legend */}
+            <div className="map-legend">
+              <h4
+                style={{
+                  margin: "0 0 8px 0",
+                  fontSize: "14px",
+                  color: "#374151",
+                }}
+              >
+                Forklaring:
+              </h4>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "12px",
+                  fontSize: "12px",
+                }}
+              >
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "4px" }}
+                >
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      color: "#1F2937",
+                      border: "1px solid #DC2626",
+                      padding: "2px 4px",
+                      borderRadius: "3px",
+                      backgroundColor: "#DC2626",
+                    }}
+                  >
+                    JS
+                  </span>
+                  <span
+                    style={{
+                      width: "12px",
+                      height: "12px",
+                      borderRadius: "50%",
+                      backgroundColor: "#DC2626",
+                      display: "inline-block",
+                    }}
+                  ></span>
+                  <span>Høy intensitet</span>
+                </div>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "4px" }}
+                >
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      color: "#1F2937",
+                      border: "1px solid #F97316",
+                      padding: "2px 4px",
+                      borderRadius: "3px",
+                      backgroundColor: "#F97316",
+                    }}
+                  >
+                    JS
+                  </span>
+                  <span
+                    style={{
+                      width: "12px",
+                      height: "12px",
+                      borderRadius: "50%",
+                      backgroundColor: "#F97316",
+                      display: "inline-block",
+                    }}
+                  ></span>
+                  <span>Medium intensitet</span>
+                </div>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "4px" }}
+                >
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      color: "#1F2937",
+                      border: "1px solid #64748B",
+                      padding: "2px 4px",
+                      borderRadius: "3px",
+                      backgroundColor: "#64748B",
+                    }}
+                  >
+                    JS
+                  </span>
+                  <span
+                    style={{
+                      width: "12px",
+                      height: "12px",
+                      borderRadius: "50%",
+                      backgroundColor: "#64748B",
+                      display: "inline-block",
+                    }}
+                  ></span>
+                  <span>Lav intensitet</span>
+                </div>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "4px" }}
+                >
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      color: "#FFFFFF",
+                      border: "1px solid #10B981",
+                      padding: "2px 4px",
+                      borderRadius: "3px",
+                      backgroundColor: "#10B981",
+                    }}
+                  >
+                    JS
+                  </span>
+                  <span
+                    style={{
+                      width: "12px",
+                      height: "12px",
+                      borderRadius: "50%",
+                      backgroundColor: "#10B981",
+                      display: "inline-block",
+                    }}
+                  ></span>
+                  <span>Faset ut</span>
+                </div>
+              </div>
+              <div
+                style={{
+                  marginTop: "8px",
+                  fontSize: "11px",
+                  color: "#6b7280",
+                  fontStyle: "italic",
+                }}
+              >
+                💡 Feltforkortelser (f.eks. JS = Johan Sverdrup) vises på kartet
+              </div>
+            </div>
+
             <div className="map-hint">
               {gameState.multiPhaseOutMode
                 ? `⚡ Multi-utfasing: Klikk på opptil ${calculatePhaseOutCapacity(gameState)} felt å fase ut samtidig!`
                 : "Klikk på et oljefelt for å fase det ut! 🛢️ → 🌱"}
+              <div style={{ fontSize: "12px", marginTop: "8px", opacity: 0.7 }}>
+                Viser {gameFields.length} felt på kartet
+              </div>
             </div>
           </div>
         );
@@ -1761,8 +2239,16 @@ const PhaseOutMapPage: React.FC = () => {
     const baseCapacity = 3; // Can phase out 3 fields per year by default
     const techBonus = Math.floor(state.norwayTechRank / 20); // +1 for every 20% tech rank
     const investmentBonus = Math.floor(
-      Object.values(state.investments).reduce((sum, inv) => sum + inv, 0) / 100,
-    ); // +1 for every 100 billion invested
+      (state.investments.green_tech +
+        state.investments.ai_research +
+        state.investments.renewable_energy +
+        state.investments.carbon_capture +
+        state.investments.hydrogen_tech +
+        state.investments.quantum_computing +
+        state.investments.battery_tech +
+        state.investments.offshore_wind) /
+        100,
+    ); // +1 for every 100 billion invested in good tech
 
     return Math.min(8, baseCapacity + techBonus + investmentBonus); // Max 8 fields per year
   };
@@ -1794,7 +2280,11 @@ const PhaseOutMapPage: React.FC = () => {
       <AchievementDebugPanel gameState={gameState} />
 
       {/* Multi-select controls */}
-      <MultiSelectControls gameState={gameState} dispatch={dispatch} />
+      <MultiSelectControls
+        gameState={gameState}
+        dispatch={dispatch}
+        budget={budget}
+      />
 
       {/* Header */}
       <div className="header">
@@ -2032,7 +2522,7 @@ const PhaseOutMapPage: React.FC = () => {
       <div
         className="educational-stats"
         style={{
-          position: "fixed",
+          position: "relative",
           top: "20px",
           right: "20px",
           background: "rgba(0, 0, 0, 0.8)",
@@ -2133,7 +2623,12 @@ const calculatePhaseOutCapacity = (state: GameState): number => {
   const totalInvestment =
     state.investments.green_tech +
     state.investments.renewable_energy +
-    state.investments.ai_research;
+    state.investments.ai_research +
+    state.investments.carbon_capture +
+    state.investments.hydrogen_tech +
+    state.investments.quantum_computing +
+    state.investments.battery_tech +
+    state.investments.offshore_wind;
   const investmentBonus = Math.floor(totalInvestment / 100);
 
   // The total capacity is the sum of base capacity and bonuses, with a maximum cap.
@@ -2166,7 +2661,8 @@ const AchievementDebugPanel: React.FC<{ gameState: GameState }> = ({
 const MultiSelectControls: React.FC<{
   gameState: GameState;
   dispatch: Function;
-}> = ({ gameState, dispatch }) => {
+  budget: number;
+}> = ({ gameState, dispatch, budget }) => {
   console.log(
     "MultiSelectControls render - multiPhaseOutMode:",
     gameState.multiPhaseOutMode,
@@ -2235,6 +2731,10 @@ const MultiSelectControls: React.FC<{
       <div style={{ fontSize: "12px", marginTop: "8px", opacity: 0.8 }}>
         💡 Klikk på felt for å velge/fjerne fra batch
       </div>
+      <MultiPhaseOutSummary
+        selectedFields={gameState.selectedFields}
+        budget={budget}
+      />
     </div>
   );
 };
@@ -2243,53 +2743,212 @@ const InvestmentPanel: React.FC<{
   gameState: GameState;
   dispatch: Function;
 }> = ({ gameState, dispatch }) => {
-  const investments: { type: Investment; label: string; color: string }[] = [
-    { type: "green_tech", label: "Grønn Teknologi", color: "#22C55E" },
-    { type: "ai_research", label: "AI Forskning", color: "#6366F1" },
-    { type: "renewable_energy", label: "Fornybar Energi", color: "#F59E0B" },
-    { type: "carbon_capture", label: "Karbonfangst", color: "#0EA5E9" },
-    { type: "foreign_cloud", label: "Utenlandsk Sky", color: "#EF4444" },
+  const investments: {
+    type: Investment;
+    label: string;
+    color: string;
+    description: string;
+  }[] = [
+    {
+      type: "green_tech",
+      label: "Grønn Teknologi",
+      color: "#22C55E",
+      description: "Generell grønn innovasjon og cleantech",
+    },
+    {
+      type: "ai_research",
+      label: "AI Forskning",
+      color: "#6366F1",
+      description: "Kunstig intelligens for klimaløsninger",
+    },
+    {
+      type: "renewable_energy",
+      label: "Fornybar Energi",
+      color: "#F59E0B",
+      description: "Sol, vind og vannkraft",
+    },
+    {
+      type: "carbon_capture",
+      label: "Karbonfangst",
+      color: "#0EA5E9",
+      description: "CCS og direkte luftfangst",
+    },
+    {
+      type: "hydrogen_tech",
+      label: "Hydrogen Teknologi",
+      color: "#10B981",
+      description: "Grønt hydrogen og brenselsceller",
+    },
+    {
+      type: "quantum_computing",
+      label: "Kvante Databehandling",
+      color: "#8B5CF6",
+      description: "Kvante-teknologi for energioptimering",
+    },
+    {
+      type: "battery_tech",
+      label: "Batteriteknologi",
+      color: "#F97316",
+      description: "Energilagring og batterier",
+    },
+    {
+      type: "offshore_wind",
+      label: "Havvind",
+      color: "#06B6D4",
+      description: "Flytende havvindteknologi",
+    },
+    {
+      type: "foreign_cloud",
+      label: "Utenlandsk Sky",
+      color: "#EF4444",
+      description: "Importerer datacenter-tjenester",
+    },
+    {
+      type: "fossil_subsidies",
+      label: "Fossil Subsidier",
+      color: "#DC2626",
+      description: "Støtter olje- og gassindustrien",
+    },
+    {
+      type: "crypto_mining",
+      label: "Kryptovaluta Mining",
+      color: "#991B1B",
+      description: "Energikrevende kryptovaluta",
+    },
+    {
+      type: "fast_fashion",
+      label: "Fast Fashion",
+      color: "#7F1D1D",
+      description: "Støtter hurtigmote-industrien",
+    },
   ];
 
   const handleInvest = (type: Investment, amount: number) => {
     dispatch({ type: "MAKE_INVESTMENT", payload: { type, amount } });
   };
 
+  const goodInvestments = investments.filter(
+    (inv) =>
+      ![
+        "foreign_cloud",
+        "fossil_subsidies",
+        "crypto_mining",
+        "fast_fashion",
+      ].includes(inv.type),
+  );
+  const badInvestments = investments.filter((inv) =>
+    [
+      "foreign_cloud",
+      "fossil_subsidies",
+      "crypto_mining",
+      "fast_fashion",
+    ].includes(inv.type),
+  );
+
   return (
     <div className="investment-panel">
-      <h4>Investeringer</h4>
-      <div className="investment-buttons">
-        {investments.map((inv) => (
-          <button
-            key={inv.type}
-            style={{
-              background: inv.color,
-              color: "#fff",
-              margin: "4px",
-              padding: "8px 12px",
-              borderRadius: "6px",
-              border: "none",
-              cursor: gameState.budget >= 100 ? "pointer" : "not-allowed",
-              opacity: gameState.budget >= 100 ? 1 : 0.5,
-            }}
-            disabled={gameState.budget < 100}
-            onClick={() => handleInvest(inv.type, 100)}
-            title={`Invester 100 mrd i ${inv.label}`}
-          >
-            +100 mrd {inv.label}
-          </button>
-        ))}
-      </div>
-      <div className="investment-summary">
-        <h5>Din portefølje:</h5>
-        <ul>
-          {investments.map((inv) => (
-            <li key={inv.type}>
-              <span style={{ color: inv.color }}>{inv.label}:</span>{" "}
-              {gameState.investments[inv.type]} mrd
-            </li>
+      <h4>💰 Investeringer</h4>
+
+      {/* Gode investeringer */}
+      <div style={{ marginBottom: "20px" }}>
+        <h5 style={{ color: "#22C55E", marginBottom: "10px" }}>
+          🌱 Gode Investeringer (Øker Tech-Rank)
+        </h5>
+        <div className="investment-buttons">
+          {goodInvestments.map((inv) => (
+            <button
+              key={inv.type}
+              style={{
+                background: inv.color,
+                color: "#fff",
+                margin: "4px",
+                padding: "8px 12px",
+                borderRadius: "6px",
+                border: "none",
+                cursor: gameState.budget >= 100 ? "pointer" : "not-allowed",
+                opacity: gameState.budget >= 100 ? 1 : 0.5,
+                fontSize: "12px",
+              }}
+              disabled={gameState.budget < 100}
+              onClick={() => handleInvest(inv.type, 100)}
+              title={`${inv.description} - 100 mrd NOK`}
+            >
+              +100 mrd {inv.label}
+            </button>
           ))}
-        </ul>
+        </div>
+      </div>
+
+      {/* Dårlige investeringer */}
+      <div style={{ marginBottom: "20px" }}>
+        <h5 style={{ color: "#EF4444", marginBottom: "10px" }}>
+          ⚠️ Dårlige Investeringer (Reduserer Tech-Rank)
+        </h5>
+        <div className="investment-buttons">
+          {badInvestments.map((inv) => (
+            <button
+              key={inv.type}
+              style={{
+                background: inv.color,
+                color: "#fff",
+                margin: "4px",
+                padding: "8px 12px",
+                borderRadius: "6px",
+                border: "none",
+                cursor: gameState.budget >= 100 ? "pointer" : "not-allowed",
+                opacity: gameState.budget >= 100 ? 1 : 0.5,
+                fontSize: "12px",
+              }}
+              disabled={gameState.budget < 100}
+              onClick={() => handleInvest(inv.type, 100)}
+              title={`${inv.description} - 100 mrd NOK`}
+            >
+              +100 mrd {inv.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Portfolio oversikt */}
+      <div className="investment-summary">
+        <h5>📊 Din portefølje:</h5>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "10px",
+            fontSize: "12px",
+          }}
+        >
+          <div>
+            <strong style={{ color: "#22C55E" }}>Gode investeringer:</strong>
+            <ul style={{ margin: "5px 0", paddingLeft: "15px" }}>
+              {goodInvestments.map(
+                (inv) =>
+                  gameState.investments[inv.type] > 0 && (
+                    <li key={inv.type}>
+                      <span style={{ color: inv.color }}>{inv.label}:</span>{" "}
+                      {gameState.investments[inv.type]} mrd
+                    </li>
+                  ),
+              )}
+            </ul>
+          </div>
+          <div>
+            <strong style={{ color: "#EF4444" }}>Dårlige investeringer:</strong>
+            <ul style={{ margin: "5px 0", paddingLeft: "15px" }}>
+              {badInvestments.map(
+                (inv) =>
+                  gameState.investments[inv.type] > 0 && (
+                    <li key={inv.type}>
+                      <span style={{ color: inv.color }}>{inv.label}:</span>{" "}
+                      {gameState.investments[inv.type]} mrd
+                    </li>
+                  ),
+              )}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );

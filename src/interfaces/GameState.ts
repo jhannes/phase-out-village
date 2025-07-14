@@ -55,7 +55,14 @@ export type Investment =
   | "ai_research"
   | "renewable_energy"
   | "carbon_capture"
-  | "foreign_cloud";
+  | "hydrogen_tech"
+  | "quantum_computing"
+  | "battery_tech"
+  | "offshore_wind"
+  | "foreign_cloud"
+  | "fossil_subsidies"
+  | "crypto_mining"
+  | "fast_fashion";
 
 export type ViewMode = "map" | "emissions" | "production" | "economics";
 
