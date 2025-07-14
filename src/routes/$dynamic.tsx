@@ -13,7 +13,7 @@ function RouteComponent() {
   return (
     <>
       <p>Hello "/{dynamic}"</p>
-      <p>This is a dynamic route for dynamic: {dynamic}.</p>
+      <p>This is a dynamic route example for dynamic: {dynamic}.</p>
     </>
   );
 }
