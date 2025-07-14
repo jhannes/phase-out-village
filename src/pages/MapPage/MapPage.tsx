@@ -1847,6 +1847,9 @@ const PhaseOutMapPage: React.FC = () => {
 
     const map = mapInstanceRef.current;
 
+    // Clear existing overlays
+    map.getOverlays().clear();
+
     let vectorLayer = map
       .getLayers()
       .getArray()
@@ -1879,34 +1882,48 @@ const PhaseOutMapPage: React.FC = () => {
           }
         }
 
-        const size =
-          field.status === "closed"
-            ? 12
-            : Math.max(12, Math.min(20, field.production * 1.2));
+        // Create HTML overlay for field label
+        const coordinates = fromLonLat([field.lon, field.lat]);
+        const element = document.createElement("div");
+        element.style.cssText = `
+          font-size: 12px;
+          font-weight: bold;
+          color: ${field.status === "closed" ? "#FFFFFF" : "#1F2937"};
+          border: 1px solid ${color};
+          padding: 2px 4px;
+          border-radius: 3px;
+          background-color: ${color};
+          pointer-events: auto;
+          white-space: nowrap;
+          user-select: none;
+          cursor: pointer;
+        `;
+        element.textContent = getFieldAbbreviation(field.name);
 
+        // Add click handler to the overlay element
+        element.addEventListener("click", (event) => {
+          event.stopPropagation();
+          handleFieldClick(field, gameState, dispatch);
+        });
+
+        const overlay = new Overlay({
+          position: coordinates,
+          element: element,
+          positioning: "center-center",
+        });
+
+        map.addOverlay(overlay);
+
+        // Create larger invisible clickable area
         feature.setStyle(
           new Style({
             image: new Circle({
-              radius: size,
-              fill: new Fill({ color }),
+              radius: 20,
+              fill: new Fill({ color: "transparent" }),
               stroke: new Stroke({
-                color: strokeColor,
-                width: strokeWidth,
+                color: "transparent",
+                width: 0,
               }),
-            }),
-            text: new Text({
-              text: getFieldAbbreviation(field.name),
-              offsetY: 0,
-              font: "bold 10px Arial, sans-serif",
-              fill: new Fill({
-                color: "#FFFFFF",
-              }),
-              stroke: new Stroke({
-                color: "#000000",
-                width: 2,
-              }),
-              textAlign: "center",
-              textBaseline: "middle",
             }),
           }),
         );
@@ -2116,15 +2133,6 @@ const PhaseOutMapPage: React.FC = () => {
                   >
                     JS
                   </span>
-                  <span
-                    style={{
-                      width: "12px",
-                      height: "12px",
-                      borderRadius: "50%",
-                      backgroundColor: "#DC2626",
-                      display: "inline-block",
-                    }}
-                  ></span>
                   <span>Høy intensitet</span>
                 </div>
                 <div
@@ -2143,15 +2151,6 @@ const PhaseOutMapPage: React.FC = () => {
                   >
                     JS
                   </span>
-                  <span
-                    style={{
-                      width: "12px",
-                      height: "12px",
-                      borderRadius: "50%",
-                      backgroundColor: "#F97316",
-                      display: "inline-block",
-                    }}
-                  ></span>
                   <span>Medium intensitet</span>
                 </div>
                 <div
@@ -2170,15 +2169,6 @@ const PhaseOutMapPage: React.FC = () => {
                   >
                     JS
                   </span>
-                  <span
-                    style={{
-                      width: "12px",
-                      height: "12px",
-                      borderRadius: "50%",
-                      backgroundColor: "#64748B",
-                      display: "inline-block",
-                    }}
-                  ></span>
                   <span>Lav intensitet</span>
                 </div>
                 <div
@@ -2197,15 +2187,6 @@ const PhaseOutMapPage: React.FC = () => {
                   >
                     JS
                   </span>
-                  <span
-                    style={{
-                      width: "12px",
-                      height: "12px",
-                      borderRadius: "50%",
-                      backgroundColor: "#10B981",
-                      display: "inline-block",
-                    }}
-                  ></span>
                   <span>Faset ut</span>
                 </div>
               </div>
