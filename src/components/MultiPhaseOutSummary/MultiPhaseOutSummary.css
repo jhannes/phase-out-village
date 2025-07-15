@@ -1,193 +1,220 @@
-.multi-phaseout-summary {
-  margin-bottom: 16px;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  color: #fff;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+:root {
+  --color-bg: #fff;
+  --color-text: #1e293b;
+  --color-border: #e5e7eb;
+  --color-positive: #16a34a;
+  --color-negative: #dc2626;
+  --color-muted: #6b7280;
+  --color-accent: #10b981;
+  --color-bg-section: #f8fafc;
 }
 
-.multi-phaseout-summary.can-afford {
-  border: 2px solid #22c55e;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #23272e;
+    --color-text: #f3f4f6;
+    --color-border: #3a3f47;
+    --color-positive: #22c55e;
+    --color-negative: #ef4444;
+    --color-muted: #94a3b8;
+    --color-accent: #22c55e;
+    --color-bg-section: #2a2e36;
+  }
 }
 
-.multi-phaseout-summary.cannot-afford {
-  border: 2px solid #ef4444;
+/* Minimalistisk variant for MultiPhaseOutSummary */
+.multi-phaseout-summary.minimal {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  margin-bottom: 32px;
 }
 
-.multi-phaseout-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding-bottom: 12px;
+.multi-phaseout-summary.minimal header {
+  border: none;
+  background: none;
+  padding: 0;
+  margin-bottom: 24px;
 }
 
-.multi-phaseout-title {
+.multi-phaseout-summary.minimal h2 {
+  color: var(--color-text);
+  font-size: 1.25rem;
+  font-weight: 600;
   margin: 0;
-  color: #22c55e;
-  font-size: 1.1em;
 }
 
-.multi-phaseout-status {
-  font-size: 0.9em;
-  font-weight: bold;
+/* Header and title */
+.mpo-header {
+  margin-bottom: 24px;
 }
-
-.multi-phaseout-status.can-afford {
-  color: #22c55e;
+.mpo-title {
+  font-weight: 600;
+  font-size: 20px;
+  margin: 0;
+  letter-spacing: 0.5px;
+  color: var(--color-text);
 }
-
-.multi-phaseout-status.cannot-afford {
-  color: #ef4444;
+.mpo-afford {
+  font-size: 14px;
+  color: var(--color-positive);
+  margin-top: 4px;
 }
-
-.multi-phaseout-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.multi-phaseout-section-title {
-  font-size: 0.9em;
-  opacity: 0.8;
-}
-
-.multi-phaseout-section-content {
-  font-size: 0.85em;
-  margin-top: 8px;
-}
-
-.multi-phaseout-section-content > div {
-  margin-bottom: 4px;
-}
-
-.multi-phaseout-production-value {
-  color: #fbbf24;
-}
-
-.multi-phaseout-emissions-value {
-  color: #ef4444;
-  font-weight: bold;
-}
-
-.multi-phaseout-jobs-value {
-  color: #fbbf24;
-}
-
-.multi-phaseout-new-jobs-value {
-  color: #22c55e;
-}
-
-.multi-phaseout-positive-change {
-  color: #22c55e;
-}
-
-.multi-phaseout-negative-change {
-  color: #ef4444;
-}
-
-.multi-phaseout-economics {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 16px;
-}
-
-.multi-phaseout-economics-title {
-  font-size: 0.9em;
-  opacity: 0.8;
-  margin-bottom: 8px;
-}
-
-.multi-phaseout-economics-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.multi-phaseout-economics-content {
-  font-size: 0.85em;
-}
-
-.multi-phaseout-economics-content > div {
-  margin-bottom: 4px;
-}
-
-.multi-phaseout-cost-affordable {
-  color: #fbbf24;
-}
-
-.multi-phaseout-cost-unaffordable {
-  color: #ef4444;
-}
-
-.multi-phaseout-lost-revenue {
-  color: #ef4444;
-}
-
-.multi-phaseout-shortfall {
-  color: #ef4444;
-  font-size: 0.8em;
+.mpo-shortfall {
+  font-size: 14px;
+  color: var(--color-negative);
   margin-top: 4px;
 }
 
-.multi-phaseout-new-revenue {
-  color: #22c55e;
-}
-
-.multi-phaseout-climate {
-  background: rgba(34, 197, 94, 0.1);
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 16px;
-  border: 1px solid rgba(34, 197, 94, 0.3);
-}
-
-.multi-phaseout-climate-title {
-  font-size: 0.9em;
-  color: #22c55e;
-  margin-bottom: 8px;
-  font-weight: bold;
-}
-
-.multi-phaseout-climate-grid {
+/* Grid layout */
+.mpo-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 24px;
+}
+
+.mpo-grid > div {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.mpo-grid > div[style*='border-top'] {
+  border-top: 1px solid var(--color-border) !important;
+  margin-top: 0;
+}
+
+.mpo-grid ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 14px;
+}
+
+.mpo-grid li {
+  margin-bottom: 2px;
+}
+
+/* Fargekoder for tall */
+.mpo-grid .positive, .multi-phaseout-positive-change {
+  color: var(--color-positive);
+}
+.mpo-grid .negative, .multi-phaseout-negative-change {
+  color: var(--color-negative);
+}
+
+.mpo-grid .neutral {
+  color: var(--color-muted);
+}
+
+.mpo-label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+.mpo-label-small {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+.mpo-value {
+  font-size: 18px;
+  color: var(--color-text);
+  font-weight: 400;
+}
+.mpo-value-large {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.mpo-section {
+  grid-column: 1 / span 2;
+  border-top: 1px solid var(--color-border);
+  padding-top: 16px;
+}
+
+.mpo-workers-row {
+  display: flex;
+  align-items: baseline;
   gap: 16px;
-  font-size: 0.85em;
+}
+.mpo-arrow {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+.mpo-positive {
+  font-size: 14px;
+  color: var(--color-positive);
+  margin-left: 8px;
+}
+.mpo-negative {
+  font-size: 14px;
+  color: var(--color-negative);
+  margin-left: 8px;
+}
+.mpo-breakdown {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 14px;
+  color: var(--color-text);
 }
 
-.multi-phaseout-climate-reduction {
-  color: #22c55e;
-  font-weight: bold;
+.mpo-footer {
+  margin-top: 24px;
+  text-align: right;
 }
 
-.multi-phaseout-climate-lifetime {
-  color: #22c55e;
-  font-weight: bold;
-  font-size: 1.1em;
-}
-
-.multi-phaseout-climate-note {
-  font-size: 0.75em;
-  opacity: 0.8;
-  margin-top: 6px;
-}
-
-.multi-phaseout-transition {
-  font-size: 0.85em;
-}
-
-.multi-phaseout-transition-title {
-  margin-bottom: 6px;
-}
-
-.multi-phaseout-transition-content {
-  background: rgba(34, 197, 94, 0.1);
-  padding: 8px;
+.phase-out-button {
+  background: var(--color-accent-2);
+  color: #fff;
+  border: none;
   border-radius: 6px;
-  color: #22c55e;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.phase-out-button:disabled {
+  background: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* Fjern gamle stiler for .multi-phaseout-summary hvis .minimal er satt */
+.multi-phaseout-summary.minimal,
+.multi-phaseout-summary.minimal * {
+  box-shadow: none !important;
+  background: none !important;
+  border-radius: 0 !important;
+}
+
+/* Subtil seksjonsinndeling */
+.mpo-grid > div + div {
+  margin-top: 0;
+}
+
+/* Fjerner gamle mørke bakgrunner og rammer */
+.multi-phaseout-summary,
+.multi-phaseout-header,
+.multi-phaseout-economics,
+.multi-phaseout-climate,
+.multi-phaseout-transition-content {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Typografi */
+.multi-phaseout-summary.minimal,
+.multi-phaseout-summary.minimal h2,
+.multi-phaseout-summary.minimal div,
+.multi-phaseout-summary.minimal ul,
+.multi-phaseout-summary.minimal li {
+  font-family: inherit;
+  letter-spacing: 0;
 }

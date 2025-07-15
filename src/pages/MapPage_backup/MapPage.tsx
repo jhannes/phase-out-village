@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import MultiPhaseOutSummary from "../../components/MultiPhaseOutSummary/MultiPhaseOutSummary";
 import { gameReducer } from "../../state/GameReducer";
+import { useGameState } from "../../context/GameStateContext";
 import OlMap from "ol/Map";
 import View from "ol/View";
 import { fromLonLat } from "ol/proj";
@@ -1582,6 +1583,7 @@ const GameOverModal: React.FC<{
 
 // Updated main component
 const PhaseOutMapPage: React.FC = () => {
+  // Use local state for now - can be migrated to context later
   const [gameState, dispatch] = useReducer(gameReducer, loadGameState());
   const {
     gameFields,
@@ -1660,11 +1662,13 @@ const PhaseOutMapPage: React.FC = () => {
     }
   };
 
-  // Initialize map only when in map view
+  // Initialize map (remove currentView dependency)
   useEffect(() => {
-    if (!mapRef.current || currentView !== "map") return;
+    if (!mapRef.current || mapInstanceRef.current) return;
 
-    if (!mapInstanceRef.current) {
+    console.log("Initializing map...");
+
+    try {
       mapInstanceRef.current = new OlMap({
         target: mapRef.current,
         layers: [
@@ -1686,30 +1690,45 @@ const PhaseOutMapPage: React.FC = () => {
         controls: [],
       });
 
+      console.log("Map created successfully");
+
       // Force initial render
       setTimeout(() => {
         if (mapInstanceRef.current) {
           mapInstanceRef.current.updateSize();
           mapInstanceRef.current.renderSync();
+          console.log("Map updated and rendered");
         }
       }, 100);
+    } catch (error) {
+      console.error("Failed to create map:", error);
     }
+  }, []);
 
-    // Update map size when switching to map view
-    setTimeout(() => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.updateSize();
-        mapInstanceRef.current.renderSync();
-      }
-    }, 150);
-
-    return () => {
-      if (mapInstanceRef.current && !mapRef.current) {
-        mapInstanceRef.current.setTarget(undefined);
-        mapInstanceRef.current = null;
-      }
-    };
+  // Update map size when switching to map view
+  useEffect(() => {
+    if (currentView === "map" && mapInstanceRef.current) {
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.updateSize();
+          mapInstanceRef.current.renderSync();
+        }
+      }, 150);
+    }
   }, [currentView]);
+
+  // Update map size when tab becomes visible
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (mapInstanceRef.current && mapRef.current) {
+        if (mapRef.current.offsetParent !== null) {
+          mapInstanceRef.current.updateSize();
+        }
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Separate effect for map rendering updates
   useEffect(() => {

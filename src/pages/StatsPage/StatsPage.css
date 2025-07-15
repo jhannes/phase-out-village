@@ -1,0 +1,658 @@
+/* StatsPage - Mobile First Design */
+
+.stats-page {
+  padding: 16px;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+/* Header Styles */
+.stats-header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 16px 0;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  letter-spacing: -0.5px;
+}
+
+.title-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  background: var(--color-card);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.tab-button {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 12px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+}
+
+.tab-button:hover {
+  color: var(--color-text);
+  background: var(--color-accent);
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, var(--color-accent) 0%, #1d4ed8 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.tab-icon {
+  font-size: 14px;
+}
+
+/* Tab Content */
+.tab-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--color-card);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px var(--color-shadow);
+  border: 1px solid var(--color-border);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.stat-card-green::before {
+  background: linear-gradient(90deg, var(--color-positive) 0%, #16a34a 100%);
+}
+
+.stat-card-orange::before {
+  background: linear-gradient(90deg, var(--color-warning) 0%, #d97706 100%);
+}
+
+.stat-card-red::before {
+  background: linear-gradient(90deg, var(--color-negative) 0%, #dc2626 100%);
+}
+
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.stat-icon {
+  font-size: 20px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.stat-trend {
+  font-size: 12px;
+}
+
+.trend-up {
+  color: var(--color-positive);
+}
+
+.trend-down {
+  color: var(--color-negative);
+}
+
+.trend-neutral {
+  color: var(--color-text-muted);
+}
+
+.stat-content {
+  text-align: left;
+}
+
+.stat-title {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 2px 0;
+  line-height: 1.2;
+}
+
+.stat-subtitle {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* Progress Section */
+.progress-section {
+  background: var(--color-card);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px var(--color-shadow);
+  border: 1px solid var(--color-border);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-icon {
+  font-size: 18px;
+}
+
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.progress-item {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.progress-values {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.progress-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  animation: shimmer 2s infinite;
+}
+
+.progress-percentage {
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Achievements Preview */
+.achievements-preview {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.achievement-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.achievement-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.achievement-item.unlocked {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border: 1px solid #22c55e;
+}
+
+.achievement-item.locked {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  opacity: 0.6;
+}
+
+.achievement-icon {
+  font-size: 24px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.achievement-content {
+  flex: 1;
+}
+
+.achievement-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+
+.achievement-desc {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Emissions Tab */
+.emissions-tab {
+  background: white;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.tab-content-wrapper {
+  padding: 16px;
+}
+
+/* Economics Tab */
+.economics-tab {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.economics-summary {
+  background: var(--color-card);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px var(--color-shadow);
+  border: 1px solid var(--color-border);
+}
+
+.economics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.economics-card {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.economics-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.economics-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.economics-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.economics-item:last-child {
+  border-bottom: none;
+}
+
+.economics-value {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.economics-value.green {
+  color: var(--color-positive);
+}
+
+/* Cost-Benefit Analysis */
+.cost-benefit {
+  background: var(--color-card-alt);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+}
+
+.analysis-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 12px 0;
+}
+
+.analysis-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.analysis-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  padding: 8px;
+  border-radius: 6px;
+  line-height: 1.4;
+}
+
+.analysis-item.positive {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--color-positive);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.analysis-item.neutral {
+  background: var(--color-bg-section);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.analysis-icon {
+  font-size: 14px;
+  margin-top: 1px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Responsive Design */
+@media (max-width: 375px) {
+  .stats-page {
+    padding: 12px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .stats-grid {
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+  }
+
+  .tab-button {
+    padding: 10px 6px;
+    font-size: 11px;
+  }
+
+  .tab-icon {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 768px) {
+  .stats-page {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .economics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .progress-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .achievement-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .stats-page {
+    max-width: 1024px;
+    padding: 32px;
+  }
+
+  .progress-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .achievement-items {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .stats-page {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+
+  .page-title {
+    color: #f1f5f9;
+  }
+
+  .page-subtitle {
+    color: #94a3b8;
+  }
+
+  .tab-navigation {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .tab-button {
+    color: #94a3b8;
+  }
+
+  .tab-button:hover {
+    color: #f1f5f9;
+  }
+
+  .stat-card,
+  .progress-section,
+  .achievements-preview,
+  .economics-summary,
+  .emissions-tab {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .section-title,
+  .stat-value,
+  .achievement-name,
+  .economics-title,
+  .economics-value,
+  .analysis-title {
+    color: #f1f5f9;
+  }
+
+  .stat-title,
+  .stat-subtitle,
+  .progress-label,
+  .progress-values,
+  .progress-percentage,
+  .achievement-desc {
+    color: #94a3b8;
+  }
+
+  .economics-card,
+  .cost-benefit,
+  .progress-item {
+    background: rgba(15, 23, 42, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .achievement-item.unlocked {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: #22c55e;
+  }
+
+  .achievement-item.locked {
+    background: rgba(15, 23, 42, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Touch Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .tab-button {
+    padding: 14px 8px;
+  }
+
+  .stat-card:hover {
+    transform: none;
+  }
+
+  .achievement-item:hover {
+    transform: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .stat-card,
+  .progress-section,
+  .achievements-preview {
+    border-width: 2px;
+  }
+
+  .tab-button.active {
+    box-shadow: 0 0 0 2px #3b82f6;
+  }
+}

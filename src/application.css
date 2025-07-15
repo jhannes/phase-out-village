@@ -1,5 +1,36 @@
 :root {
-  color-scheme: light;
+  --color-bg: #fff;
+  --color-bg-section: #f8fafc;
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-border: #e5e7eb;
+  --color-accent: #3b82f6;
+  --color-accent-2: #10b981;
+  --color-positive: #16a34a;
+  --color-negative: #dc2626;
+  --color-warning: #f59e0b;
+  --color-card: #fff;
+  --color-card-alt: #f3f4f6;
+  --color-shadow: rgba(0,0,0,0.06);
+  --color-text-on-accent: var(--color-text);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #23272e;
+    --color-bg-section: #2a2e36;
+    --color-text: #f3f4f6;
+    --color-text-muted: #94a3b8;
+    --color-border: #3a3f47;
+    --color-accent: #60a5fa;
+    --color-accent-2: #22c55e;
+    --color-positive: #22c55e;
+    --color-negative: #ef4444;
+    --color-warning: #fbbf24;
+    --color-card: #1e293b;
+    --color-card-alt: #23272e;
+    --color-shadow: rgba(0,0,0,0.18);
+    --color-text-on-accent: #fff;
+  }
 }
 
 td {
@@ -7,16 +38,16 @@ td {
 }
 
 .projected {
-  color: red;
+  color: var(--color-negative);
   font-style: italic;
 }
 
 .field-separator {
-  border-left: 0.05rem solid black;
+  border-left: 0.05rem solid var(--color-border);
 }
 
 .sub-separator {
-  border-right: 1px solid #ddd;
+  border-right: 1px solid var(--color-border);
 }
 
 .production-view-toggle-button {
@@ -24,8 +55,8 @@ td {
 }
 
 .production-view-toggle-button button {
-  background-color: lightgray;
-  color: black;
+  background-color: var(--color-card-alt);
+  color: var(--color-text);
   padding: 6px 12px;
   border: none;
   margin-right: 4px;
@@ -34,13 +65,13 @@ td {
 }
 
 .production-view-toggle-button button.active {
-  background-color: #333;
-  color: white;
+  background-color: #333; /* Kan evt. lages variabel hvis ønskelig */
+  color: #fff;
 }
 
 .price-controls {
   padding: 1rem;
-  background-color: #f5f5f5;
+  background-color: var(--color-bg-section);
   border-radius: 8px;
   margin-bottom: 1rem;
 }
@@ -96,7 +127,7 @@ td {
   padding: 0.4rem;
   font-size: 1rem;
   border-radius: 4px;
-  border: 1px solid #aaa;
+  border: 1px solid #aaa; /* Kan evt. lages variabel */
 }
 
 .total-emissionChart {
@@ -114,3 +145,20 @@ td {
   padding: 1rem;
   align-items: start;
 }
+
+@media (prefers-color-scheme: dark) {
+  html, body, .root-layout, .main-content, .compact-mobile-layout, .mobile-game-layout {
+    background: linear-gradient(135deg, #23272e 0%, #3a3f47 100%) !important;
+    /* Lys, nøytral grå, ikke mørk blå */
+  }
+  /* Overstyr også eventuelle mørkeblå bakgrunner på kort, paneler, cards */
+  .content-card, .compact-card, .stat-card, .quick-fields, .selected-summary, .available-fields, .analytics-card, .compact-stat, .progress-section, .achievements-preview, .economics-summary, .emissions-tab, .field-item, .selected-field, .field-row, .summary-item, .trend-item, .progress-item, .economics-card, .cost-benefit, .achievement-item, .achievement-badge, .mobile-status-bar, .mobile-bottom-nav, .bottom-nav, .game-status-bar {
+    background: rgba(50, 54, 60, 0.95) !important;
+    border-color: rgba(255,255,255,0.08) !important;
+  }
+  /* Tekstfarge for god kontrast */
+  body, .root-layout, .main-content, .compact-mobile-layout, .mobile-game-layout, .content-card, .compact-card, .stat-card {
+    /* color: #f3f4f6; */
+  }
+}
+

@@ -48,7 +48,11 @@ export type GameAction =
   | { type: "CLOSE_ACHIEVEMENT_MODAL" }
   | { type: "CLOSE_EVENT_MODAL" }
   | { type: "CLOSE_GAME_OVER_MODAL" }
-  | { type: "ADVANCE_YEAR_MANUALLY" };
+  | { type: "ADVANCE_YEAR_MANUALLY" }
+  | { type: "SELECT_FIELD"; payload: string }
+  | { type: "DESELECT_FIELD"; payload: string }
+  | { type: "MULTI_PHASE_OUT"; payload: string[] }
+  | { type: "UPDATE_BUDGET"; payload: number };
 
 export type Investment =
   | "green_tech"

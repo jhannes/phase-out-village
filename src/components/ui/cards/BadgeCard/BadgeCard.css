@@ -28,7 +28,10 @@
   height: auto;
   aspect-ratio: 1 / 1;
   border-radius: 10px;
-  background-color: var(--bg-color-primary);
+  background: var(--color-card);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px var(--color-shadow);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -55,7 +58,14 @@
 
 .badge-card-content p {
   font-size: 1rem;
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
+}
+
+.badge-title {
+  color: var(--color-accent);
+}
+.badge-desc {
+  color: var(--color-text-muted);
 }
 
 /* @media (min-width: 900px) { */

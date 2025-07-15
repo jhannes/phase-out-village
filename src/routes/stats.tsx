@@ -1,10 +1,11 @@
 import React from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import CompactStatsPage from "../pages/StatsPage/CompactStatsPage";
 
-export const Route = createFileRoute("/map")({
+export const Route = createFileRoute("/stats")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  return <div>Hello "/map"!</div>;
+  return <CompactStatsPage />;
 }

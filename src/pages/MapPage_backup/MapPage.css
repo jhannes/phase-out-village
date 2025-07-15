@@ -1,18 +1,22 @@
 :root {
-  --modal-bg: #fff;
-  --modal-text: #222;
+  --modal-bg: var(--color-card);
+  --modal-text: var(--color-text);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --modal-bg: #18181b;
-    --modal-text: #f3f4f6;
+    --modal-bg: var(--color-card);
+    --modal-text: var(--color-text);
   }
 }
 
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    var(--color-accent-2) 100%
+  );
   padding: 20px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
@@ -22,14 +26,14 @@
 }
 
 .header {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-card);
   backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 24px;
   box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+    0 20px 25px -5px var(--color-shadow),
+    0 10px 10px -5px var(--color-shadow);
+  border: 1px solid var(--color-border);
   width: 100%;
   max-width: 900px;
 }
@@ -44,29 +48,32 @@
 .title {
   font-size: 24px;
   font-weight: bold;
-  color: #1e40af;
+  color: var(--color-accent);
 }
 
 .year-badge {
   font-size: 18px;
   font-weight: bold;
-  color: #d97706;
+  color: var(--color-warning);
 }
 
 .progress-bar {
-  background-color: #e5e7eb;
+  background-color: var(--color-border);
   border-radius: 9999px;
   height: 24px;
   margin-bottom: 20px; /* Space after progress bar */
 }
 
 .progress-fill {
-  background: linear-gradient(to right, #4ade80, #16a34a);
+  background: linear-gradient(
+    to right,
+    var(--color-positive),
+    var(--color-accent-2)
+  );
   height: 24px;
   border-radius: 9999px;
   transition: width 0.5s ease;
 }
-/* TODO: Better colors for the stats */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -81,19 +88,19 @@
 }
 
 .stat-card-green {
-  background-color: #dcfce7;
+  background-color: var(--color-positive);
 }
 
 .stat-card-yellow {
-  background-color: #fef3c7;
+  background-color: var(--color-warning);
 }
 
 .stat-card-blue {
-  background-color: #dbeafe;
+  background-color: var(--color-accent);
 }
 
 .stat-card-purple {
-  background-color: antiquewhite;
+  background-color: var(--color-accent-2);
 }
 
 .stat-emoji {
@@ -103,11 +110,13 @@
 .stat-value {
   font-weight: bold;
   font-size: 18px;
+  color: var(--color-text);
 }
 
 .stat-label {
   font-size: 12px;
   margin-top: 4px;
+  color: var(--color-text-muted);
 }
 
 /* New: Main content area to hold map/view and dashboard */

@@ -1,0 +1,15 @@
+.field-grid {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+.field-grid-header {
+  background: var(--color-bg-section);
+  color: var(--color-text);
+}
+.field-grid-row {
+  border-bottom: 1px solid var(--color-border);
+}
+.field-grid-cell {
+  color: var(--color-text);
+}

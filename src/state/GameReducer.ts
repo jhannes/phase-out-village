@@ -106,9 +106,9 @@ const createFieldFromRealData = (fieldName: string, realData: any): Field => {
   const estimatedLifetimeYears = 15;
   const totalLifetimeEmissions = yearlyEmissionMt * estimatedLifetimeYears;
 
-  const baseCostPerBoe = 15;
+  const baseCostPerBoe = 500; // More realistic cost per BOE for phase-out
   const phaseOutCost = Math.max(
-    5,
+    50, // Minimum 50 billion NOK
     Math.floor(currentProduction * baseCostPerBoe),
   );
 
@@ -145,7 +145,7 @@ const createFieldFromRealData = (fieldName: string, realData: any): Field => {
 };
 
 // Create a fresh game state
-const createFreshGameState = (): GameState => {
+export const createFreshGameState = (): GameState => {
   const realData = generateCompleteData(data);
   const gameFields = Object.keys(realData).map((fieldName) =>
     createFieldFromRealData(fieldName, realData),
@@ -203,6 +203,8 @@ const createFreshGameState = (): GameState => {
   };
 };
 
+export const initialGameState = createFreshGameState();
+
 export const gameReducer = (
   state: GameState,
   action: GameAction,
@@ -231,14 +233,14 @@ export const gameReducer = (
       if (
         !field ||
         field.status === "closed" ||
-        state.budget < field.phaseOutCost
+        state.budget < (field.phaseOutCost || 0)
       ) {
         return state;
       }
 
       const actualCost = state.nextPhaseOutDiscount
-        ? field.phaseOutCost * (1 - state.nextPhaseOutDiscount)
-        : field.phaseOutCost;
+        ? (field.phaseOutCost || 0) * (1 - state.nextPhaseOutDiscount)
+        : field.phaseOutCost || 0;
 
       newState = {
         ...state,
@@ -246,7 +248,7 @@ export const gameReducer = (
         score: state.score + Math.floor(field.totalLifetimeEmissions / 1000),
         globalTemperature: Math.max(
           1.1,
-          state.globalTemperature - field.emissions[0] * 0.001,
+          state.globalTemperature - (field.emissions?.[0] || 0) * 0.001,
         ),
         gameFields: state.gameFields.map((f) =>
           f.name === fieldName
@@ -315,7 +317,8 @@ export const gameReducer = (
       // Filtrer ut kun aktive og overkommelige felt
       const fieldsToPhaseOut = state.selectedFields.filter(
         (field) =>
-          field.status === "active" && state.budget >= field.phaseOutCost,
+          field.status === "active" &&
+          state.budget >= (field.phaseOutCost || 0),
       );
 
       const capacity = calculatePhaseOutCapacity(state);
@@ -336,8 +339,8 @@ export const gameReducer = (
       // Summer kostnad og utslipp
       const totalCost = actualFields.reduce((sum, field) => {
         const actualCost = state.nextPhaseOutDiscount
-          ? field.phaseOutCost * (1 - state.nextPhaseOutDiscount)
-          : field.phaseOutCost;
+          ? (field.phaseOutCost || 0) * (1 - state.nextPhaseOutDiscount)
+          : field.phaseOutCost || 0;
         return sum + actualCost;
       }, 0);
 
@@ -357,7 +360,7 @@ export const gameReducer = (
         0,
       );
       const totalEmissionsReduction = actualFields.reduce(
-        (sum, field) => sum + field.emissions[0],
+        (sum, field) => sum + (field.emissions?.[0] || 0),
         0,
       );
 
@@ -537,11 +540,11 @@ export const gameReducer = (
         (f) => f.status === "active",
       );
       const totalEmissions = activeFields.reduce(
-        (sum, f) => sum + f.emissions[0],
+        (sum, f) => sum + (f.emissions?.[0] || 0),
         0,
       );
       const totalProduction = activeFields.reduce(
-        (sum, f) => sum + f.production,
+        (sum, f) => sum + (f.production || 0),
         0,
       );
       newState = { ...state, totalEmissions, totalProduction };
@@ -635,6 +638,79 @@ export const gameReducer = (
       newState = { ...state, tutorialStep: 10 };
       break;
 
+    case "SELECT_FIELD": {
+      const fieldName = action.payload;
+      const field = state.gameFields.find((f) => f.name === fieldName);
+      if (!field || state.selectedFields.some((f) => f.name === fieldName)) {
+        return state;
+      }
+      newState = {
+        ...state,
+        selectedFields: [...state.selectedFields, field],
+      };
+      break;
+    }
+
+    case "DESELECT_FIELD": {
+      const fieldName = action.payload;
+      newState = {
+        ...state,
+        selectedFields: state.selectedFields.filter(
+          (f) => f.name !== fieldName,
+        ),
+      };
+      break;
+    }
+
+    case "MULTI_PHASE_OUT": {
+      const fieldNames = action.payload;
+      const fields = state.gameFields.filter(
+        (f) => fieldNames.includes(f.name) && f.status === "active",
+      );
+
+      if (fields.length === 0) {
+        return state;
+      }
+
+      const totalCost = fields.reduce(
+        (sum, field) => sum + (field.phaseOutCost || 0),
+        0,
+      );
+
+      if (state.budget < totalCost) {
+        return state;
+      }
+
+      const totalEmissionsSaved = fields.reduce(
+        (sum, field) => sum + field.totalLifetimeEmissions,
+        0,
+      );
+
+      newState = {
+        ...state,
+        budget: state.budget - totalCost,
+        score: state.score + Math.floor(totalEmissionsSaved / 1000),
+        gameFields: state.gameFields.map((field) =>
+          fields.some((f) => f.name === field.name)
+            ? { ...field, status: "closed" as const, production: 0 }
+            : field,
+        ),
+        selectedFields: [],
+        shutdowns: {
+          ...state.shutdowns,
+          ...fields.reduce(
+            (acc, field) => ({ ...acc, [field.name]: state.year + 1 }),
+            {},
+          ),
+        },
+      };
+      break;
+    }
+
+    case "UPDATE_BUDGET":
+      newState = { ...state, budget: action.payload };
+      break;
+
     default:
       return state;
   }
@@ -644,10 +720,10 @@ export const gameReducer = (
     try {
       const stateToSave = {
         gameFields: newState.gameFields.map((field) => ({
-          name: field.name,
-          status: field.status,
-          phaseOutCost: field.phaseOutCost,
-          production: field.production,
+          name: field.name || "Unknown",
+          status: field.status || "active",
+          phaseOutCost: field.phaseOutCost || 0,
+          production: field.production || 0,
         })),
         budget: newState.budget,
         score: newState.score,

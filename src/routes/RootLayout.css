@@ -1,0 +1,409 @@
+/* Root Layout - Mobile First Navigation */
+
+.root-layout {
+  min-height: 100vh;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+}
+
+/* Mobile Main Content */
+.main-content {
+  flex: 1;
+  position: relative;
+  background: var(--color-bg);
+}
+
+.main-content.mobile {
+  padding-bottom: 130px; /* Space for status bar + bottom nav */
+}
+
+.main-content.desktop {
+  padding-top: 70px; /* Space for desktop nav */
+  padding-bottom: 20px;
+}
+
+/* Mobile Status Bar */
+.mobile-status-bar {
+  position: fixed;
+  bottom: 70px; /* Above bottom nav */
+  left: 0;
+  right: 0;
+  background: var(--color-bg-section);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 12px;
+  z-index: 999;
+  box-shadow: 0 -2px 10px var(--color-shadow);
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.status-icon {
+  font-size: 16px;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.status-value {
+  font-size: 11px;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Mobile Bottom Navigation */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-section) 0%,
+    var(--color-bg) 100%
+  );
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index: 1000;
+  box-shadow: 0 -4px 20px var(--color-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.root-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 6px 8px;
+  border-radius: 8px;
+  min-width: 60px;
+  position: relative;
+}
+
+.root-nav-item:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.root-nav-item.active {
+  color: #ffffff;
+  background: rgba(59, 130, 246, 0.2);
+  transform: scale(1.05);
+}
+
+.root-nav-item.active .nav-icon {
+  transform: scale(1.2);
+}
+
+.nav-icon-container {
+  position: relative;
+  margin-bottom: 2px;
+}
+
+.nav-icon {
+  font-size: 20px;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.nav-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1;
+  letter-spacing: 0.2px;
+}
+
+/* Desktop Navigation */
+.desktop-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+}
+
+.desktop-nav-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  height: 70px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  text-decoration: none;
+}
+
+.brand-icon {
+  font-size: 24px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.brand-text {
+  letter-spacing: -0.5px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.nav-link {
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.nav-link:hover {
+  color: #1e293b;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.nav-link.active {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.nav-link.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 16px;
+  right: 16px;
+  height: 2px;
+  background: #3b82f6;
+  border-radius: 1px;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 375px) {
+  .nav-label {
+    font-size: 9px;
+  }
+
+  .nav-icon {
+    font-size: 18px;
+  }
+
+  .status-value {
+    font-size: 10px;
+  }
+
+  .status-icon {
+    font-size: 14px;
+  }
+
+  .main-content.mobile {
+    padding-bottom: 120px;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-status-bar,
+  .mobile-bottom-nav {
+    display: none;
+  }
+
+  .desktop-nav {
+    display: block;
+  }
+}
+
+@media (max-width: 767px) {
+  .desktop-nav {
+    display: none;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.root-nav-item.active .nav-icon {
+  animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .root-layout {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+
+  .desktop-nav {
+    background: rgba(15, 23, 42, 0.95);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .nav-brand {
+    color: #f1f5f9;
+  }
+
+  .nav-link {
+    color: #94a3b8;
+  }
+
+  .nav-link:hover {
+    color: #f1f5f9;
+  }
+
+  .mobile-bottom-nav {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+
+  .mobile-status-bar {
+    background: rgba(15, 23, 42, 0.95);
+  }
+}
+
+/* Safe area adjustments for iOS */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .mobile-bottom-nav {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Smooth transitions between views */
+.main-content > * {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Loading states */
+.root-nav-item:active {
+  transform: scale(0.95);
+}
+
+.nav-link:active {
+  transform: scale(0.98);
+}
+
+/* Restart Button Styles */
+.desktop-restart-button {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-left: 16px;
+}
+
+.desktop-restart-button:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.desktop-restart-button:active {
+  transform: translateY(0);
+}
+
+.mobile-restart-container {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1001;
+}
+
+.mobile-restart-button {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-restart-button:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: scale(1.1);
+}
+
+.mobile-restart-button:active {
+  transform: scale(0.95);
+}

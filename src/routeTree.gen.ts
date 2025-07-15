@@ -12,9 +12,10 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestRouteImport } from './routes/test'
+import { Route as StatsRouteImport } from './routes/stats'
 import { Route as ProductiontableRouteImport } from './routes/productiontable'
 import { Route as PhaseOutGameRouteImport } from './routes/phase-out-game'
-import { Route as MapRouteImport } from './routes/map'
+import { Route as InvestmentsRouteImport } from './routes/investments'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as DynamicRouteImport } from './routes/$dynamic'
 
@@ -23,6 +24,11 @@ const IndexLazyRouteImport = createFileRoute('/')()
 const TestRoute = TestRouteImport.update({
   id: '/test',
   path: '/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatsRoute = StatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductiontableRoute = ProductiontableRouteImport.update({
@@ -35,9 +41,9 @@ const PhaseOutGameRoute = PhaseOutGameRouteImport.update({
   path: '/phase-out-game',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MapRoute = MapRouteImport.update({
-  id: '/map',
-  path: '/map',
+const InvestmentsRoute = InvestmentsRouteImport.update({
+  id: '/investments',
+  path: '/investments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -60,18 +66,20 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/$dynamic': typeof DynamicRoute
   '/about': typeof AboutRoute
-  '/map': typeof MapRoute
+  '/investments': typeof InvestmentsRoute
   '/phase-out-game': typeof PhaseOutGameRoute
   '/productiontable': typeof ProductiontableRoute
+  '/stats': typeof StatsRoute
   '/test': typeof TestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/$dynamic': typeof DynamicRoute
   '/about': typeof AboutRoute
-  '/map': typeof MapRoute
+  '/investments': typeof InvestmentsRoute
   '/phase-out-game': typeof PhaseOutGameRoute
   '/productiontable': typeof ProductiontableRoute
+  '/stats': typeof StatsRoute
   '/test': typeof TestRoute
 }
 export interface FileRoutesById {
@@ -79,9 +87,10 @@ export interface FileRoutesById {
   '/': typeof IndexLazyRoute
   '/$dynamic': typeof DynamicRoute
   '/about': typeof AboutRoute
-  '/map': typeof MapRoute
+  '/investments': typeof InvestmentsRoute
   '/phase-out-game': typeof PhaseOutGameRoute
   '/productiontable': typeof ProductiontableRoute
+  '/stats': typeof StatsRoute
   '/test': typeof TestRoute
 }
 export interface FileRouteTypes {
@@ -90,27 +99,30 @@ export interface FileRouteTypes {
     | '/'
     | '/$dynamic'
     | '/about'
-    | '/map'
+    | '/investments'
     | '/phase-out-game'
     | '/productiontable'
+    | '/stats'
     | '/test'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/$dynamic'
     | '/about'
-    | '/map'
+    | '/investments'
     | '/phase-out-game'
     | '/productiontable'
+    | '/stats'
     | '/test'
   id:
     | '__root__'
     | '/'
     | '/$dynamic'
     | '/about'
-    | '/map'
+    | '/investments'
     | '/phase-out-game'
     | '/productiontable'
+    | '/stats'
     | '/test'
   fileRoutesById: FileRoutesById
 }
@@ -118,9 +130,10 @@ export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   DynamicRoute: typeof DynamicRoute
   AboutRoute: typeof AboutRoute
-  MapRoute: typeof MapRoute
+  InvestmentsRoute: typeof InvestmentsRoute
   PhaseOutGameRoute: typeof PhaseOutGameRoute
   ProductiontableRoute: typeof ProductiontableRoute
+  StatsRoute: typeof StatsRoute
   TestRoute: typeof TestRoute
 }
 
@@ -131,6 +144,13 @@ declare module '@tanstack/react-router' {
       path: '/test'
       fullPath: '/test'
       preLoaderRoute: typeof TestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stats': {
+      id: '/stats'
+      path: '/stats'
+      fullPath: '/stats'
+      preLoaderRoute: typeof StatsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/productiontable': {
@@ -147,11 +167,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PhaseOutGameRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/map': {
-      id: '/map'
-      path: '/map'
-      fullPath: '/map'
-      preLoaderRoute: typeof MapRouteImport
+    '/investments': {
+      id: '/investments'
+      path: '/investments'
+      fullPath: '/investments'
+      preLoaderRoute: typeof InvestmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -182,9 +202,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   DynamicRoute: DynamicRoute,
   AboutRoute: AboutRoute,
-  MapRoute: MapRoute,
+  InvestmentsRoute: InvestmentsRoute,
   PhaseOutGameRoute: PhaseOutGameRoute,
   ProductiontableRoute: ProductiontableRoute,
+  StatsRoute: StatsRoute,
   TestRoute: TestRoute,
 }
 export const routeTree = rootRouteImport
