@@ -11,7 +11,7 @@
   --color-warning: #f59e0b;
   --color-card: #fff;
   --color-card-alt: #f3f4f6;
-  --color-shadow: rgba(0,0,0,0.06);
+  --color-shadow: rgba(0, 0, 0, 0.06);
   --color-text-on-accent: var(--color-text);
 }
 @media (prefers-color-scheme: dark) {
@@ -28,7 +28,7 @@
     --color-warning: #fbbf24;
     --color-card: #1e293b;
     --color-card-alt: #23272e;
-    --color-shadow: rgba(0,0,0,0.18);
+    --color-shadow: rgba(0, 0, 0, 0.18);
     --color-text-on-accent: #fff;
   }
 }
@@ -147,18 +147,54 @@ td {
 }
 
 @media (prefers-color-scheme: dark) {
-  html, body, .root-layout, .main-content, .compact-mobile-layout, .mobile-game-layout {
+  html,
+  body,
+  .root-layout,
+  .main-content,
+  .compact-mobile-layout,
+  .mobile-game-layout {
     background: linear-gradient(135deg, #23272e 0%, #3a3f47 100%) !important;
     /* Lys, nøytral grå, ikke mørk blå */
   }
   /* Overstyr også eventuelle mørkeblå bakgrunner på kort, paneler, cards */
-  .content-card, .compact-card, .stat-card, .quick-fields, .selected-summary, .available-fields, .analytics-card, .compact-stat, .progress-section, .achievements-preview, .economics-summary, .emissions-tab, .field-item, .selected-field, .field-row, .summary-item, .trend-item, .progress-item, .economics-card, .cost-benefit, .achievement-item, .achievement-badge, .mobile-status-bar, .mobile-bottom-nav, .bottom-nav, .game-status-bar {
+  .content-card,
+  .compact-card,
+  .stat-card,
+  .quick-fields,
+  .selected-summary,
+  .available-fields,
+  .analytics-card,
+  .compact-stat,
+  .progress-section,
+  .achievements-preview,
+  .economics-summary,
+  .emissions-tab,
+  .field-item,
+  .selected-field,
+  .field-row,
+  .summary-item,
+  .trend-item,
+  .progress-item,
+  .economics-card,
+  .cost-benefit,
+  .achievement-item,
+  .achievement-badge,
+  .mobile-status-bar,
+  .mobile-bottom-nav,
+  .bottom-nav,
+  .game-status-bar {
     background: rgba(50, 54, 60, 0.95) !important;
-    border-color: rgba(255,255,255,0.08) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
   }
   /* Tekstfarge for god kontrast */
-  body, .root-layout, .main-content, .compact-mobile-layout, .mobile-game-layout, .content-card, .compact-card, .stat-card {
+  body,
+  .root-layout,
+  .main-content,
+  .compact-mobile-layout,
+  .mobile-game-layout,
+  .content-card,
+  .compact-card,
+  .stat-card {
     /* color: #f3f4f6; */
   }
 }
-

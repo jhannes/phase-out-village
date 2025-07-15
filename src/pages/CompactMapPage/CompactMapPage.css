@@ -19,7 +19,11 @@
 .map-display {
   flex: 1;
   position: relative;
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-2) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    var(--color-accent-2) 100%
+  );
   border-radius: 8px;
   margin: 12px;
   overflow: hidden;
@@ -563,7 +567,12 @@
 .intensity-bar {
   position: relative;
   height: 60px;
-  background: linear-gradient(90deg, var(--color-negative) 0%, var(--color-warning) 50%, var(--color-positive) 100%);
+  background: linear-gradient(
+    90deg,
+    var(--color-negative) 0%,
+    var(--color-warning) 50%,
+    var(--color-positive) 100%
+  );
   border-radius: 4px;
   margin-bottom: 8px;
 }
@@ -754,7 +763,11 @@
   }
 
   .map-display {
-    background: linear-gradient(135deg, var(--color-bg-section) 0%, var(--color-bg) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--color-bg-section) 0%,
+      var(--color-bg) 100%
+    );
   }
 
   .selection-header {

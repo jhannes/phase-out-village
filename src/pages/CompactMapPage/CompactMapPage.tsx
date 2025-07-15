@@ -456,7 +456,10 @@ const CompactMapPage: React.FC = () => {
 
       const isSelected = selectedFields.some((f) => f.name === field.name);
       if (isSelected) {
-        dispatch({ type: "DESELECT_FIELD_FROM_MULTI", payload: field.name ?? "" });
+        dispatch({
+          type: "DESELECT_FIELD_FROM_MULTI",
+          payload: field.name ?? "",
+        });
       } else {
         const capacity = calculatePhaseOutCapacity();
         if (selectedFields.length < capacity) {
@@ -1211,14 +1214,25 @@ const CompactMapPage: React.FC = () => {
   );
 
   const header = (
-    <div className="map-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+    <div
+      className="map-header"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
       <div>
-        <h1 className="page-title" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <h1
+          className="page-title"
+          style={{ display: "flex", alignItems: "center", gap: 8 }}
+        >
           <span className="title-icon">🗺️</span>
           Norske Oljeområder
         </h1>
         <div style={{ fontSize: "14px", color: "#6b7280" }}>
-          År: {year || 2025} | Poeng: {score || 0} | Felt faset ut: {Object.keys(shutdowns || {}).length}
+          År: {year || 2025} | Poeng: {score || 0} | Felt faset ut:{" "}
+          {Object.keys(shutdowns || {}).length}
         </div>
       </div>
       <button

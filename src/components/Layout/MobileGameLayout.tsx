@@ -103,7 +103,7 @@ const MobileGameLayout: React.FC<MobileGameLayoutProps> = ({
             <div
               className="progress-fill"
               style={{
-                width: `${Math.max(0, 100 - (gameState.fieldsRemaining / 50) * 100)}%`
+                width: `${Math.max(0, 100 - (gameState.fieldsRemaining / 50) * 100)}%`,
               }}
             />
           </div>
@@ -117,9 +117,7 @@ const MobileGameLayout: React.FC<MobileGameLayoutProps> = ({
       <main className="main-content">
         <div className="content-wrapper">
           {/* View-specific content */}
-          <div className={`view-container view-${activeView}`}>
-            {children}
-          </div>
+          <div className={`view-container view-${activeView}`}>{children}</div>
 
           {/* Floating Action Button for primary action */}
           {activeView === "map" && (

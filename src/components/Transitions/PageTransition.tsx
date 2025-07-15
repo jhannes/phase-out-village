@@ -42,9 +42,11 @@ const PageTransition: React.FC<PageTransitionProps> = ({
       className={`page-transition page-transition-${direction} ${
         isVisible ? "visible" : "hidden"
       }`}
-      style={{
-        "--transition-duration": `${duration}ms`,
-      } as React.CSSProperties}
+      style={
+        {
+          "--transition-duration": `${duration}ms`,
+        } as React.CSSProperties
+      }
     >
       {children}
     </div>

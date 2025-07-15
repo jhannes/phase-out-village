@@ -84,7 +84,7 @@
   padding: 0;
 }
 
-.mpo-grid > div[style*='border-top'] {
+.mpo-grid > div[style*="border-top"] {
   border-top: 1px solid var(--color-border) !important;
   margin-top: 0;
 }
@@ -100,10 +100,12 @@
 }
 
 /* Fargekoder for tall */
-.mpo-grid .positive, .multi-phaseout-positive-change {
+.mpo-grid .positive,
+.multi-phaseout-positive-change {
   color: var(--color-positive);
 }
-.mpo-grid .negative, .multi-phaseout-negative-change {
+.mpo-grid .negative,
+.multi-phaseout-negative-change {
   color: var(--color-negative);
 }
 

@@ -283,8 +283,12 @@ const InvestmentsPage: React.FC = () => {
           <h3>💡 Investeringstips</h3>
           <ul>
             <li>Gode investeringer øker Norges teknologiske uavhengighet</li>
-            <li>Høyere Tech-Rank gir større kapasitet til å fase ut oljefelt</li>
-            <li>Dårlige investeringer reduserer Tech-Rank og bremser fremgangen</li>
+            <li>
+              Høyere Tech-Rank gir større kapasitet til å fase ut oljefelt
+            </li>
+            <li>
+              Dårlige investeringer reduserer Tech-Rank og bremser fremgangen
+            </li>
             <li>Balanser investeringene for optimal utvikling</li>
           </ul>
         </div>
