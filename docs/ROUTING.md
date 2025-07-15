@@ -1,4 +1,3 @@
-````markdown
 # File-Based Routing with TanStack Router
 
 This guide explains how to set up and use file-based routing in a React project using TanStack Router and Vite.
@@ -167,4 +166,3 @@ if (!rootElement.innerHTML) {
 ```
 
 This setup provides a powerful and type-safe way to handle routing in your React application.
-````

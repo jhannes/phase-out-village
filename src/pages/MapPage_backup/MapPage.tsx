@@ -30,10 +30,8 @@ import { OilFieldDataset, ShutdownMap } from "../../types/types";
 import { EmissionsView } from "../../components/charts/EmissionsView";
 import { type } from "os";
 import { checkAndAwardAchievements } from "../../achievements";
-// import { FieldModal } from "../../components/modals/FieldModal";
-// import of badge components removed due to missing module and unused imports
-
-// Placeholder for FieldModal to resolve import error
+import { getUnlockedLayers } from '../../components/ProgressiveDataUnlocks';
+import { DATA_LAYERS } from '../../components/ProgressiveDataLayers';
 const FieldModal: React.FC<{
   selectedField: Field | null;
   budget: number;
@@ -968,50 +966,104 @@ const calculateEnvironmentalState = (gameState: GameState) => {
   };
 };
 
-// Progressive UI component that reveals data based on player progress
-// TODO: Define what data belongs to each layer (basic, intermediate, advanced, expert)
-// TODO: Implement conditional rendering for each data layer in ProgressiveDataPanel
-// TODO: Add unlock logic for intermediate layer (e.g., after phasing out X fields)
-// TODO: Add unlock logic for advanced layer (e.g., after reaching Y score or year)
-// TODO: Add unlock logic for expert layer (e.g., after earning a specific achievement)
-// TODO: Display a message or animation when a new data layer is unlocked
-// TODO: Refactor data panel to support dynamic layer updates based on game state
-// TODO: Implement this component
+// Helper to map field keys to values from gameState
+function getFieldValue(field: string, gameState: GameState): string | number | undefined {
+  switch (field) {
+    case 'fieldName':
+      // Example: show number of fields or names (customize as needed)
+      return gameState.gameFields.map(f => f.name).join(', ');
+    case 'production':
+      return gameState.totalProduction?.toFixed(1) + ' mill. boe';
+    case 'basicEmissions':
+      return gameState.totalEmissions?.toFixed(1) + ' Mt';
+    case 'workers':
+      return gameState.gameFields.reduce((sum, f) => sum + (f.workers || 0), 0);
+    case 'efficiency':
+      // Example: average intensity
+      if (gameState.gameFields.length === 0) return '?';
+      return (
+        gameState.gameFields.reduce((sum, f) => sum + (f.intensity || 0), 0) /
+        gameState.gameFields.length
+      ).toFixed(1) + ' kg CO₂/boe';
+    case 'emissionTrends':
+      // Example: show change in emissions (dummy)
+      return 'Trend: ' + (gameState.totalEmissions > 0 ? '↓' : '↑');
+    case 'shutdownCost':
+      // Example: total shutdown cost
+      return (gameState.gameFields.reduce((sum, f) => sum + (f.phaseOutCost || 0), 0)).toLocaleString() + ' mill NOK';
+    case 'financialBreakdown':
+      // Example: show budget
+      return (gameState.budget || 0).toLocaleString() + ' mill NOK';
+    case 'futureProjections':
+      // Example: show year
+      return 'År: ' + (gameState.year || '?');
+    case 'lifetimeEmissions':
+      // Example: total lifetime emissions
+      return (gameState.gameFields.reduce((sum, f) => sum + (f.totalLifetimeEmissions || 0), 0) / 1000).toFixed(0) + ' Mt';
+    case 'hiddenStats':
+      // Example: show number of achievements
+      return (gameState.achievements?.length || 0) + ' prestasjoner';
+    case 'expertTips':
+      // Example: show a tip (dummy)
+      return 'Optimaliser utfasing for lavere utslipp!';
+    case 'advancedComparisons':
+      // Example: compare phased out vs. remaining fields
+      const closed = gameState.gameFields.filter(f => f.status === 'closed').length;
+      const active = gameState.gameFields.filter(f => f.status === 'active').length;
+      return `${closed} faset ut / ${active} igjen`;
+    default:
+      return '?';
+  }
+}
+
 const ProgressiveDataPanel: React.FC<{
   gameState: GameState;
-  layer: DataLayer;
-}> = ({ gameState, layer }) => {
-  const showBasic = ["basic", "intermediate", "advanced", "expert"].includes(
-    layer,
-  );
-  const showIntermediate = ["intermediate", "advanced", "expert"].includes(
-    layer,
-  );
-  const showAdvanced = ["advanced", "expert"].includes(layer);
-  const showExpert = layer === "expert";
+}> = ({ gameState }) => {
+  // Map gameState to the shape expected by getUnlockedLayers
+  const unlockState = {
+    fieldsPhasedOut: Object.keys(gameState.shutdowns || {}).length,
+    score: gameState.score,
+    year: gameState.year,
+    achievements: gameState.achievements || [],
+  };
+  const unlockedLayers = getUnlockedLayers(unlockState);
+  // Track the most recently unlocked layer for animation/message
+  const [lastUnlockedLayer, setLastUnlockedLayer] = React.useState<DataLayer | null>(null);
+  const prevUnlockedCount = React.useRef(unlockedLayers.length);
+
+  React.useEffect(() => {
+    if (unlockedLayers.length > prevUnlockedCount.current) {
+      setLastUnlockedLayer(unlockedLayers[unlockedLayers.length - 1]);
+      setTimeout(() => setLastUnlockedLayer(null), 2500);
+    }
+    prevUnlockedCount.current = unlockedLayers.length;
+  }, [unlockedLayers.length]);
 
   return (
     <div className="progressive-data-panel">
-      {showBasic && (
-        <div className="data-layer basic">
-          <h4>📊 Grunnleggende Data</h4>
-          <div className="data-grid">
-            <div className="data-item">
-              <span>Aktive felt:</span>
-              <span>
-                {
-                  gameState.gameFields.filter((f) => f.status === "active")
-                    .length
-                }
-              </span>
-            </div>
-            <div className="data-item">
-              <span>Utslipp per år:</span>
-              <span>{gameState.totalEmissions.toFixed(1)} Mt</span>
-            </div>
-          </div>
+      {lastUnlockedLayer && (
+        <div className="layer-unlocked-message">
+          <span role="img" aria-label="Unlocked">🔓</span> Nytt datalag låst opp: <b>{lastUnlockedLayer}</b>!
         </div>
       )}
+      {unlockedLayers.map((layer) => (
+        <div className={`data-layer ${layer}`} key={layer}>
+          <h4>
+            {layer === 'basic' && '📊 Grunnleggende Data'}
+            {layer === 'intermediate' && '🔎 Utvidet Data'}
+            {layer === 'advanced' && '🚀 Avansert Data'}
+            {layer === 'expert' && '🧠 Ekspert Data'}
+          </h4>
+          <div className="data-grid">
+            {DATA_LAYERS[layer].map((field) => (
+              <div className="data-item" key={field}>
+                <span>{field}:</span>
+                <span>{getFieldValue(field, gameState)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
@@ -2475,7 +2527,6 @@ const PhaseOutMapPage: React.FC = () => {
       {/* Progressive data panel */}
       <ProgressiveDataPanel
         gameState={gameState}
-        layer={gameState.dataLayerUnlocked}
       />
 
       {/* Field Modal */}
