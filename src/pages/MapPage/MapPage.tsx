@@ -140,8 +140,8 @@ const FieldModal: React.FC<{
                 <span style={{ color: "#DC2626", fontWeight: "bold" }}>
                   {(() => {
                     const emissions =
-                      selectedField.emissions &&
-                      Array.isArray(selectedField.emissions)
+                      Array.isArray(selectedField.emissions) &&
+                      selectedField.emissions.length > 0
                         ? selectedField.emissions[0]
                         : 0;
                     return (emissions || 0).toFixed(1);
@@ -525,18 +525,16 @@ const MapPage: React.FC = () => {
   const mapInstanceRef = useRef<any>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Aggregate total emissions per year across all fields
-  const emissionsDataMap: Record<string, number> = {};
-  Object.values(data).forEach((fieldData) => {
-    Object.entries(fieldData).forEach(([year, { emission }]) => {
-      if (emission) {
-        emissionsDataMap[year] = (emissionsDataMap[year] || 0) + emission;
-      }
-    });
-  });
-  const emissionsData = Object.entries(emissionsDataMap)
-    .map(([year, emission]) => ({ year, emission }))
-    .sort((a, b) => Number(a.year) - Number(b.year));
+  // Aggregate total emissions per year across all fields for 2020-2025
+  const years = [2020, 2021, 2022, 2023, 2024, 2025];
+  const totalEmissionsByYear = years.map(
+    (year) =>
+      Object.values(data).reduce((sum, fieldData) => {
+        const yearData = fieldData[year.toString()];
+        return sum + (yearData?.emission || 0);
+      }, 0) / 1000, // convert to Mt
+  );
+  const emissionsData = [{ name: "Totalt", data: totalEmissionsByYear }];
 
   // Initialize game state
   useEffect(() => {
@@ -574,30 +572,6 @@ const MapPage: React.FC = () => {
   const phaseOutField = useCallback((fieldName: string) => {
     dispatch({ type: "PHASE_OUT_FIELD", payload: fieldName });
   }, []);
-
-  // --- Early return for loading state ---
-  if (
-    !isInitialized ||
-    !gameState ||
-    !gameState.gameFields ||
-    gameState.gameFields.length === 0
-  ) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          flexDirection: "column",
-          gap: "16px",
-        }}
-      >
-        <div style={{ fontSize: "48px" }}>🔄</div>
-        <div>Loading game data...</div>
-      </div>
-    );
-  }
 
   // --- Tab state ---
   const tabs = [
@@ -662,6 +636,30 @@ const MapPage: React.FC = () => {
   const activeTabData = tabs.find((tab) => tab.id === activeTab);
   const isMobile =
     typeof window !== "undefined" ? window.innerWidth < 768 : false;
+
+  // --- Early return for loading state ---
+  if (
+    !isInitialized ||
+    !gameState ||
+    !gameState.gameFields ||
+    gameState.gameFields.length === 0
+  ) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          flexDirection: "column",
+          gap: "16px",
+        }}
+      >
+        <div style={{ fontSize: "48px" }}>🔄</div>
+        <div>Loading game data...</div>
+      </div>
+    );
+  }
 
   // --- Layout ---
   if (isMobile) {
