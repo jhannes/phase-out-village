@@ -1,72 +1,71 @@
 /* Bottom Navigation Styles - Mobile First */
 :root {
+  --bottom-nav-height: 70px;
+  --status-bar-height: 48px;
   --color-text-on-accent: var(--color-text);
 }
 
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(
-    135deg,
-    var(--color-bg-section) 0%,
-    var(--color-bg) 100%
-  );
-  border-top: 1px solid var(--color-border);
+/* Bottom navigation bar: always at the very bottom */
+.bottom-nav-bar {
   display: flex;
   justify-content: space-around;
   align-items: center;
+  background: var(--color-bg-section, #fff);
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  box-shadow: 0 -4px 20px var(--color-shadow, rgba(0,0,0,0.05));
   padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-  z-index: 1000;
-  box-shadow: 0 -4px 20px var(--color-shadow);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  z-index: 1001;
+  width: 100%;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--bottom-nav-height);
 }
 
-.bottom-nav-item {
+.bottom-nav-bar-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background: none;
   border: none;
-  color: var(--color-text-on-accent);
+  color: var(--color-text-muted, #64748b);
   cursor: pointer;
   transition: all 0.2s ease;
   padding: 6px 8px;
   border-radius: 8px;
   min-width: 60px;
   position: relative;
+  font: inherit;
+  outline: none;
 }
 
-.bottom-nav-item:hover {
-  color: var(--color-text);
-  background: var(--color-border);
+.bottom-nav-bar-item:hover,
+.bottom-nav-bar-item:focus {
+  color: var(--color-text, #1e293b);
+  background: var(--color-border, #e5e7eb);
 }
 
-.bottom-nav-item.active {
-  color: var(--color-text-on-accent);
-  background: var(--color-accent);
+.bottom-nav-bar-item.active {
+  color: var(--color-text-on-accent, #fff);
+  background: var(--color-accent, #3b82f6);
   transform: scale(1.05);
+  box-shadow: 0 2px 8px var(--color-accent, #3b82f6, 0.2);
 }
 
-.bottom-nav-item.active .nav-icon {
+.bottom-nav-bar-item.active .bottom-nav-bar-icon {
   transform: scale(1.2);
 }
 
-.nav-icon-container {
-  position: relative;
-  margin-bottom: 2px;
-}
-
-.nav-icon {
+.bottom-nav-bar-icon {
   font-size: 20px;
   display: block;
   transition: transform 0.2s ease;
+  margin-bottom: 2px;
 }
 
-.nav-label {
+.bottom-nav-bar-label {
   font-size: 10px;
   font-weight: 500;
   text-align: center;
@@ -75,12 +74,12 @@
   color: inherit;
 }
 
-.nav-badge {
+.bottom-nav-bar-badge {
   position: absolute;
   top: -6px;
   right: -6px;
-  background: var(--color-negative);
-  color: var(--color-text-on-accent);
+  background: var(--color-negative, #ef4444);
+  color: var(--color-text-on-accent, #fff);
   font-size: 8px;
   font-weight: bold;
   padding: 2px 4px;
@@ -90,15 +89,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-/* Game Status Bar */
+/* Game Status Bar: sits directly above bottom nav bar */
 .game-status-bar {
   position: fixed;
-  bottom: 70px; /* Above bottom nav */
   left: 0;
   right: 0;
+  bottom: var(--bottom-nav-height);
   background: var(--color-bg-section);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -107,8 +106,9 @@
   justify-content: space-around;
   align-items: center;
   padding: 8px 12px;
-  z-index: 999;
+  z-index: 1000;
   box-shadow: 0 -2px 10px var(--color-shadow);
+  height: var(--status-bar-height);
 }
 
 .status-item {
@@ -139,44 +139,37 @@
 
 /* Content padding to account for fixed bottom elements */
 .main-content {
-  padding-bottom: 130px; /* Space for status bar + nav bar */
+  padding-bottom: calc(var(--bottom-nav-height) + var(--status-bar-height) + 16px);
   min-height: 100vh;
 }
 
-/* Responsive adjustments */
 @media (max-width: 375px) {
-  .nav-label {
+  .bottom-nav-bar-label {
     font-size: 9px;
   }
-
-  .nav-icon {
+  .bottom-nav-bar-icon {
     font-size: 18px;
   }
-
   .status-value {
     font-size: 10px;
   }
-
   .status-icon {
     font-size: 14px;
   }
 }
 
 @media (min-width: 768px) {
-  .bottom-nav {
-    display: none; /* Hide on tablet/desktop - use sidebar instead */
+  .bottom-nav-bar {
+    display: none;
   }
-
   .game-status-bar {
     display: none;
   }
-
   .main-content {
     padding-bottom: 20px;
   }
 }
 
-/* Animation for active state */
 @keyframes pulse {
   0% {
     transform: scale(1);
@@ -189,17 +182,25 @@
   }
 }
 
-.bottom-nav-item.active .nav-icon {
+.bottom-nav-bar-item.active .bottom-nav-bar-icon {
   animation: pulse 0.3s ease-in-out;
 }
 
-/* Dark mode support */
 @media (prefers-color-scheme: dark) {
-  .bottom-nav {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  .bottom-nav-bar {
+    background: var(--color-bg-section-dark, #0f172a);
+    border-top-color: var(--color-border-dark, #334155);
   }
-
-  .game-status-bar {
-    background: rgba(15, 23, 42, 0.95);
+  .bottom-nav-bar-item {
+    color: var(--color-text-muted-dark, #94a3b8);
+  }
+  .bottom-nav-bar-item:hover,
+  .bottom-nav-bar-item:focus {
+    color: var(--color-text-dark, #f1f5f9);
+    background: var(--color-border-dark, #334155);
+  }
+  .bottom-nav-bar-item.active {
+    background: var(--color-accent-dark, #2563eb);
+    color: var(--color-text-on-accent-dark, #fff);
   }
 }

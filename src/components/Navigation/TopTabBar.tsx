@@ -1,7 +1,7 @@
 import React from "react";
-import "./BottomNavBar.css";
+import "./TopTabBar.css";
 
-export interface BottomNavBarItem {
+export interface TopTabBarItem {
   id: string;
   icon: React.ReactNode;
   label: string;
@@ -11,34 +11,35 @@ export interface BottomNavBarItem {
   ariaLabel?: string;
 }
 
-export interface BottomNavBarProps {
-  items: BottomNavBarItem[];
+export interface TopTabBarProps {
+  items: TopTabBarItem[];
   className?: string;
+  fixed?: boolean; // If true, sticky/fixed at bottom
   style?: React.CSSProperties;
 }
 
-const BottomNavBar: React.FC<BottomNavBarProps> = ({ items, className = "", style }) => {
+const TopTabBar: React.FC<TopTabBarProps> = ({ items, className = "", fixed = true, style }) => {
   return (
     <nav
-      className={`bottom-nav-bar ${className}`.trim()}
+      className={`tab-bar${fixed ? " tab-bar-fixed" : ""} ${className}`.trim()}
       style={style}
       role="tablist"
-      aria-label="Hovednavigasjon"
+      aria-label="Navigasjon"
     >
       {items.map((item) => (
         <button
           key={item.id}
-          className={`bottom-nav-bar-item${item.active ? " active" : ""}`}
+          className={`tab-bar-item${item.active ? " active" : ""}`}
           onClick={item.onClick}
           aria-label={item.ariaLabel || item.label}
           aria-selected={item.active}
           role="tab"
           tabIndex={item.active ? 0 : -1}
         >
-          <span className="bottom-nav-bar-icon">{item.icon}</span>
-          <span className="bottom-nav-bar-label">{item.label}</span>
+          <span className="tab-bar-icon">{item.icon}</span>
+          <span className="tab-bar-label">{item.label}</span>
           {item.badge && item.badge > 0 && (
-            <span className="bottom-nav-bar-badge">{item.badge}</span>
+            <span className="tab-bar-badge">{item.badge}</span>
           )}
         </button>
       ))}
@@ -46,4 +47,4 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ items, className = "", styl
   );
 };
 
-export default BottomNavBar;
+export default TopTabBar; 

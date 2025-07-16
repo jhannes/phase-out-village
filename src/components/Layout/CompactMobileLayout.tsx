@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import TopTabBar, { TopTabBarItem } from "../Navigation/TopTabBar";
 import "./CompactMobileLayout.css";
 
 interface Tab {
@@ -9,19 +10,17 @@ interface Tab {
   badge?: number;
 }
 
-interface CompactMobileLayoutProps {
+interface MobileTabsLayoutProps {
   tabs: Tab[];
   defaultTab?: string;
   header?: React.ReactNode;
-  statusBar?: React.ReactNode;
   floatingActions?: React.ReactNode;
 }
 
-const CompactMobileLayout: React.FC<CompactMobileLayoutProps> = ({
+const MobileTabsLayout: React.FC<MobileTabsLayoutProps> = ({
   tabs,
   defaultTab,
   header,
-  statusBar,
   floatingActions,
 }) => {
   const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.id);
@@ -86,35 +85,30 @@ const CompactMobileLayout: React.FC<CompactMobileLayoutProps> = ({
     }
   };
 
+  // Convert tabs to TopTabBarItem[]
+  const tabBarItems: TopTabBarItem[] = tabs.map((tab) => ({
+    id: tab.id,
+    icon: tab.icon,
+    label: tab.title,
+    badge: tab.badge,
+    active: activeTab === tab.id,
+    onClick: () => handleTabChange(tab.id),
+    ariaLabel: tab.title,
+  }));
+
   return (
-    <div className="compact-mobile-layout">
+    <div className="mobile-tabs-layout">
       {/* Dynamic Header */}
       <header
-        className={`compact-header ${headerVisible ? "visible" : "hidden"} ${isScrolling ? "scrolling" : ""}`}
+        className={`mobile-tabs-header ${headerVisible ? "visible" : "hidden"} ${isScrolling ? "scrolling" : ""}`}
       >
         {header && <div className="header-content">{header}</div>}
-
-        {/* Horizontal Tab Navigation */}
-        <nav className="horizontal-tabs">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={`tab-button ${activeTab === tab.id ? "active" : ""}`}
-              onClick={() => handleTabChange(tab.id)}
-              aria-label={tab.title}
-            >
-              <span className="tab-icon">{tab.icon}</span>
-              <span className="tab-title">{tab.title}</span>
-              {tab.badge && tab.badge > 0 && (
-                <span className="tab-badge">{tab.badge}</span>
-              )}
-            </button>
-          ))}
-        </nav>
+        {/* Horizontal TopTabBar Navigation */}
+        <TopTabBar items={tabBarItems} fixed={false} className="mobile-tabs-bar" />
       </header>
 
       {/* Main Content Area */}
-      <main ref={contentRef} className="compact-content">
+      <main ref={contentRef} className="mobile-tabs-content">
         <div className="tab-content-container">
           {activeTabData && (
             <div className={`tab-content tab-${activeTab}`} key={activeTab}>
@@ -124,9 +118,6 @@ const CompactMobileLayout: React.FC<CompactMobileLayoutProps> = ({
         </div>
       </main>
 
-      {/* Status Bar */}
-      {statusBar && <div className="compact-status-bar">{statusBar}</div>}
-
       {/* Floating Actions */}
       {floatingActions && (
         <div className="floating-actions">{floatingActions}</div>
@@ -135,4 +126,4 @@ const CompactMobileLayout: React.FC<CompactMobileLayoutProps> = ({
   );
 };
 
-export default CompactMobileLayout;
+export default MobileTabsLayout;

@@ -1,0 +1,137 @@
+.tab-bar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: var(--color-bg-section, #fff);
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  box-shadow: 0 -4px 20px var(--color-shadow, rgba(0,0,0,0.05));
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index: 1000;
+  gap: 0;
+  width: 100%;
+}
+
+.tab-bar-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Safe area for iOS */
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+.tab-bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-text-muted, #64748b);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 6px 8px;
+  border-radius: 8px;
+  min-width: 60px;
+  position: relative;
+  font: inherit;
+  outline: none;
+}
+
+.tab-bar-item:hover,
+.tab-bar-item:focus {
+  color: var(--color-text, #1e293b);
+  background: var(--color-border, #e5e7eb);
+}
+
+.tab-bar-item.active {
+  color: var(--color-text-on-accent, #fff);
+  background: var(--color-accent, #3b82f6);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px var(--color-accent, #3b82f6, 0.2);
+}
+
+.tab-bar-item.active .tab-bar-icon {
+  transform: scale(1.2);
+}
+
+.tab-bar-icon {
+  font-size: 20px;
+  display: block;
+  transition: transform 0.2s ease;
+  margin-bottom: 2px;
+}
+
+.tab-bar-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1;
+  letter-spacing: 0.2px;
+  color: inherit;
+}
+
+.tab-bar-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--color-negative, #ef4444);
+  color: var(--color-text-on-accent, #fff);
+  font-size: 8px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 8px;
+  min-width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Animation for active state */
+@keyframes tabbar-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.tab-bar-item.active .tab-bar-icon {
+  animation: tabbar-pulse 0.3s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 375px) {
+  .tab-bar-label {
+    font-size: 9px;
+  }
+  .tab-bar-icon {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 768px) {
+  .tab-bar-fixed {
+    display: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .tab-bar {
+    background: var(--color-bg-section-dark, #0f172a);
+    border-top-color: var(--color-border-dark, #334155);
+  }
+  .tab-bar-item {
+    color: var(--color-text-muted-dark, #94a3b8);
+  }
+  .tab-bar-item:hover,
+  .tab-bar-item:focus {
+    color: var(--color-text-dark, #f1f5f9);
+    background: var(--color-border-dark, #334155);
+  }
+  .tab-bar-item.active {
+    background: var(--color-accent-dark, #2563eb);
+    color: var(--color-text-on-accent-dark, #fff);
+  }
+} 

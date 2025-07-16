@@ -1,267 +1,153 @@
-/* StatsPage - Mobile First Design */
+/* Compact Stats Page - Minimal Scrolling Design */
 
-.stats-page {
-  padding: 16px;
-  min-height: 100vh;
-  background: var(--color-bg);
+.overview-content,
+.economics-content,
+.climate-content {
+  padding: 12px;
+  min-height: calc(100vh - 200px);
 }
 
-/* Header Styles */
-.stats-header {
-  text-align: center;
-  margin-bottom: 24px;
-  padding: 16px 0;
+/* Enhanced Stats Grid */
+.compact-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.page-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--color-text);
-  margin: 0 0 8px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  letter-spacing: -0.5px;
-}
-
-.title-icon {
-  font-size: 28px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.page-subtitle {
-  font-size: 14px;
-  color: var(--color-text-muted);
-  margin: 0;
-  font-weight: 500;
-}
-
-/* Tab Navigation */
-.tab-navigation {
-  display: flex;
-  background: var(--color-card);
+.compact-stat {
+  background: white;
   border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 20px;
+  padding: 12px;
+  text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  border: 1px solid var(--color-border);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.tab-button {
-  flex: 1;
-  background: none;
-  border: none;
-  padding: 12px 8px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease;
 }
 
-.tab-button:hover {
-  color: var(--color-text);
-  background: var(--color-accent);
-}
-
-.tab-button.active {
-  background: linear-gradient(135deg, var(--color-accent) 0%, #1d4ed8 100%);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+.compact-stat:hover {
   transform: translateY(-1px);
 }
 
-.tab-icon {
-  font-size: 14px;
-}
-
-/* Tab Content */
-.tab-content {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Stats Grid */
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.stat-card {
-  background: var(--color-card);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 8px var(--color-shadow);
-  border: 1px solid var(--color-border);
-  position: relative;
-  overflow: hidden;
-  transition: all 0.2s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-.stat-card::before {
+.compact-stat::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 4px;
+  background: #3b82f6;
+}
+
+.compact-stat.green::before {
+  background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+}
+
+.compact-stat.blue::before {
   background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
 }
 
-.stat-card-green::before {
-  background: linear-gradient(90deg, var(--color-positive) 0%, #16a34a 100%);
+.compact-stat.orange::before {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
 }
 
-.stat-card-orange::before {
-  background: linear-gradient(90deg, var(--color-warning) 0%, #d97706 100%);
+.compact-stat.purple::before {
+  background: linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%);
 }
 
-.stat-card-red::before {
-  background: linear-gradient(90deg, var(--color-negative) 0%, #dc2626 100%);
-}
-
-.stat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.stat-icon {
-  font-size: 20px;
+.compact-stat-icon {
+  font-size: 24px;
+  margin-bottom: 6px;
+  display: block;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
-.stat-trend {
-  font-size: 12px;
-}
-
-.trend-up {
-  color: var(--color-positive);
-}
-
-.trend-down {
-  color: var(--color-negative);
-}
-
-.trend-neutral {
-  color: var(--color-text-muted);
-}
-
-.stat-content {
-  text-align: left;
-}
-
-.stat-title {
-  font-size: 11px;
-  color: var(--color-text-muted);
-  font-weight: 600;
-  margin: 0 0 4px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.stat-value {
+.compact-stat-value {
   font-size: 18px;
   font-weight: 700;
-  color: var(--color-text);
-  margin: 0 0 2px 0;
-  line-height: 1.2;
+  color: #1e293b;
+  margin-bottom: 4px;
+  line-height: 1;
 }
 
-.stat-subtitle {
+.compact-stat-label {
   font-size: 10px;
-  color: var(--color-text-muted);
-  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
 }
 
-/* Progress Section */
-.progress-section {
-  background: var(--color-card);
+/* Compact Cards */
+.compact-card {
+  background: white;
   border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px var(--color-shadow);
-  border: 1px solid var(--color-border);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.section-title {
+.compact-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.compact-card-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--color-text);
-  margin: 0 0 16px 0;
+  color: #1e293b;
+  margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
-.section-icon {
-  font-size: 18px;
-}
-
-.progress-container {
+/* Progress Items */
+.progress-items {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .progress-item {
   background: #f8fafc;
   border-radius: 8px;
-  padding: 12px;
+  padding: 10px;
 }
 
-.progress-header {
+.progress-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-}
-
-.progress-label {
+  margin-bottom: 6px;
   font-size: 12px;
   font-weight: 600;
   color: #374151;
 }
 
-.progress-values {
-  font-size: 11px;
-  color: #64748b;
-  font-weight: 500;
-}
-
-.progress-bar-container {
+.progress-bar {
   width: 100%;
-  height: 8px;
+  height: 6px;
   background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
-  margin-bottom: 4px;
 }
 
-.progress-bar-fill {
+.progress-fill {
   height: 100%;
-  border-radius: 4px;
+  border-radius: 3px;
   transition: width 0.5s ease;
   position: relative;
 }
 
-.progress-bar-fill::after {
+.progress-fill::after {
   content: "";
   position: absolute;
   top: 0;
@@ -277,207 +163,16 @@
   animation: shimmer 2s infinite;
 }
 
-.progress-percentage {
-  font-size: 10px;
-  color: #64748b;
-  font-weight: 600;
-  text-align: right;
+.progress-fill.green {
+  background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
 }
 
-/* Achievements Preview */
-.achievements-preview {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+.progress-fill.blue {
+  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
 }
 
-.achievement-items {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.achievement-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.achievement-item.unlocked {
-  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-  border: 1px solid #22c55e;
-}
-
-.achievement-item.locked {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  opacity: 0.6;
-}
-
-.achievement-icon {
-  font-size: 24px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-}
-
-.achievement-content {
-  flex: 1;
-}
-
-.achievement-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 2px;
-}
-
-.achievement-desc {
-  font-size: 11px;
-  color: #64748b;
-}
-
-/* Emissions Tab */
-.emissions-tab {
-  background: white;
-  border-radius: 12px;
-  padding: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-}
-
-.tab-content-wrapper {
-  padding: 16px;
-}
-
-/* Economics Tab */
-.economics-tab {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.economics-summary {
-  background: var(--color-card);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px var(--color-shadow);
-  border: 1px solid var(--color-border);
-}
-
-.economics-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.economics-card {
-  background: #f8fafc;
-  border-radius: 8px;
-  padding: 16px;
-  border: 1px solid #e2e8f0;
-}
-
-.economics-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0 0 12px 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.economics-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.economics-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.economics-item:last-child {
-  border-bottom: none;
-}
-
-.economics-value {
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.economics-value.green {
-  color: var(--color-positive);
-}
-
-/* Cost-Benefit Analysis */
-.cost-benefit {
-  background: var(--color-card-alt);
-  border-radius: 8px;
-  padding: 16px;
-  border: 1px solid var(--color-border);
-}
-
-.analysis-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0 0 12px 0;
-}
-
-.analysis-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.analysis-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 12px;
-  padding: 8px;
-  border-radius: 6px;
-  line-height: 1.4;
-}
-
-.analysis-item.positive {
-  background: rgba(34, 197, 94, 0.1);
-  color: var(--color-positive);
-  border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-.analysis-item.neutral {
-  background: var(--color-bg-section);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-}
-
-.analysis-icon {
-  font-size: 14px;
-  margin-top: 1px;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.progress-fill.orange {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
 }
 
 @keyframes shimmer {
@@ -489,179 +184,373 @@
   }
 }
 
+/* Achievements Grid */
+.achievements-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.achievement-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px;
+  border-radius: 8px;
+  text-align: center;
+  transition: all 0.2s ease;
+  border: 1px solid;
+}
+
+.achievement-badge.unlocked {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.achievement-badge.locked {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+  opacity: 0.7;
+}
+
+.achievement-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.achievement-name {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* Economics Content */
+.economics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.economics-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 12px;
+}
+
+.economics-item:last-child {
+  border-bottom: none;
+}
+
+.economics-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.economics-value {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.economics-value.green {
+  color: #22c55e;
+}
+
+/* Cost-Benefit Items */
+.cost-benefit-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.benefit-item.positive {
+  background: rgba(34, 197, 94, 0.1);
+  color: #166534;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.benefit-item.neutral {
+  background: rgba(100, 116, 139, 0.1);
+  color: #334155;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.benefit-icon {
+  font-size: 12px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+/* Climate Content */
+.climate-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.climate-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.climate-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.climate-info {
+  flex: 1;
+}
+
+.climate-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+
+.climate-label {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+/* Intensity Info */
+.intensity-info {
+  text-align: center;
+}
+
+.intensity-current {
+  margin-bottom: 16px;
+}
+
+.intensity-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  display: block;
+}
+
+.intensity-unit {
+  font-size: 12px;
+  color: #64748b;
+  display: block;
+  margin: 2px 0 4px 0;
+}
+
+.intensity-label {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.intensity-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.comparison-item {
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+
+.comparison-label {
+  font-size: 9px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.comparison-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Header Styling */
+.stats-header {
+  text-align: center;
+  padding: 0;
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.title-icon {
+  font-size: 20px;
+}
+
 /* Responsive Design */
 @media (max-width: 375px) {
-  .stats-page {
-    padding: 12px;
+  .compact-stats-grid {
+    gap: 8px;
   }
 
-  .page-title {
+  .compact-stat {
+    padding: 10px;
+  }
+
+  .compact-stat-icon {
     font-size: 20px;
   }
 
-  .stats-grid {
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-
-  .stat-card {
-    padding: 12px;
-  }
-
-  .stat-value {
+  .compact-stat-value {
     font-size: 16px;
   }
 
-  .tab-button {
-    padding: 10px 6px;
-    font-size: 11px;
+  .achievements-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
   }
 
-  .tab-icon {
-    font-size: 12px;
+  .achievement-badge {
+    padding: 8px 4px;
+  }
+
+  .achievement-icon {
+    font-size: 16px;
+  }
+
+  .achievement-name {
+    font-size: 9px;
+  }
+
+  .intensity-comparison {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
 }
 
 @media (min-width: 768px) {
-  .stats-page {
-    max-width: 768px;
-    margin: 0 auto;
-    padding: 24px;
+  .compact-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
   }
 
-  .stats-grid {
+  .achievements-grid {
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
   }
 
   .economics-grid {
     grid-template-columns: 1fr 1fr;
   }
 
-  .progress-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-
-  .achievement-items {
+  .climate-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
   }
 }
 
-@media (min-width: 1024px) {
-  .stats-page {
-    max-width: 1024px;
-    padding: 32px;
-  }
-
-  .progress-container {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .achievement-items {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* Dark Mode Support */
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
-  .stats-page {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  .compact-stat,
+  .compact-card {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .compact-stat-value,
+  .compact-card-title,
+  .climate-value,
+  .intensity-value,
+  .comparison-value,
+  .economics-value {
+    color: #f1f5f9;
+  }
+
+  .compact-stat-label,
+  .climate-label,
+  .intensity-label,
+  .intensity-unit,
+  .comparison-label,
+  .economics-label {
+    color: #94a3b8;
   }
 
   .page-title {
     color: #f1f5f9;
   }
 
-  .page-subtitle {
-    color: #94a3b8;
-  }
-
-  .tab-navigation {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .tab-button {
-    color: #94a3b8;
-  }
-
-  .tab-button:hover {
-    color: #f1f5f9;
-  }
-
-  .stat-card,
-  .progress-section,
-  .achievements-preview,
-  .economics-summary,
-  .emissions-tab {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .section-title,
-  .stat-value,
-  .achievement-name,
-  .economics-title,
-  .economics-value,
-  .analysis-title {
-    color: #f1f5f9;
-  }
-
-  .stat-title,
-  .stat-subtitle,
-  .progress-label,
-  .progress-values,
-  .progress-percentage,
-  .achievement-desc {
-    color: #94a3b8;
-  }
-
-  .economics-card,
-  .cost-benefit,
-  .progress-item {
+  .progress-item,
+  .climate-stat,
+  .comparison-item {
     background: rgba(15, 23, 42, 0.8);
     border-color: rgba(255, 255, 255, 0.1);
   }
 
-  .achievement-item.unlocked {
+  .achievement-badge.unlocked {
     background: rgba(34, 197, 94, 0.2);
-    border-color: #22c55e;
+    color: #22c55e;
   }
 
-  .achievement-item.locked {
+  .achievement-badge.locked {
     background: rgba(15, 23, 42, 0.8);
-    border-color: rgba(255, 255, 255, 0.1);
+    color: #64748b;
   }
 }
 
-/* Touch Optimizations */
-@media (hover: none) and (pointer: coarse) {
-  .tab-button {
-    padding: 14px 8px;
-  }
-
-  .stat-card:hover {
-    transform: none;
-  }
-
-  .achievement-item:hover {
-    transform: none;
-  }
+/* Accessibility */
+.compact-stat:focus,
+.achievement-badge:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
-/* High contrast mode */
-@media (prefers-contrast: high) {
-  .stat-card,
-  .progress-section,
-  .achievements-preview {
-    border-width: 2px;
+/* Performance optimizations */
+.compact-stat,
+.achievement-badge,
+.progress-fill {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .compact-stat,
+  .achievement-badge,
+  .progress-fill {
+    transition: none;
   }
 
-  .tab-button.active {
-    box-shadow: 0 0 0 2px #3b82f6;
+  .progress-fill::after {
+    animation: none;
   }
 }

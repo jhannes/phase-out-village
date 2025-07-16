@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import BottomNavBar from "../Navigation/BottomNavBar";
+import BottomNavBar, { BottomNavBarItem } from "../Navigation/BottomNavBar";
 import "./MobileGameLayout.css";
 
 interface MobileGameLayoutProps {
@@ -14,13 +14,46 @@ interface MobileGameLayoutProps {
   onViewChange?: (view: string) => void;
 }
 
-interface ViewConfig {
-  id: string;
-  title: string;
-  component: React.ReactNode;
-  fullScreen?: boolean;
-  scrollable?: boolean;
-}
+const navItemsConfig = (
+  activeView: string,
+  onViewChange: (view: string) => void
+): BottomNavBarItem[] => [
+  {
+    id: "map",
+    icon: "🗺️",
+    label: "Kart",
+    active: activeView === "map",
+    onClick: () => onViewChange("map"),
+  },
+  {
+    id: "stats",
+    icon: "📊",
+    label: "Statistikk",
+    active: activeView === "stats",
+    onClick: () => onViewChange("stats"),
+  },
+  {
+    id: "budget",
+    icon: "💰",
+    label: "Budsjett",
+    active: activeView === "budget",
+    onClick: () => onViewChange("budget"),
+  },
+  {
+    id: "achievements",
+    icon: "🏆",
+    label: "Prestasjon",
+    active: activeView === "achievements",
+    onClick: () => onViewChange("achievements"),
+  },
+  {
+    id: "settings",
+    icon: "⚙️",
+    label: "Innstillinger",
+    active: activeView === "settings",
+    onClick: () => onViewChange("settings"),
+  },
+];
 
 const MobileGameLayout: React.FC<MobileGameLayoutProps> = ({
   children,
@@ -129,11 +162,41 @@ const MobileGameLayout: React.FC<MobileGameLayoutProps> = ({
         </div>
       </main>
 
-      {/* Bottom Navigation */}
+      {/* Game Status Bar - Above nav bar */}
+      <div className="game-status-bar">
+        <div className="status-item">
+          <span className="status-icon">💰</span>
+          <span className="status-value">
+            {gameState?.budget
+              ? `${(gameState.budget / 1000000).toFixed(1)}M kr`
+              : "0M kr"}
+          </span>
+        </div>
+        <div className="status-item">
+          <span className="status-icon">🛢️</span>
+          <span className="status-value">
+            {gameState?.fieldsRemaining || 0}
+          </span>
+        </div>
+        <div className="status-item">
+          <span className="status-icon">🌱</span>
+          <span className="status-value">
+            {gameState?.selectedFields?.length || 0}
+          </span>
+        </div>
+        <div className="status-item">
+          <span className="status-icon">💨</span>
+          <span className="status-value">
+            {gameState?.totalEmissions
+              ? `${(gameState.totalEmissions / 1000000).toFixed(1)}Mt`
+              : "0Mt"}
+          </span>
+        </div>
+      </div>
+
+      {/* Bottom Navigation Bar */}
       <BottomNavBar
-        activeView={activeView}
-        onViewChange={handleViewChange}
-        gameState={gameState}
+        items={navItemsConfig(activeView, handleViewChange)}
       />
     </div>
   );

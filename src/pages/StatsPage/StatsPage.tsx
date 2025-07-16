@@ -1,40 +1,12 @@
-import React, { useState, useEffect } from "react";
-import "./StatsPage.css";
-import { EmissionsView } from "../../components/charts/EmissionsView";
+import React, { useState } from "react";
+import MobileTabsLayout from "../../components/Layout/CompactMobileLayout";
+import TopTabBar from "../../components/Navigation/TopTabBar";
 import { useGameStats, useGameState } from "../../context/GameStateContext";
+import "./StatsPage.css";
 
-interface StatsPageProps {}
-
-interface GameStats {
-  totalEmissionsReduced: number;
-  totalBudgetSpent: number;
-  fieldsPhased: number;
-  totalFields: number;
-  averageIntensity: number;
-  projectedSavings: number;
-  completionPercentage: number;
-  co2PerBOE: number;
-}
-
-const StatsPage: React.FC<StatsPageProps> = () => {
+const CompactStatsPage: React.FC = () => {
   const gameStats = useGameStats();
   const { gameState } = useGameState();
-
-  // Use real game data
-  const stats: GameStats = {
-    totalEmissionsReduced: gameStats.totalEmissionsReduced,
-    totalBudgetSpent: gameStats.totalBudgetSpent,
-    fieldsPhased: gameStats.fieldsPhased,
-    totalFields: gameStats.totalFields,
-    averageIntensity: gameStats.averageIntensity,
-    projectedSavings: gameStats.projectedSavings / 1000000, // Convert to millions
-    completionPercentage: gameStats.completionPercentage,
-    co2PerBOE: gameStats.co2PerBOE,
-  };
-
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "emissions" | "economics"
-  >("overview");
 
   const formatNumber = (num: number, suffix: string = ""): string => {
     if (num >= 1000000) {
@@ -45,320 +17,376 @@ const StatsPage: React.FC<StatsPageProps> = () => {
     return `${num.toFixed(1)}${suffix}`;
   };
 
-  const StatCard: React.FC<{
-    icon: string;
-    title: string;
-    value: string;
-    subtitle?: string;
-    trend?: "up" | "down" | "neutral";
-    color?: "green" | "blue" | "orange" | "red";
-  }> = ({ icon, title, value, subtitle, trend, color = "blue" }) => (
-    <div className={`stat-card stat-card-${color}`}>
-      <div className="stat-header">
-        <span className="stat-icon">{icon}</span>
-        <div className="stat-trend">
-          {trend === "up" && <span className="trend-up">↗️</span>}
-          {trend === "down" && <span className="trend-down">↘️</span>}
-          {trend === "neutral" && <span className="trend-neutral">→</span>}
+  // Overview Tab Content
+  const OverviewContent = () => (
+    <div className="overview-content">
+      {/* Key Stats Grid */}
+      <div className="compact-stats-grid">
+        <div className="compact-stat green">
+          <span className="compact-stat-icon">🌱</span>
+          <div className="compact-stat-value">{gameStats.fieldsPhased}</div>
+          <div className="compact-stat-label">Felt faset ut</div>
+        </div>
+        <div className="compact-stat blue">
+          <span className="compact-stat-icon">💨</span>
+          <div className="compact-stat-value">
+            {gameStats.totalEmissionsReduced.toFixed(1)}Mt
+          </div>
+          <div className="compact-stat-label">CO₂ redusert</div>
+        </div>
+        <div className="compact-stat orange">
+          <span className="compact-stat-icon">💰</span>
+          <div className="compact-stat-value">
+            {formatNumber(gameStats.totalBudgetSpent)}
+          </div>
+          <div className="compact-stat-label">Investert</div>
+        </div>
+        <div className="compact-stat purple">
+          <span className="compact-stat-icon">🎯</span>
+          <div className="compact-stat-value">
+            {gameStats.completionPercentage.toFixed(0)}%
+          </div>
+          <div className="compact-stat-label">Fullført</div>
         </div>
       </div>
-      <div className="stat-content">
-        <h3 className="stat-title">{title}</h3>
-        <div className="stat-value">{value}</div>
-        {subtitle && <div className="stat-subtitle">{subtitle}</div>}
+
+      {/* Progress Cards */}
+      <div className="compact-card">
+        <div className="compact-card-header">
+          <h3 className="compact-card-title">🎯 Fremgang</h3>
+        </div>
+        <div className="progress-items">
+          <div className="progress-item">
+            <div className="progress-info">
+              <span>Utfasing</span>
+              <span>
+                {gameStats.fieldsPhased}/{gameStats.totalFields}
+              </span>
+            </div>
+            {/*   <div className="progress-bar"> */}
+            {/*     <div */}
+            {/*       className="progress-fill green" */}
+            {/*       style={{ width: `${(gameStats.fieldsPhased / gameStats.totalFields) * 100}%` }} */}
+            {/*     /> */}
+            {/*   </div> */}
+            {/* </div> */}
+            {/* <div className="progress-item"> */}
+            {/*   <div className="progress-info"> */}
+            {/*     <span>CO₂ reduksjon</span> */}
+            {/*     <span>{gameStats.totalEmissionsReduced.toFixed(1)}/50Mt</span> */}
+            {/*   </div> */}
+            <div className="progress-bar">
+              <div
+                className="progress-fill blue"
+                style={{
+                  width: `${Math.min((gameStats.totalEmissionsReduced / 50) * 100, 100)}%`,
+                }}
+              />
+            </div>
+          </div>
+          <div className="progress-item">
+            <div className="progress-info">
+              <span>Budsjett</span>
+              <span>{formatNumber(gameStats.totalBudgetSpent)}/100M</span>
+            </div>
+            <div className="progress-bar">
+              <div
+                className="progress-fill orange"
+                style={{
+                  width: `${(gameStats.totalBudgetSpent / 100000000) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Achievements */}
+      <div className="compact-card">
+        <div className="compact-card-header">
+          <h3 className="compact-card-title">🏆 Prestasjoner</h3>
+        </div>
+        <div className="achievements-grid">
+          <div
+            className={`achievement-badge ${gameStats.fieldsPhased >= 1 ? "unlocked" : "locked"}`}
+          >
+            <span className="achievement-icon">🌱</span>
+            <span className="achievement-name">Første utfasing</span>
+          </div>
+          <div
+            className={`achievement-badge ${gameStats.totalEmissionsReduced >= 10 ? "unlocked" : "locked"}`}
+          >
+            <span className="achievement-icon">💚</span>
+            <span className="achievement-name">Miljøvennlig</span>
+          </div>
+          <div
+            className={`achievement-badge ${gameStats.fieldsPhased >= 25 ? "unlocked" : "locked"}`}
+          >
+            <span className="achievement-icon">🎯</span>
+            <span className="achievement-name">Målfokusert</span>
+          </div>
+          <div
+            className={`achievement-badge ${gameStats.completionPercentage >= 50 ? "unlocked" : "locked"}`}
+          >
+            <span className="achievement-icon">⭐</span>
+            <span className="achievement-name">Halvveis</span>
+          </div>
+        </div>
       </div>
     </div>
   );
 
-  const ProgressBar: React.FC<{
-    label: string;
-    current: number;
-    max: number;
-    color?: string;
-  }> = ({ label, current, max, color = "#22c55e" }) => {
-    const percentage = Math.min((current / max) * 100, 100);
+  // Economics Tab Content
+  const EconomicsContent = () => (
+    <div className="economics-content">
+      <div className="compact-card">
+        <div className="compact-card-header">
+          <h3 className="compact-card-title">💼 Økonomi</h3>
+        </div>
+        <div className="economics-grid">
+          <div className="economics-item">
+            <span className="economics-label">Totalt investert</span>
+            <span className="economics-value">
+              {formatNumber(gameStats.totalBudgetSpent, " kr")}
+            </span>
+          </div>
+          <div className="economics-item">
+            <span className="economics-label">Per felt</span>
+            <span className="economics-value">
+              {gameStats.fieldsPhased > 0
+                ? formatNumber(
+                    gameStats.totalBudgetSpent / gameStats.fieldsPhased,
+                    " kr",
+                  )
+                : "0 kr"}
+            </span>
+          </div>
+          <div className="economics-item">
+            <span className="economics-label">Gjenværende</span>
+            <span className="economics-value">
+              {formatNumber(gameState.budget, " kr")}
+            </span>
+          </div>
+          <div className="economics-item">
+            <span className="economics-label">Estimert besparelse</span>
+            <span className="economics-value green">
+              {formatNumber(gameStats.projectedSavings, " kr")}
+            </span>
+          </div>
+        </div>
+      </div>
 
+      <div className="compact-card">
+        <div className="compact-card-header">
+          <h3 className="compact-card-title">📈 Kost-Nytte</h3>
+        </div>
+        <div className="cost-benefit-items">
+          <div className="benefit-item positive">
+            <span className="benefit-icon">✅</span>
+            <span>
+              CO₂ reduksjon: {gameStats.totalEmissionsReduced.toFixed(1)} Mt/år
+            </span>
+          </div>
+          <div className="benefit-item positive">
+            <span className="benefit-icon">✅</span>
+            <span>
+              Karbonbesparelse:{" "}
+              {formatNumber(gameStats.projectedSavings, " kr")}
+            </span>
+          </div>
+          <div className="benefit-item neutral">
+            <span className="benefit-icon">📋</span>
+            <span>
+              Jobber i transisjon: ~
+              {(gameStats.fieldsPhased * 150).toLocaleString()}
+            </span>
+          </div>
+          <div className="benefit-item positive">
+            <span className="benefit-icon">✅</span>
+            <span>
+              Nye grønne jobber: ~
+              {(gameStats.fieldsPhased * 200).toLocaleString()}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Climate Tab Content
+  const ClimateContent = () => (
+    <div className="climate-content">
+      <div className="compact-card">
+        <div className="compact-card-header">
+          <h3 className="compact-card-title">🌍 Klimapåvirkning</h3>
+        </div>
+        <div className="climate-stats">
+          <div className="climate-stat">
+            <span className="climate-icon">🌡️</span>
+            <div className="climate-info">
+              <div className="climate-value">
+                +1.
+                {(1 + Math.max(0, 5 - gameStats.totalEmissionsReduced * 0.1))
+                  .toFixed(1)
+                  .slice(-1)}
+                °C
+              </div>
+              <div className="climate-label">Global temperatur</div>
+            </div>
+          </div>
+          <div className="climate-stat">
+            <span className="climate-icon">💨</span>
+            <div className="climate-info">
+              <div className="climate-value">
+                {gameStats.totalEmissionsReduced.toFixed(1)} Mt
+              </div>
+              <div className="climate-label">CO₂ unngått årlig</div>
+            </div>
+          </div>
+          <div className="climate-stat">
+            <span className="climate-icon">🌱</span>
+            <div className="climate-info">
+              <div className="climate-value">
+                {(gameStats.totalEmissionsReduced * 20).toFixed(0)} Mt
+              </div>
+              <div className="climate-label">Total besparelse (20 år)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="compact-card">
+        <div className="compact-card-header">
+          <h3 className="compact-card-title">📊 Intensitet</h3>
+        </div>
+        <div className="intensity-info">
+          <div className="intensity-current">
+            <span className="intensity-value">
+              {gameStats.averageIntensity.toFixed(1)}
+            </span>
+            <span className="intensity-unit">kg CO₂e/BOE</span>
+            <span className="intensity-label">Gjennomsnittlig intensitet</span>
+          </div>
+          <div className="intensity-comparison">
+            <div className="comparison-item">
+              <span className="comparison-label">Globalt snitt</span>
+              <span className="comparison-value">18.5 kg</span>
+            </div>
+            <div className="comparison-item">
+              <span className="comparison-label">Norsk mål</span>
+              <span className="comparison-value">8.0 kg</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Define tabs BEFORE using them in useState
+  const tabs = [
+    {
+      id: "overview",
+      title: "Oversikt",
+      icon: "📊",
+      content: <OverviewContent />,
+      badge: gameStats.fieldsPhased,
+    },
+    {
+      id: "economics",
+      title: "Økonomi",
+      icon: "💰",
+      content: <EconomicsContent />,
+    },
+    {
+      id: "climate",
+      title: "Klima",
+      icon: "🌍",
+      content: <ClimateContent />,
+    },
+  ];
+
+  const [activeTab, setActiveTab] = useState(tabs[0].id);
+  const activeTabData = tabs.find(tab => tab.id === activeTab);
+  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+
+  const statusBar = (
+    <>
+      <div className="status-item">
+        <span className="status-icon">💰</span>
+        <div className="status-value">{formatNumber(gameState.budget)}</div>
+        <div className="status-label">Budsjett</div>
+      </div>
+      <div className="status-item">
+        <span className="status-icon">🛢️</span>
+        <div className="status-value">{gameStats.fieldsRemaining}</div>
+        <div className="status-label">Felt igjen</div>
+      </div>
+      <div className="status-item">
+        <span className="status-icon">🌱</span>
+        <div className="status-value">{gameStats.selectedFieldsCount}</div>
+        <div className="status-label">Valgte</div>
+      </div>
+      <div className="status-item">
+        <span className="status-icon">💨</span>
+        <div className="status-value">
+          {gameStats.totalEmissionsReduced.toFixed(1)}Mt
+        </div>
+        <div className="status-label">Redusert</div>
+      </div>
+    </>
+  );
+
+  const floatingActions = (
+    <>
+      <button className="fab primary" title="Multi-utfasing">
+        🎯
+      </button>
+      <button className="fab secondary" title="Oppdater data">
+        🔄
+      </button>
+    </>
+  );
+
+  const header = (
+    <div className="stats-header">
+      <h1 className="page-title">
+        <span className="title-icon">📊</span>
+        Statistikk
+      </h1>
+    </div>
+  );
+
+  if (isMobile) {
     return (
-      <div className="progress-item">
-        <div className="progress-header">
-          <span className="progress-label">{label}</span>
-          <span className="progress-values">
-            {current} / {max}
-          </span>
-        </div>
-        <div className="progress-bar-container">
-          <div
-            className="progress-bar-fill"
-            style={{
-              width: `${percentage}%`,
-              backgroundColor: color,
-            }}
-          />
-        </div>
-        <div className="progress-percentage">{percentage.toFixed(1)}%</div>
-      </div>
+      <MobileTabsLayout
+        tabs={tabs}
+        defaultTab="overview"
+        header={header}
+        floatingActions={floatingActions}
+      />
     );
-  };
+  }
 
+  // Desktop: TopTabBar and active tab content
   return (
-    <div className="stats-page">
-      <div className="stats-header">
-        <h1 className="page-title">
-          <span className="title-icon">📊</span>
-          Spillstatistikk
-        </h1>
-        <p className="page-subtitle">Oversikt over din fremgang i utfasingen</p>
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="tab-navigation">
-        <button
-          className={`tab-button ${activeTab === "overview" ? "active" : ""}`}
-          onClick={() => setActiveTab("overview")}
-        >
-          <span className="tab-icon">📈</span>
-          Oversikt
-        </button>
-        <button
-          className={`tab-button ${activeTab === "emissions" ? "active" : ""}`}
-          onClick={() => setActiveTab("emissions")}
-        >
-          <span className="tab-icon">💨</span>
-          Utslipp
-        </button>
-        <button
-          className={`tab-button ${activeTab === "economics" ? "active" : ""}`}
-          onClick={() => setActiveTab("economics")}
-        >
-          <span className="tab-icon">💰</span>
-          Økonomi
-        </button>
-      </div>
-
-      {/* Tab Content */}
-      <div className="tab-content">
-        {activeTab === "overview" && (
-          <div className="overview-tab">
-            {/* Key Stats Grid */}
-            <div className="stats-grid">
-              <StatCard
-                icon="🌱"
-                title="Felt faset ut"
-                value={`${stats.fieldsPhased}`}
-                subtitle={`av ${stats.totalFields} totalt`}
-                trend="up"
-                color="green"
-              />
-              <StatCard
-                icon="💨"
-                title="CO₂ redusert"
-                value={`${stats.totalEmissionsReduced} Mt`}
-                subtitle="årlig besparelse"
-                trend="down"
-                color="green"
-              />
-              <StatCard
-                icon="💰"
-                title="Budsjett brukt"
-                value={formatNumber(stats.totalBudgetSpent, " kr")}
-                subtitle="av total ramme"
-                trend="up"
-                color="orange"
-              />
-              <StatCard
-                icon="⚡"
-                title="Intensitet"
-                value={`${stats.averageIntensity} kg`}
-                subtitle="CO₂e per BOE"
-                trend="down"
-                color="blue"
-              />
-            </div>
-
-            {/* Progress Section */}
-            <div className="progress-section">
-              <h2 className="section-title">
-                <span className="section-icon">🎯</span>
-                Fremgang
-              </h2>
-              <div className="progress-container">
-                <ProgressBar
-                  label="Utfasing av felt"
-                  current={stats.fieldsPhased}
-                  max={stats.totalFields}
-                  color="#22c55e"
-                />
-                <ProgressBar
-                  label="Utslippsreduksjon"
-                  current={stats.totalEmissionsReduced}
-                  max={50}
-                  color="#3b82f6"
-                />
-                <ProgressBar
-                  label="Budsjettbruk"
-                  current={stats.totalBudgetSpent}
-                  max={gameState.budget + stats.totalBudgetSpent}
-                  color="#f59e0b"
-                />
-              </div>
-            </div>
-
-            {/* Achievements Preview */}
-            <div className="achievements-preview">
-              <h2 className="section-title">
-                <span className="section-icon">🏆</span>
-                Prestasjoner
-              </h2>
-              <div className="achievement-items">
-                <div
-                  className={`achievement-item ${stats.fieldsPhased >= 1 ? "unlocked" : "locked"}`}
-                >
-                  <span className="achievement-icon">🌱</span>
-                  <div className="achievement-content">
-                    <div className="achievement-name">Første utfasing</div>
-                    <div className="achievement-desc">
-                      Fase ut ditt første felt
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className={`achievement-item ${stats.totalEmissionsReduced >= 10 ? "unlocked" : "locked"}`}
-                >
-                  <span className="achievement-icon">💚</span>
-                  <div className="achievement-content">
-                    <div className="achievement-name">Miljøvennlig</div>
-                    <div className="achievement-desc">Reduser 10 Mt CO₂</div>
-                  </div>
-                </div>
-                <div
-                  className={`achievement-item ${stats.fieldsPhased >= 25 ? "unlocked" : "locked"}`}
-                >
-                  <span className="achievement-icon">🎯</span>
-                  <div className="achievement-content">
-                    <div className="achievement-name">Målfokusert</div>
-                    <div className="achievement-desc">Fase ut 25 felt</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "emissions" && (
-          <div className="emissions-tab">
-            <div className="tab-content-wrapper">
-              <EmissionsView data={[]} />
-            </div>
-          </div>
-        )}
-
-        {activeTab === "economics" && (
-          <div className="economics-tab">
-            <div className="economics-summary">
-              <h2 className="section-title">
-                <span className="section-icon">💼</span>
-                Økonomisk sammendrag
-              </h2>
-
-              <div className="economics-grid">
-                <div className="economics-card">
-                  <h3 className="economics-title">💰 Investeringer</h3>
-                  <div className="economics-content">
-                    <div className="economics-item">
-                      <span>Totalt investert:</span>
-                      <span className="economics-value">
-                        {formatNumber(stats.totalBudgetSpent, " kr")}
-                      </span>
-                    </div>
-                    <div className="economics-item">
-                      <span>Gjennomsnittskostnad per felt:</span>
-                      <span className="economics-value">
-                        {formatNumber(
-                          stats.totalBudgetSpent / stats.fieldsPhased,
-                          " kr",
-                        )}
-                      </span>
-                    </div>
-                    <div className="economics-item">
-                      <span>Gjenværende budsjett:</span>
-                      <span className="economics-value">
-                        {formatNumber(gameState.budget, " kr")}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="economics-card">
-                  <h3 className="economics-title">📈 Besparelser</h3>
-                  <div className="economics-content">
-                    <div className="economics-item">
-                      <span>Årlig CO₂-besparelse:</span>
-                      <span className="economics-value green">
-                        {stats.totalEmissionsReduced} Mt
-                      </span>
-                    </div>
-                    <div className="economics-item">
-                      <span>Estimert verdi (20 år):</span>
-                      <span className="economics-value green">
-                        {formatNumber(stats.projectedSavings * 1000000, " kr")}
-                      </span>
-                    </div>
-                    <div className="economics-item">
-                      <span>ROI (Return on Investment):</span>
-                      <span className="economics-value green">
-                        +
-                        {(
-                          ((stats.projectedSavings * 1000000) /
-                            stats.totalBudgetSpent) *
-                          100
-                        ).toFixed(1)}
-                        %
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Cost-Benefit Analysis */}
-              <div className="cost-benefit">
-                <h3 className="analysis-title">📊 Kost-nytte analyse</h3>
-                <div className="analysis-content">
-                  <div className="analysis-item positive">
-                    <span className="analysis-icon">✅</span>
-                    <span>
-                      Reduserte klimagassutslipp: {stats.totalEmissionsReduced}{" "}
-                      Mt CO₂e/år
-                    </span>
-                  </div>
-                  <div className="analysis-item positive">
-                    <span className="analysis-icon">✅</span>
-                    <span>
-                      Fremtidig karbonkostnadsbesparelse:{" "}
-                      {formatNumber(stats.projectedSavings * 1000000, " kr")}
-                    </span>
-                  </div>
-                  <div className="analysis-item neutral">
-                    <span className="analysis-icon">📋</span>
-                    <span>
-                      Arbeidsplasser i transisjon: ~
-                      {(stats.fieldsPhased * 150).toLocaleString()} jobber
-                    </span>
-                  </div>
-                  <div className="analysis-item positive">
-                    <span className="analysis-icon">✅</span>
-                    <span>
-                      Nye grønne arbeidsplasser: ~
-                      {(stats.fieldsPhased * 200).toLocaleString()} jobber
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+    <div className="desktop-stats-content">
+      <TopTabBar
+        items={tabs.map(tab => ({
+          id: tab.id,
+          icon: tab.icon,
+          label: tab.title,
+          badge: tab.badge,
+          active: activeTab === tab.id,
+          onClick: () => setActiveTab(tab.id),
+          ariaLabel: tab.title,
+        }))}
+        fixed={false}
+      />
+      <div className={`tab-content tab-${activeTab}`}>
+        {activeTabData?.content}
       </div>
     </div>
   );
 };
 
-export default StatsPage;
+export default CompactStatsPage;

@@ -1,11 +1,11 @@
-import React from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import CompactStatsPage from "../pages/StatsPage/CompactStatsPage";
+import React from 'react'
+import { createFileRoute } from '@tanstack/react-router'
+import StatsPage from '../pages/StatsPage/StatsPage'
 
-export const Route = createFileRoute("/stats")({
+export const Route = createFileRoute('/stats')({
   component: RouteComponent,
-});
+})
 
 function RouteComponent() {
-  return <CompactStatsPage />;
+  return <StatsPage />;
 }

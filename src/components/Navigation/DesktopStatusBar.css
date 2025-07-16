@@ -1,0 +1,51 @@
+.desktop-status-bar {
+  position: fixed;
+  bottom: 0;
+  top: auto;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  border-bottom: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  z-index: 101;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+  gap: 40px;
+}
+
+.desktop-status-bar .status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+
+.desktop-status-bar .status-icon {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+
+.desktop-status-bar .status-value {
+  font-size: 14px;
+  font-weight: bold;
+  color: #1e293b;
+  text-align: center;
+  line-height: 1;
+}
+
+.desktop-status-bar .status-label {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+@media (max-width: 767px) {
+  .desktop-status-bar {
+    display: none;
+  }
+} 

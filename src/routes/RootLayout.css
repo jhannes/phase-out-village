@@ -8,7 +8,8 @@
   background: var(--color-bg);
 }
 
-/* Mobile Main Content */
+
+/* Main Content */
 .main-content {
   flex: 1;
   position: relative;
@@ -16,15 +17,15 @@
 }
 
 .main-content.mobile {
-  padding-bottom: 130px; /* Space for status bar + bottom nav */
+  padding-bottom: 130px; /* Space for status bar + nav bar */
 }
 
 .main-content.desktop {
-  padding-top: 70px; /* Space for desktop nav */
-  padding-bottom: 20px;
+  padding-top: 70px; /* Only for nav now */
+  padding-bottom: 68px; /* Space for desktop status bar at bottom */
 }
 
-/* Mobile Status Bar */
+/* Mobile Status Bar (used above BottomNavBar) */
 .mobile-status-bar {
   position: fixed;
   bottom: 70px; /* Above bottom nav */
@@ -66,76 +67,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
-}
-
-/* Mobile Bottom Navigation */
-.mobile-bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(
-    135deg,
-    var(--color-bg-section) 0%,
-    var(--color-bg) 100%
-  );
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-  z-index: 1000;
-  box-shadow: 0 -4px 20px var(--color-shadow);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.root-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255, 255, 255, 0.6);
-  text-decoration: none;
-  transition: all 0.2s ease;
-  padding: 6px 8px;
-  border-radius: 8px;
-  min-width: 60px;
-  position: relative;
-}
-
-.root-nav-item:hover {
-  color: rgba(255, 255, 255, 0.8);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.root-nav-item.active {
-  color: #ffffff;
-  background: rgba(59, 130, 246, 0.2);
-  transform: scale(1.05);
-}
-
-.root-nav-item.active .nav-icon {
-  transform: scale(1.2);
-}
-
-.nav-icon-container {
-  position: relative;
-  margin-bottom: 2px;
-}
-
-.nav-icon {
-  font-size: 20px;
-  display: block;
-  transition: transform 0.2s ease;
-}
-
-.nav-label {
-  font-size: 10px;
-  font-weight: 500;
-  text-align: center;
-  line-height: 1;
-  letter-spacing: 0.2px;
 }
 
 /* Desktop Navigation */
@@ -223,30 +154,24 @@
   .nav-label {
     font-size: 9px;
   }
-
   .nav-icon {
     font-size: 18px;
   }
-
   .status-value {
     font-size: 10px;
   }
-
   .status-icon {
     font-size: 14px;
   }
-
   .main-content.mobile {
     padding-bottom: 120px;
   }
 }
 
 @media (min-width: 768px) {
-  .mobile-status-bar,
-  .mobile-bottom-nav {
+  .mobile-status-bar {
     display: none;
   }
-
   .desktop-nav {
     display: block;
   }
@@ -281,73 +206,8 @@
   }
 }
 
-.root-nav-item.active .nav-icon {
-  animation: pulse 0.3s ease-in-out;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .root-layout {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  }
-
-  .desktop-nav {
-    background: rgba(15, 23, 42, 0.95);
-    border-bottom-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .nav-brand {
-    color: #f1f5f9;
-  }
-
-  .nav-link {
-    color: #94a3b8;
-  }
-
-  .nav-link:hover {
-    color: #f1f5f9;
-  }
-
-  .mobile-bottom-nav {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  }
-
-  .mobile-status-bar {
-    background: rgba(15, 23, 42, 0.95);
-  }
-}
-
-/* Safe area adjustments for iOS */
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .mobile-bottom-nav {
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
-  }
-}
-
-/* Smooth transitions between views */
-.main-content > * {
+.nav-link.active::after {
   animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Loading states */
-.root-nav-item:active {
-  transform: scale(0.95);
-}
-
-.nav-link:active {
-  transform: scale(0.98);
 }
 
 /* Restart Button Styles */
@@ -406,4 +266,24 @@
 
 .mobile-restart-button:active {
   transform: scale(0.95);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .root-layout {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+  .desktop-nav {
+    background: rgba(15, 23, 42, 0.95);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  .nav-brand {
+    color: #f1f5f9;
+  }
+  .nav-link {
+    color: #94a3b8;
+  }
+  .nav-link:hover {
+    color: #f1f5f9;
+  }
 }

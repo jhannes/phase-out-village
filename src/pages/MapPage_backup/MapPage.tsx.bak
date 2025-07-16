@@ -30,8 +30,8 @@ import { OilFieldDataset, ShutdownMap } from "../../types/types";
 import { EmissionsView } from "../../components/charts/EmissionsView";
 import { type } from "os";
 import { checkAndAwardAchievements } from "../../achievements";
-import { getUnlockedLayers } from '../../components/ProgressiveDataUnlocks';
-import { DATA_LAYERS } from '../../components/ProgressiveDataLayers';
+import { getUnlockedLayers } from "../../components/ProgressiveDataUnlocks";
+import { DATA_LAYERS } from "../../components/ProgressiveDataLayers";
 const FieldModal: React.FC<{
   selectedField: Field | null;
   budget: number;
@@ -967,52 +967,72 @@ const calculateEnvironmentalState = (gameState: GameState) => {
 };
 
 // Helper to map field keys to values from gameState
-function getFieldValue(field: string, gameState: GameState): string | number | undefined {
+function getFieldValue(
+  field: string,
+  gameState: GameState,
+): string | number | undefined {
   switch (field) {
-    case 'fieldName':
+    case "fieldName":
       // Example: show number of fields or names (customize as needed)
-      return gameState.gameFields.map(f => f.name).join(', ');
-    case 'production':
-      return gameState.totalProduction?.toFixed(1) + ' mill. boe';
-    case 'basicEmissions':
-      return gameState.totalEmissions?.toFixed(1) + ' Mt';
-    case 'workers':
+      return gameState.gameFields.map((f) => f.name).join(", ");
+    case "production":
+      return gameState.totalProduction?.toFixed(1) + " mill. boe";
+    case "basicEmissions":
+      return gameState.totalEmissions?.toFixed(1) + " Mt";
+    case "workers":
       return gameState.gameFields.reduce((sum, f) => sum + (f.workers || 0), 0);
-    case 'efficiency':
+    case "efficiency":
       // Example: average intensity
-      if (gameState.gameFields.length === 0) return '?';
+      if (gameState.gameFields.length === 0) return "?";
       return (
-        gameState.gameFields.reduce((sum, f) => sum + (f.intensity || 0), 0) /
-        gameState.gameFields.length
-      ).toFixed(1) + ' kg CO₂/boe';
-    case 'emissionTrends':
+        (
+          gameState.gameFields.reduce((sum, f) => sum + (f.intensity || 0), 0) /
+          gameState.gameFields.length
+        ).toFixed(1) + " kg CO₂/boe"
+      );
+    case "emissionTrends":
       // Example: show change in emissions (dummy)
-      return 'Trend: ' + (gameState.totalEmissions > 0 ? '↓' : '↑');
-    case 'shutdownCost':
+      return "Trend: " + (gameState.totalEmissions > 0 ? "↓" : "↑");
+    case "shutdownCost":
       // Example: total shutdown cost
-      return (gameState.gameFields.reduce((sum, f) => sum + (f.phaseOutCost || 0), 0)).toLocaleString() + ' mill NOK';
-    case 'financialBreakdown':
+      return (
+        gameState.gameFields
+          .reduce((sum, f) => sum + (f.phaseOutCost || 0), 0)
+          .toLocaleString() + " mill NOK"
+      );
+    case "financialBreakdown":
       // Example: show budget
-      return (gameState.budget || 0).toLocaleString() + ' mill NOK';
-    case 'futureProjections':
+      return (gameState.budget || 0).toLocaleString() + " mill NOK";
+    case "futureProjections":
       // Example: show year
-      return 'År: ' + (gameState.year || '?');
-    case 'lifetimeEmissions':
+      return "År: " + (gameState.year || "?");
+    case "lifetimeEmissions":
       // Example: total lifetime emissions
-      return (gameState.gameFields.reduce((sum, f) => sum + (f.totalLifetimeEmissions || 0), 0) / 1000).toFixed(0) + ' Mt';
-    case 'hiddenStats':
+      return (
+        (
+          gameState.gameFields.reduce(
+            (sum, f) => sum + (f.totalLifetimeEmissions || 0),
+            0,
+          ) / 1000
+        ).toFixed(0) + " Mt"
+      );
+    case "hiddenStats":
       // Example: show number of achievements
-      return (gameState.achievements?.length || 0) + ' prestasjoner';
-    case 'expertTips':
+      return (gameState.achievements?.length || 0) + " prestasjoner";
+    case "expertTips":
       // Example: show a tip (dummy)
-      return 'Optimaliser utfasing for lavere utslipp!';
-    case 'advancedComparisons':
+      return "Optimaliser utfasing for lavere utslipp!";
+    case "advancedComparisons":
       // Example: compare phased out vs. remaining fields
-      const closed = gameState.gameFields.filter(f => f.status === 'closed').length;
-      const active = gameState.gameFields.filter(f => f.status === 'active').length;
+      const closed = gameState.gameFields.filter(
+        (f) => f.status === "closed",
+      ).length;
+      const active = gameState.gameFields.filter(
+        (f) => f.status === "active",
+      ).length;
       return `${closed} faset ut / ${active} igjen`;
     default:
-      return '?';
+      return "?";
   }
 }
 
@@ -1028,7 +1048,8 @@ const ProgressiveDataPanel: React.FC<{
   };
   const unlockedLayers = getUnlockedLayers(unlockState);
   // Track the most recently unlocked layer for animation/message
-  const [lastUnlockedLayer, setLastUnlockedLayer] = React.useState<DataLayer | null>(null);
+  const [lastUnlockedLayer, setLastUnlockedLayer] =
+    React.useState<DataLayer | null>(null);
   const prevUnlockedCount = React.useRef(unlockedLayers.length);
 
   React.useEffect(() => {
@@ -1043,16 +1064,19 @@ const ProgressiveDataPanel: React.FC<{
     <div className="progressive-data-panel">
       {lastUnlockedLayer && (
         <div className="layer-unlocked-message">
-          <span role="img" aria-label="Unlocked">🔓</span> Nytt datalag låst opp: <b>{lastUnlockedLayer}</b>!
+          <span role="img" aria-label="Unlocked">
+            🔓
+          </span>{" "}
+          Nytt datalag låst opp: <b>{lastUnlockedLayer}</b>!
         </div>
       )}
       {unlockedLayers.map((layer) => (
         <div className={`data-layer ${layer}`} key={layer}>
           <h4>
-            {layer === 'basic' && '📊 Grunnleggende Data'}
-            {layer === 'intermediate' && '🔎 Utvidet Data'}
-            {layer === 'advanced' && '🚀 Avansert Data'}
-            {layer === 'expert' && '🧠 Ekspert Data'}
+            {layer === "basic" && "📊 Grunnleggende Data"}
+            {layer === "intermediate" && "🔎 Utvidet Data"}
+            {layer === "advanced" && "🚀 Avansert Data"}
+            {layer === "expert" && "🧠 Ekspert Data"}
           </h4>
           <div className="data-grid">
             {DATA_LAYERS[layer].map((field) => (
@@ -2525,9 +2549,7 @@ const PhaseOutMapPage: React.FC = () => {
       </div>
 
       {/* Progressive data panel */}
-      <ProgressiveDataPanel
-        gameState={gameState}
-      />
+      <ProgressiveDataPanel gameState={gameState} />
 
       {/* Field Modal */}
       {showFieldModal && (
