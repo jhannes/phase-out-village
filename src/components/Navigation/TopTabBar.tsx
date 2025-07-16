@@ -18,7 +18,12 @@ export interface TopTabBarProps {
   style?: React.CSSProperties;
 }
 
-const TopTabBar: React.FC<TopTabBarProps> = ({ items, className = "", fixed = true, style }) => {
+const TopTabBar: React.FC<TopTabBarProps> = ({
+  items,
+  className = "",
+  fixed = true,
+  style,
+}) => {
   return (
     <nav
       className={`tab-bar${fixed ? " tab-bar-fixed" : ""} ${className}`.trim()}
@@ -47,4 +52,4 @@ const TopTabBar: React.FC<TopTabBarProps> = ({ items, className = "", fixed = tr
   );
 };
 
-export default TopTabBar; 
+export default TopTabBar;

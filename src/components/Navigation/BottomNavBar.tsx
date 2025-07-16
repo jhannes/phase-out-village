@@ -17,7 +17,11 @@ export interface BottomNavBarProps {
   style?: React.CSSProperties;
 }
 
-const BottomNavBar: React.FC<BottomNavBarProps> = ({ items, className = "", style }) => {
+const BottomNavBar: React.FC<BottomNavBarProps> = ({
+  items,
+  className = "",
+  style,
+}) => {
   return (
     <nav
       className={`bottom-nav-bar ${className}`.trim()}

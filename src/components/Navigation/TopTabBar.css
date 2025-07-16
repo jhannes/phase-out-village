@@ -4,7 +4,7 @@
   align-items: center;
   background: var(--color-bg-section, #fff);
   border-top: 1px solid var(--color-border, #e5e7eb);
-  box-shadow: 0 -4px 20px var(--color-shadow, rgba(0,0,0,0.05));
+  box-shadow: 0 -4px 20px var(--color-shadow, rgba(0, 0, 0, 0.05));
   padding: 8px 0 max(8px, env(safe-area-inset-bottom));
   z-index: 1000;
   gap: 0;
@@ -86,14 +86,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Animation for active state */
 @keyframes tabbar-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .tab-bar-item.active .tab-bar-icon {
@@ -134,4 +140,4 @@
     background: var(--color-accent-dark, #2563eb);
     color: var(--color-text-on-accent-dark, #fff);
   }
-} 
+}

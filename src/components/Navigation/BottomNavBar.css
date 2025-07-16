@@ -12,7 +12,7 @@
   align-items: center;
   background: var(--color-bg-section, #fff);
   border-top: 1px solid var(--color-border, #e5e7eb);
-  box-shadow: 0 -4px 20px var(--color-shadow, rgba(0,0,0,0.05));
+  box-shadow: 0 -4px 20px var(--color-shadow, rgba(0, 0, 0, 0.05));
   padding: 8px 0 max(8px, env(safe-area-inset-bottom));
   z-index: 1001;
   width: 100%;
@@ -89,7 +89,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Game Status Bar: sits directly above bottom nav bar */
@@ -139,7 +139,9 @@
 
 /* Content padding to account for fixed bottom elements */
 .main-content {
-  padding-bottom: calc(var(--bottom-nav-height) + var(--status-bar-height) + 16px);
+  padding-bottom: calc(
+    var(--bottom-nav-height) + var(--status-bar-height) + 16px
+  );
   min-height: 100vh;
 }
 

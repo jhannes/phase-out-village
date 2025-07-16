@@ -137,7 +137,7 @@ const RootLayout: React.FC = () => {
       onClick: () => {
         if (
           window.confirm(
-            "Er du sikker på at du vil starte spillet på nytt? All fremgang vil gå tapt."
+            "Er du sikker på at du vil starte spillet på nytt? All fremgang vil gå tapt.",
           )
         ) {
           localStorage.removeItem("phaseOutVillage_gameState");

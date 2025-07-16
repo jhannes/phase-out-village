@@ -1,4 +1,11 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo, useReducer } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+  useReducer,
+} from "react";
 import OlMap from "ol/Map";
 import View from "ol/View";
 import { fromLonLat } from "ol/proj";
@@ -35,7 +42,10 @@ const getFieldAbbreviation = (fieldName: string): string => {
   return abbreviations[fieldName] || fieldName.substring(0, 2).toUpperCase();
 };
 
-const getColorForIntensity = (intensity: number, status: "active" | "closed" | "transitioning"): string => {
+const getColorForIntensity = (
+  intensity: number,
+  status: "active" | "closed" | "transitioning",
+): string => {
   if (status === "closed") return "#10B981";
   if (status === "transitioning") return "#F59E0B";
   if (intensity > 15) return "#DC2626";
@@ -81,9 +91,17 @@ const FieldModal: React.FC<{
   }, [selectedField?.name]);
 
   return (
-    <div className="modal field-modal" ref={modalRef} onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div
+      className="modal field-modal"
+      ref={modalRef}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button onClick={onClose} className="modal-close-button" aria-label="Lukk modal">
+        <button
+          onClick={onClose}
+          className="modal-close-button"
+          aria-label="Lukk modal"
+        >
           ×
         </button>
 
@@ -100,20 +118,32 @@ const FieldModal: React.FC<{
         <div className="field-details">
           <p>
             <strong>Status:</strong>
-            <span className={`status-${selectedField.status}`}>{selectedField.status === "active" ? "Aktiv" : selectedField.status === "closed" ? "Faset ut" : "Overgangsfase"}</span>
+            <span className={`status-${selectedField.status}`}>
+              {selectedField.status === "active"
+                ? "Aktiv"
+                : selectedField.status === "closed"
+                  ? "Faset ut"
+                  : "Overgangsfase"}
+            </span>
           </p>
 
           {selectedField.status === "active" ? (
             <>
               <p>
                 <strong>Årlig produksjon:</strong>
-                <span>{(selectedField.production || 0).toFixed(1)} mill. boe</span>
+                <span>
+                  {(selectedField.production || 0).toFixed(1)} mill. boe
+                </span>
               </p>
               <p>
                 <strong>Årlige utslipp:</strong>
                 <span style={{ color: "#DC2626", fontWeight: "bold" }}>
                   {(() => {
-                    const emissions = selectedField.emissions && Array.isArray(selectedField.emissions) ? selectedField.emissions[0] : 0;
+                    const emissions =
+                      selectedField.emissions &&
+                      Array.isArray(selectedField.emissions)
+                        ? selectedField.emissions[0]
+                        : 0;
                     return (emissions || 0).toFixed(1);
                   })()}{" "}
                   Mt CO₂
@@ -121,7 +151,9 @@ const FieldModal: React.FC<{
               </p>
               <p>
                 <strong>Utslippsintensitet:</strong>
-                <span>{(selectedField.intensity || 0).toFixed(1)} kg CO₂/boe</span>
+                <span>
+                  {(selectedField.intensity || 0).toFixed(1)} kg CO₂/boe
+                </span>
               </p>
               <p>
                 <strong>Arbeidsplasser:</strong>
@@ -129,27 +161,61 @@ const FieldModal: React.FC<{
               </p>
               <p>
                 <strong>Omstillingspotensial:</strong>
-                <span style={{ color: "#059669", fontWeight: "bold" }}>{(selectedField.transitionPotential || "unknown").replace("_", " ")}</span>
+                <span style={{ color: "#059669", fontWeight: "bold" }}>
+                  {(selectedField.transitionPotential || "unknown").replace(
+                    "_",
+                    " ",
+                  )}
+                </span>
               </p>
 
               <hr />
 
               <div className="cost">
                 <strong>💥 Totalt livstidsutslipp ved forbrenning:</strong>
-                <div style={{ fontSize: "1.2em", color: "#DC2626", marginTop: "8px" }}>{((selectedField.totalLifetimeEmissions || 0) / 1000).toFixed(0)} Mt CO₂</div>
-                <small style={{ opacity: 0.8 }}>Dette er CO₂ som slippes ut når oljen brennes av forbrukere</small>
+                <div
+                  style={{
+                    fontSize: "1.2em",
+                    color: "#DC2626",
+                    marginTop: "8px",
+                  }}
+                >
+                  {((selectedField.totalLifetimeEmissions || 0) / 1000).toFixed(
+                    0,
+                  )}{" "}
+                  Mt CO₂
+                </div>
+                <small style={{ opacity: 0.8 }}>
+                  Dette er CO₂ som slippes ut når oljen brennes av forbrukere
+                </small>
               </div>
 
               <div className="cost">
                 <strong>💰 Kostnad for utfasing:</strong>
-                <div style={{ fontSize: "1.2em", marginTop: "8px" }}>{(selectedField.phaseOutCost || 0).toLocaleString()} mrd NOK</div>
+                <div style={{ fontSize: "1.2em", marginTop: "8px" }}>
+                  {(selectedField.phaseOutCost || 0).toLocaleString()} mrd NOK
+                </div>
               </div>
             </>
           ) : (
             <div style={{ textAlign: "center", padding: "20px" }}>
               <div style={{ fontSize: "3em", marginBottom: "16px" }}>🌱</div>
-              <p style={{ color: "#10B981", fontSize: "1.2em", fontWeight: "bold" }}>Dette feltet er allerede faset ut!</p>
-              <p style={{ color: "#6B7280", marginTop: "8px" }}>Du hindrer nå {((selectedField.totalLifetimeEmissions || 0) / 1000).toFixed(0)} Mt CO₂ fra å bli sluppet ut i atmosfæren.</p>
+              <p
+                style={{
+                  color: "#10B981",
+                  fontSize: "1.2em",
+                  fontWeight: "bold",
+                }}
+              >
+                Dette feltet er allerede faset ut!
+              </p>
+              <p style={{ color: "#6B7280", marginTop: "8px" }}>
+                Du hindrer nå{" "}
+                {((selectedField.totalLifetimeEmissions || 0) / 1000).toFixed(
+                  0,
+                )}{" "}
+                Mt CO₂ fra å bli sluppet ut i atmosfæren.
+              </p>
             </div>
           )}
         </div>
@@ -157,13 +223,31 @@ const FieldModal: React.FC<{
         <div className="modal-actions">
           {selectedField.status === "active" ? (
             <>
-              <button onClick={() => onPhaseOut(selectedField.name)} disabled={!canAfford} className="phase-out-button">
-                {canAfford ? `🌱 Fase ut feltet (${(selectedField.phaseOutCost || 0).toLocaleString()} mrd NOK)` : `💰 Ikke nok penger (${(selectedField.phaseOutCost || 0).toLocaleString()} mrd NOK)`}
+              <button
+                onClick={() => onPhaseOut(selectedField.name)}
+                disabled={!canAfford}
+                className="phase-out-button"
+              >
+                {canAfford
+                  ? `🌱 Fase ut feltet (${(selectedField.phaseOutCost || 0).toLocaleString()} mrd NOK)`
+                  : `💰 Ikke nok penger (${(selectedField.phaseOutCost || 0).toLocaleString()} mrd NOK)`}
               </button>
-              {!canAfford && <div className="budget-warning">Du mangler {((selectedField.phaseOutCost || 0) - budget).toLocaleString()} mrd NOK</div>}
+              {!canAfford && (
+                <div className="budget-warning">
+                  Du mangler{" "}
+                  {(
+                    (selectedField.phaseOutCost || 0) - budget
+                  ).toLocaleString()}{" "}
+                  mrd NOK
+                </div>
+              )}
             </>
           ) : (
-            <button onClick={onClose} className="phase-out-button" style={{ background: "#10B981" }}>
+            <button
+              onClick={onClose}
+              className="phase-out-button"
+              style={{ background: "#10B981" }}
+            >
               ✅ Forstått
             </button>
           )}
@@ -183,7 +267,10 @@ const MapContent: React.FC<{
   gameFields: Field[];
   handleFieldClick: (field: Field) => void;
   getFieldAbbreviation: (fieldName: string) => string;
-  getColorForIntensity: (intensity: number, status: "active" | "closed" | "transitioning") => string;
+  getColorForIntensity: (
+    intensity: number,
+    status: "active" | "closed" | "transitioning",
+  ) => string;
   showFieldModal: boolean;
   selectedField: Field | null;
   budget: number;
@@ -279,7 +366,9 @@ const MapContent: React.FC<{
     <div className="map-container">
       <h2 className="map-title">🗺️ Norske Oljeområder</h2>
       <div ref={mapRef} className="map-div" />
-      <div className="map-hint">Klikk på et oljefelt for å fase det ut! 🛢️ → 🌱</div>
+      <div className="map-hint">
+        Klikk på et oljefelt for å fase det ut! 🛢️ → 🌱
+      </div>
     </div>
   );
 };
@@ -289,7 +378,10 @@ const SelectionContent: React.FC<{
   gameFields: Field[];
   handleFieldClick: (field: Field) => void;
   getFieldAbbreviation: (fieldName: string) => string;
-  getColorForIntensity: (intensity: number, status: "active" | "closed" | "transitioning") => string;
+  getColorForIntensity: (
+    intensity: number,
+    status: "active" | "closed" | "transitioning",
+  ) => string;
   showFieldModal: boolean;
   selectedField: Field | null;
   budget: number;
@@ -316,17 +408,35 @@ const SelectionContent: React.FC<{
             className="field-item"
             onClick={() => handleFieldClick(field)}
             style={{
-              backgroundColor: getColorForIntensity(field.intensity || 0, field.status),
+              backgroundColor: getColorForIntensity(
+                field.intensity || 0,
+                field.status,
+              ),
               cursor: "pointer",
             }}
           >
             <span>{getFieldAbbreviation(field.name)}</span>
             <span>{field.name}</span>
-            <span>{field.status === "active" ? "Aktiv" : field.status === "closed" ? "Faset ut" : "Overgangsfase"}</span>
+            <span>
+              {field.status === "active"
+                ? "Aktiv"
+                : field.status === "closed"
+                  ? "Faset ut"
+                  : "Overgangsfase"}
+            </span>
           </div>
         ))}
       </div>
-      {showFieldModal && <FieldModal selectedField={selectedField} budget={budget} onPhaseOut={phaseOutField} onClose={() => dispatch({ type: "TOGGLE_FIELD_MODAL", payload: false })} />}
+      {showFieldModal && (
+        <FieldModal
+          selectedField={selectedField}
+          budget={budget}
+          onPhaseOut={phaseOutField}
+          onClose={() =>
+            dispatch({ type: "TOGGLE_FIELD_MODAL", payload: false })
+          }
+        />
+      )}
     </div>
   );
 };
@@ -344,7 +454,9 @@ const EmissionsContent: React.FC<{
       <EmissionsView data={emissionsData} />
       <div className="game-impact-summary">
         <h3>🎮 Din påvirkning</h3>
-        <p>Totale utslipp redusert: {Object.keys(shutdowns).length * 2.5}Mt CO₂</p>
+        <p>
+          Totale utslipp redusert: {Object.keys(shutdowns).length * 2.5}Mt CO₂
+        </p>
         <p>Felt faset ut: {Object.keys(shutdowns).length}</p>
       </div>
     </div>
@@ -357,10 +469,15 @@ const AchievementsContent: React.FC<{
 }> = ({ achievements }) => {
   return (
     <div className="achievement-card">
-      <h3 className="achievement-title">🏆 Dine Prestasjoner ({achievements.length})</h3>
+      <h3 className="achievement-title">
+        🏆 Dine Prestasjoner ({achievements.length})
+      </h3>
       {achievements.length === 0 ? (
         <div className="no-achievements">
-          <p>Ingen prestasjoner ennå. Fase ut ditt første oljefelt for å få "Første Skritt"!</p>
+          <p>
+            Ingen prestasjoner ennå. Fase ut ditt første oljefelt for å få
+            "Første Skritt"!
+          </p>
         </div>
       ) : (
         <div className="achievement-list">
@@ -390,7 +507,9 @@ const DashboardContent: React.FC<{
       </div>
       <div className="dashboard-card">
         <h3 className="dashboard-title">⚡ Produksjon</h3>
-        <div className="dashboard-value-orange">{totalProduction.toFixed(1)} mill. boe</div>
+        <div className="dashboard-value-orange">
+          {totalProduction.toFixed(1)} mill. boe
+        </div>
         <div className="dashboard-label">per år</div>
       </div>
     </div>
@@ -408,7 +527,7 @@ const MapPage: React.FC = () => {
 
   // Aggregate total emissions per year across all fields
   const emissionsDataMap: Record<string, number> = {};
-  Object.values(data).forEach(fieldData => {
+  Object.values(data).forEach((fieldData) => {
     Object.entries(fieldData).forEach(([year, { emission }]) => {
       if (emission) {
         emissionsDataMap[year] = (emissionsDataMap[year] || 0) + emission;
@@ -434,7 +553,18 @@ const MapPage: React.FC = () => {
   }, []);
 
   // Safe game state access
-  const { gameFields = [], budget = 0, score = 0, year = 2025, selectedField = null, showFieldModal = false, achievements = [], totalEmissions = 0, totalProduction = 0, shutdowns = {} } = gameState || {};
+  const {
+    gameFields = [],
+    budget = 0,
+    score = 0,
+    year = 2025,
+    selectedField = null,
+    showFieldModal = false,
+    achievements = [],
+    totalEmissions = 0,
+    totalProduction = 0,
+    shutdowns = {},
+  } = gameState || {};
 
   const handleFieldClick = (field: Field) => {
     dispatch({ type: "SET_SELECTED_FIELD", payload: field });
@@ -475,14 +605,36 @@ const MapPage: React.FC = () => {
       id: "map",
       title: "🗺️ Kart",
       icon: "🗺️",
-      content: <MapContent mapRef={mapRef} mapInstanceRef={mapInstanceRef} gameFields={gameFields} handleFieldClick={handleFieldClick} getFieldAbbreviation={getFieldAbbreviation} getColorForIntensity={getColorForIntensity} showFieldModal={showFieldModal} selectedField={selectedField} budget={budget} phaseOutField={phaseOutField} dispatch={dispatch} />,
+      content: (
+        <MapContent
+          mapRef={mapRef}
+          mapInstanceRef={mapInstanceRef}
+          gameFields={gameFields}
+          handleFieldClick={handleFieldClick}
+          getFieldAbbreviation={getFieldAbbreviation}
+          getColorForIntensity={getColorForIntensity}
+          showFieldModal={showFieldModal}
+          selectedField={selectedField}
+          budget={budget}
+          phaseOutField={phaseOutField}
+          dispatch={dispatch}
+        />
+      ),
       badge: undefined,
     },
     {
       id: "emissions",
       title: "📊 Utslipp",
       icon: "📊",
-      content: <EmissionsContent emissionsData={emissionsData} totalEmissions={totalEmissions} totalProduction={totalProduction} year={year} shutdowns={shutdowns} />,
+      content: (
+        <EmissionsContent
+          emissionsData={emissionsData}
+          totalEmissions={totalEmissions}
+          totalProduction={totalProduction}
+          year={year}
+          shutdowns={shutdowns}
+        />
+      ),
       badge: undefined,
     },
     {
@@ -496,13 +648,20 @@ const MapPage: React.FC = () => {
       id: "dashboard",
       title: "📊 Dashboard",
       icon: "📊",
-      content: <DashboardContent totalEmissions={totalEmissions} totalProduction={totalProduction} year={year} />,
+      content: (
+        <DashboardContent
+          totalEmissions={totalEmissions}
+          totalProduction={totalProduction}
+          year={year}
+        />
+      ),
       badge: undefined,
     },
   ];
   const [activeTab, setActiveTab] = useState(tabs[0].id);
-  const activeTabData = tabs.find(tab => tab.id === activeTab);
-  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  const activeTabData = tabs.find((tab) => tab.id === activeTab);
+  const isMobile =
+    typeof window !== "undefined" ? window.innerWidth < 768 : false;
 
   // --- Layout ---
   if (isMobile) {
@@ -520,7 +679,7 @@ const MapPage: React.FC = () => {
   return (
     <div className="desktop-map-content" style={{ padding: "0 0 68px 0" }}>
       <TopTabBar
-        items={tabs.map(tab => ({
+        items={tabs.map((tab) => ({
           id: tab.id,
           icon: tab.icon,
           label: tab.title,

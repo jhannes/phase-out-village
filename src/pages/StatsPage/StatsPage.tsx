@@ -306,8 +306,9 @@ const CompactStatsPage: React.FC = () => {
   ];
 
   const [activeTab, setActiveTab] = useState(tabs[0].id);
-  const activeTabData = tabs.find(tab => tab.id === activeTab);
-  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  const activeTabData = tabs.find((tab) => tab.id === activeTab);
+  const isMobile =
+    typeof window !== "undefined" ? window.innerWidth < 768 : false;
 
   const statusBar = (
     <>
@@ -371,7 +372,7 @@ const CompactStatsPage: React.FC = () => {
   return (
     <div className="desktop-stats-content">
       <TopTabBar
-        items={tabs.map(tab => ({
+        items={tabs.map((tab) => ({
           id: tab.id,
           icon: tab.icon,
           label: tab.title,

@@ -16,7 +16,7 @@ interface MobileGameLayoutProps {
 
 const navItemsConfig = (
   activeView: string,
-  onViewChange: (view: string) => void
+  onViewChange: (view: string) => void,
 ): BottomNavBarItem[] => [
   {
     id: "map",
@@ -195,9 +195,7 @@ const MobileGameLayout: React.FC<MobileGameLayoutProps> = ({
       </div>
 
       {/* Bottom Navigation Bar */}
-      <BottomNavBar
-        items={navItemsConfig(activeView, handleViewChange)}
-      />
+      <BottomNavBar items={navItemsConfig(activeView, handleViewChange)} />
     </div>
   );
 };

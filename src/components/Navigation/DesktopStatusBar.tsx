@@ -10,7 +10,9 @@ const DesktopStatusBar: React.FC = () => {
     <div className="desktop-status-bar">
       <div className="status-item">
         <span className="status-icon">💰</span>
-        <div className="status-value">{gameState?.budget?.toLocaleString() ?? 0}</div>
+        <div className="status-value">
+          {gameState?.budget?.toLocaleString() ?? 0}
+        </div>
         <div className="status-label">Budsjett</div>
       </div>
       <div className="status-item">
@@ -25,11 +27,13 @@ const DesktopStatusBar: React.FC = () => {
       </div>
       <div className="status-item">
         <span className="status-icon">💨</span>
-        <div className="status-value">{gameStats.totalEmissionsReduced?.toFixed(1) ?? "0.0"}Mt</div>
+        <div className="status-value">
+          {gameStats.totalEmissionsReduced?.toFixed(1) ?? "0.0"}Mt
+        </div>
         <div className="status-label">Redusert</div>
       </div>
     </div>
   );
 };
 
-export default DesktopStatusBar; 
+export default DesktopStatusBar;

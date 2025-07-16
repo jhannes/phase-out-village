@@ -14,7 +14,7 @@
   align-items: center;
   padding: 10px 0;
   z-index: 101;
-  box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
   gap: 40px;
 }
 
@@ -48,4 +48,4 @@
   .desktop-status-bar {
     display: none;
   }
-} 
+}

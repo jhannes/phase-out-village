@@ -104,7 +104,11 @@ const MobileTabsLayout: React.FC<MobileTabsLayoutProps> = ({
       >
         {header && <div className="header-content">{header}</div>}
         {/* Horizontal TopTabBar Navigation */}
-        <TopTabBar items={tabBarItems} fixed={false} className="mobile-tabs-bar" />
+        <TopTabBar
+          items={tabBarItems}
+          fixed={false}
+          className="mobile-tabs-bar"
+        />
       </header>
 
       {/* Main Content Area */}
