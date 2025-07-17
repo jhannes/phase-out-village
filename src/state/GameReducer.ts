@@ -16,6 +16,14 @@ export const gameReducer = (
 
   // Handle actions that should not trigger localStorage saves
   if (action.type === "RESTART_GAME") {
+    // Clear localStorage to ensure fresh start
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      console.log("🗑️ RESTART_GAME action - cleared localStorage");
+    } catch (error) {
+      console.warn("Failed to clear localStorage:", error);
+    }
+
     const freshState = createFreshGameState();
     console.log("🔄 RESTART_GAME action - setting showTutorialModal: true");
     return {
