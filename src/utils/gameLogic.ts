@@ -48,8 +48,8 @@ export const createFieldFromRealData = (
   // Current oil price ~80 USD/barrel, ~6.3 barrels per boe
   const oilPriceUSD = 80;
   const exchangeRate = 10; // USD to NOK
-  const revenuePerBoe = (oilPriceUSD * 6.3 * exchangeRate) / 1000; // Convert to thousands NOK
-  const yearlyRevenue = Math.floor(currentProduction * revenuePerBoe * 1000); // Convert to millions NOK
+  const revenuePerBoe = oilPriceUSD * 6.3 * exchangeRate; // NOK per boe
+  const yearlyRevenue = Math.floor(currentProduction * revenuePerBoe); // Total yearly revenue in NOK
 
   // Assign transition potential based on location and field type
   let transitionPotential: "wind" | "solar" | "data_center" | "research_hub" =
@@ -102,8 +102,8 @@ export const loadGameState = (): GameState => {
     selectedField: null,
     showFieldModal: false,
     achievements: [],
-    totalEmissions: 0,
-    totalProduction: 0,
+    totalEmissions: gameFields.reduce((sum, f) => sum + f.emissions[0], 0),
+    totalProduction: gameFields.reduce((sum, f) => sum + f.production, 0),
     shutdowns: {},
     realData,
     currentView: "map",
@@ -127,7 +127,7 @@ export const loadGameState = (): GameState => {
     norwayTechRank: 0,
     foreignDependency: 0,
     climateDamage: 0,
-    sustainabilityScore: 100,
+    sustainabilityScore: 0, // Start at 0 since no fields are phased out initially
     playerChoices: [],
     dataLayerUnlocked: "basic",
     saturationLevel: 100,
@@ -217,6 +217,14 @@ export const loadGameState = (): GameState => {
               : defaultState.score,
           year:
             typeof parsed.year === "number" ? parsed.year : defaultState.year,
+          totalEmissions:
+            typeof parsed.totalEmissions === "number"
+              ? parsed.totalEmissions
+              : defaultState.totalEmissions,
+          totalProduction:
+            typeof parsed.totalProduction === "number"
+              ? parsed.totalProduction
+              : defaultState.totalProduction,
           achievements: Array.isArray(parsed.achievements)
             ? parsed.achievements
             : defaultState.achievements,
@@ -356,8 +364,8 @@ export const createFreshGameState = (): GameState => {
     selectedField: null,
     showFieldModal: false,
     achievements: [],
-    totalEmissions: 0,
-    totalProduction: 0,
+    totalEmissions: gameFields.reduce((sum, f) => sum + f.emissions[0], 0),
+    totalProduction: gameFields.reduce((sum, f) => sum + f.production, 0),
     shutdowns: {},
     realData,
     currentView: "map",
@@ -381,7 +389,7 @@ export const createFreshGameState = (): GameState => {
     norwayTechRank: 0,
     foreignDependency: 0,
     climateDamage: 0,
-    sustainabilityScore: 100,
+    sustainabilityScore: 0, // Start at 0 since no fields are phased out initially
     playerChoices: [],
     dataLayerUnlocked: "basic",
     saturationLevel: 100,

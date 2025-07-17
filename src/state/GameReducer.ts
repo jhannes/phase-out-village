@@ -144,6 +144,19 @@ export const gameReducer = (
         Math.max(0, phasedPercentage),
       );
 
+      // Update yearly phase-out capacity
+      const baseCapacity = 3;
+      const techBonus = Math.floor(newState.norwayTechRank / 20);
+      const totalGoodInvestments =
+        newState.investments.green_tech +
+        newState.investments.ai_research +
+        newState.investments.renewable_energy;
+      const investmentBonus = Math.floor(totalGoodInvestments / 100);
+      newState.yearlyPhaseOutCapacity = Math.min(
+        8,
+        baseCapacity + techBonus + investmentBonus,
+      );
+
       break;
     }
 
@@ -186,7 +199,7 @@ export const gameReducer = (
         0,
       );
       const totalEmissionsReduction = actualFields.reduce(
-        (sum, field) => sum + field.emissions[0],
+        (sum, field) => sum + field.totalLifetimeEmissions,
         0,
       );
 
@@ -360,6 +373,41 @@ export const gameReducer = (
       return newState;
     }
 
+    case "HANDLE_EVENT": {
+      const { eventId, choice } = action.payload;
+
+      // Handle different event types based on eventId and choice
+      switch (eventId) {
+        case "oil_price_spike":
+          // Already handled in the event action
+          return { ...state, showEventModal: false };
+
+        case "climate_protests":
+          if (choice === "phase_out_free") {
+            // Player chose to phase out 2 fields for free
+            // This would need to be handled in the UI with field selection
+            return { ...state, showEventModal: false };
+          } else if (choice === "lose_support") {
+            // Player chose to lose support
+            return {
+              ...state,
+              budget: Math.max(0, state.budget - 1000),
+              showEventModal: false,
+            };
+          }
+          break;
+
+        case "tech_breakthrough":
+          // Already handled in the event action
+          return { ...state, showEventModal: false };
+
+        default:
+          return { ...state, showEventModal: false };
+      }
+
+      return { ...state, showEventModal: false };
+    }
+
     case "CLOSE_ACHIEVEMENT_MODAL":
       return { ...state, showAchievementModal: false };
 
@@ -369,11 +417,191 @@ export const gameReducer = (
     case "CLOSE_GAME_OVER_MODAL":
       return { ...state, showGameOverModal: false };
 
+    case "CLEAR_BUDGET_WARNING":
+      return {
+        ...state,
+        showBudgetWarning: false,
+        budgetWarningMessage: undefined,
+      };
+
+    case "UPDATE_BUDGET":
+      return { ...state, budget: action.payload };
+
     case "SET_SELECTED_FIELD":
       return { ...state, selectedField: action.payload };
 
     case "TOGGLE_FIELD_MODAL":
       return { ...state, showFieldModal: action.payload };
+
+    case "SELECT_FIELD":
+      const fieldToSelect = state.gameFields.find(
+        (f) => f.name === action.payload,
+      );
+      return { ...state, selectedField: fieldToSelect || null };
+
+    case "DESELECT_FIELD":
+      return { ...state, selectedField: null };
+
+    case "MULTI_PHASE_OUT":
+      // This action should trigger the same logic as PHASE_OUT_SELECTED_FIELDS
+      // but with the provided field names instead of using selectedFields
+      const fieldNamesToPhaseOut = action.payload;
+      const fieldsToPhaseOutFromNames = state.gameFields.filter(
+        (field) =>
+          fieldNamesToPhaseOut.includes(field.name) &&
+          field.status === "active" &&
+          state.budget >= field.phaseOutCost,
+      );
+
+      const capacity = calculatePhaseOutCapacity(state);
+      const actualFields = fieldsToPhaseOutFromNames.slice(0, capacity);
+
+      if (actualFields.length === 0) return state;
+
+      const totalCost = actualFields.reduce((sum, field) => {
+        const actualCost = state.nextPhaseOutDiscount
+          ? field.phaseOutCost * (1 - state.nextPhaseOutDiscount)
+          : field.phaseOutCost;
+        return sum + actualCost;
+      }, 0);
+
+      if (state.budget < totalCost) {
+        return {
+          ...state,
+          showBudgetWarning: true,
+          budgetWarningMessage: `Du mangler ${Math.round(totalCost - state.budget)} mrd NOK for å fase ut ${actualFields.length} felt.`,
+        };
+      }
+
+      const totalEmissionsSaved = actualFields.reduce(
+        (sum, field) => sum + field.totalLifetimeEmissions,
+        0,
+      );
+      const totalEmissionsReduction = actualFields.reduce(
+        (sum, field) => sum + field.totalLifetimeEmissions,
+        0,
+      );
+
+      newState = {
+        ...state,
+        budget: state.budget - totalCost,
+        score: state.score + Math.floor(totalEmissionsSaved / 1000),
+        globalTemperature: Math.max(
+          1.1,
+          state.globalTemperature - totalEmissionsReduction * 0.001,
+        ),
+        gameFields: state.gameFields.map((field) => {
+          const isBeingPhasedOut = actualFields.some(
+            (f) => f.name === field.name,
+          );
+          return isBeingPhasedOut
+            ? { ...field, status: "closed" as const, production: 0 }
+            : field;
+        }),
+        playerChoices: [
+          ...state.playerChoices,
+          `År ${state.year + 1}: Faset ut ${actualFields.length} felt - Hindret ${Math.round(totalEmissionsSaved / 1000)} Mt CO2`,
+        ],
+        year: state.year + 1,
+        goodChoiceStreak: state.goodChoiceStreak + actualFields.length,
+        badChoiceCount: Math.max(
+          0,
+          state.badChoiceCount - Math.floor(actualFields.length / 2),
+        ),
+        shutdowns: {
+          ...state.shutdowns,
+          ...actualFields.reduce(
+            (acc, field) => ({ ...acc, [field.name]: state.year + 1 }),
+            {},
+          ),
+        },
+        nextPhaseOutDiscount: undefined,
+      };
+
+      // Apply yearly consequences
+      const yearlyConsequences = calculateYearlyConsequences(newState);
+      newState.budget += yearlyConsequences.yearlyOilRevenue;
+      newState.budget = Math.max(
+        0,
+        newState.budget - yearlyConsequences.climateCostIncrease,
+      );
+      newState.climateDamage += yearlyConsequences.climateCostIncrease;
+
+      // Check for random events
+      const randomEvent = getRandomEvent(newState);
+      if (randomEvent) {
+        newState.currentEvent = randomEvent;
+        newState.showEventModal = true;
+      }
+
+      // Check achievements
+      const immediateAchievements = checkAndAwardAchievements(newState);
+      if (immediateAchievements.length > 0) {
+        newState.achievements = [
+          ...newState.achievements,
+          ...immediateAchievements,
+        ];
+        newState.newAchievements = immediateAchievements;
+        newState.showAchievementModal = true;
+      }
+
+      // Check for game over
+      if (newState.year >= 2040) {
+        const totalFields = newState.gameFields.length;
+        const phasedOutCount = Object.keys(newState.shutdowns).length;
+        const successRate = phasedOutCount / totalFields;
+
+        if (successRate >= 0.8) {
+          newState.gamePhase = "victory";
+        } else if (successRate >= 0.5) {
+          newState.gamePhase = "partial_success";
+        } else {
+          newState.gamePhase = "defeat";
+        }
+        newState.showGameOverModal = true;
+      }
+
+      // Update emissions and production statistics
+      const activeFieldsForMulti = newState.gameFields.filter(
+        (f) => f.status === "active",
+      );
+      newState.totalEmissions = activeFieldsForMulti.reduce(
+        (sum, f) => sum + f.emissions[0],
+        0,
+      );
+      newState.totalProduction = activeFieldsForMulti.reduce(
+        (sum, f) => sum + f.production,
+        0,
+      );
+
+      // Update climate metrics
+      const phasedFieldsForMulti = newState.gameFields.filter(
+        (f) => f.status === "closed",
+      );
+      const totalFieldsForMulti = newState.gameFields.length;
+      const phasedPercentageForMulti =
+        (phasedFieldsForMulti.length / totalFieldsForMulti) * 100;
+      newState.sustainabilityScore = Math.min(
+        100,
+        Math.max(0, phasedPercentageForMulti),
+      );
+
+      // Update yearly phase-out capacity
+      const baseCapacityForMulti = 3;
+      const techBonusForMulti = Math.floor(newState.norwayTechRank / 20);
+      const totalGoodInvestmentsForMulti =
+        newState.investments.green_tech +
+        newState.investments.ai_research +
+        newState.investments.renewable_energy;
+      const investmentBonusForMulti = Math.floor(
+        totalGoodInvestmentsForMulti / 100,
+      );
+      newState.yearlyPhaseOutCapacity = Math.min(
+        8,
+        baseCapacityForMulti + techBonusForMulti + investmentBonusForMulti,
+      );
+
+      return newState;
 
     case "UPDATE_EMISSIONS_PRODUCTION":
       const activeFields = state.gameFields.filter(
@@ -409,7 +637,7 @@ export const gameReducer = (
       );
       const climateDamage = Math.max(
         0,
-        state.climateDamage + totalEmissions / 1000000,
+        totalEmissions / 1000000, // Base climate damage on current emissions
       );
 
       return {
@@ -434,21 +662,6 @@ export const gameReducer = (
           ...state.investments,
           [investmentType]: state.investments[investmentType] + amount,
         },
-        norwayTechRank: Math.min(
-          100,
-          Math.max(
-            0,
-            (state.investments.green_tech +
-              state.investments.ai_research +
-              state.investments.renewable_energy +
-              (investmentType === "green_tech" ? amount : 0) +
-              (investmentType === "ai_research" ? amount : 0) +
-              (investmentType === "renewable_energy" ? amount : 0) -
-              state.investments.foreign_cloud -
-              (investmentType === "foreign_cloud" ? amount : 0)) /
-              10,
-          ),
-        ),
       };
 
       // Update tech rank based on investments
@@ -458,10 +671,38 @@ export const gameReducer = (
         newState.investments.renewable_energy;
       const totalBadInvestments = newState.investments.foreign_cloud;
 
+      // More realistic tech rank calculation: 50 billion NOK = 10% tech rank
+      // This means 500 billion NOK = 100% tech rank
       newState.norwayTechRank = Math.min(
         100,
-        Math.max(0, (totalGoodInvestments - totalBadInvestments) / 10),
+        Math.max(0, (totalGoodInvestments - totalBadInvestments) / 5),
       );
+
+      // Calculate yearly phase-out capacity based on tech rank and investments
+      const baseCapacity = 3;
+      const techBonus = Math.floor(newState.norwayTechRank / 20);
+      const investmentBonus = Math.floor(totalGoodInvestments / 100);
+      newState.yearlyPhaseOutCapacity = Math.min(
+        8,
+        baseCapacity + techBonus + investmentBonus,
+      );
+
+      // Calculate foreign dependency based on bad investments
+      newState.foreignDependency = Math.min(
+        100,
+        Math.max(0, totalBadInvestments / 10),
+      );
+
+      // Check for achievements after investment
+      const investmentAchievements = checkAndAwardAchievements(newState);
+      if (investmentAchievements.length > 0) {
+        newState.achievements = [
+          ...newState.achievements,
+          ...investmentAchievements,
+        ];
+        newState.newAchievements = investmentAchievements; // Show modal
+        newState.showAchievementModal = true;
+      }
 
       return newState;
 
@@ -491,6 +732,8 @@ export const gameReducer = (
         budget: newState.budget,
         score: newState.score,
         year: newState.year,
+        totalEmissions: newState.totalEmissions,
+        totalProduction: newState.totalProduction,
         achievements: newState.achievements,
         shutdowns: newState.shutdowns,
         investments: newState.investments,

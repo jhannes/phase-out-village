@@ -65,7 +65,7 @@ const DemoPage: React.FC<DemoPageProps> = () => {
                 <div className="demo-status-bar">
                   <div className="status-item">
                     <span>💰</span>
-                    <span>50.2M kr</span>
+                    <span>50.2 mrd NOK</span>
                   </div>
                   <div className="status-item">
                     <span>🛢️</span>

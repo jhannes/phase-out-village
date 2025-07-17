@@ -147,18 +147,20 @@ const InvestmentsPage: React.FC = () => {
               <div className="stat-item good">
                 <span className="stat-label">Gode investeringer:</span>
                 <span className="stat-value">
-                  {totalGoodInvestments} mrd NOK
+                  {totalGoodInvestments.toLocaleString()} mrd NOK
                 </span>
               </div>
               <div className="stat-item bad">
                 <span className="stat-label">Dårlige investeringer:</span>
                 <span className="stat-value">
-                  {totalBadInvestments} mrd NOK
+                  {totalBadInvestments.toLocaleString()} mrd NOK
                 </span>
               </div>
               <div className="stat-item neutral">
                 <span className="stat-label">Tilgjengelig budsjett:</span>
-                <span className="stat-value">{gameState.budget} mrd NOK</span>
+                <span className="stat-value">
+                  {gameState.budget.toLocaleString()} mrd NOK
+                </span>
               </div>
               <div className="stat-item neutral">
                 <span className="stat-label">Norge Tech-Rank:</span>
@@ -182,7 +184,8 @@ const InvestmentsPage: React.FC = () => {
                   <div className="investment-card-header">
                     <h3 style={{ color: inv.color }}>{inv.label}</h3>
                     <span className="investment-amount">
-                      {gameState.investments[inv.type] || 0} mrd NOK
+                      {(gameState.investments[inv.type] || 0).toLocaleString()}{" "}
+                      mrd NOK
                     </span>
                   </div>
                   <p className="investment-description">{inv.description}</p>
@@ -239,7 +242,8 @@ const InvestmentsPage: React.FC = () => {
                   <div className="investment-card-header">
                     <h3 style={{ color: inv.color }}>{inv.label}</h3>
                     <span className="investment-amount">
-                      {gameState.investments[inv.type] || 0} mrd NOK
+                      {(gameState.investments[inv.type] || 0).toLocaleString()}{" "}
+                      mrd NOK
                     </span>
                   </div>
                   <p className="investment-description">{inv.description}</p>

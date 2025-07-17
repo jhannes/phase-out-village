@@ -49,7 +49,7 @@ const InvestmentPanel: React.FC<{
           {investments.map((inv) => (
             <li key={inv.type}>
               <span style={{ color: inv.color }}>{inv.label}:</span>{" "}
-              {gameState.investments[inv.type]} mrd
+              {(gameState.investments[inv.type] || 0).toLocaleString()} mrd NOK
             </li>
           ))}
         </ul>

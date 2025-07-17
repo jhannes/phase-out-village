@@ -167,9 +167,9 @@ const MobileGameLayout: React.FC<MobileGameLayoutProps> = ({
         <div className="status-item">
           <span className="status-icon">💰</span>
           <span className="status-value">
-            {gameState?.budget
-              ? `${(gameState.budget / 1000000).toFixed(1)}M kr`
-              : "0M kr"}
+            {gameState.budget >= 1000000
+              ? `${(gameState.budget / 1000).toFixed(1)} mrd NOK`
+              : "0 mrd NOK"}
           </span>
         </div>
         <div className="status-item">

@@ -37,7 +37,7 @@ const CompactStatsPage: React.FC = () => {
         <div className="compact-stat orange">
           <span className="compact-stat-icon">💰</span>
           <div className="compact-stat-value">
-            {formatNumber(gameStats.totalBudgetSpent)}
+            {formatNumber(gameStats.totalBudgetSpent, " mrd NOK")}
           </div>
           <div className="compact-stat-label">Investert</div>
         </div>
@@ -87,7 +87,9 @@ const CompactStatsPage: React.FC = () => {
           <div className="progress-item">
             <div className="progress-info">
               <span>Budsjett</span>
-              <span>{formatNumber(gameStats.totalBudgetSpent)}/100M</span>
+              <span>
+                {formatNumber(gameStats.totalBudgetSpent, " mrd NOK")}/100M
+              </span>
             </div>
             <div className="progress-bar">
               <div
@@ -147,7 +149,7 @@ const CompactStatsPage: React.FC = () => {
           <div className="economics-item">
             <span className="economics-label">Totalt investert</span>
             <span className="economics-value">
-              {formatNumber(gameStats.totalBudgetSpent, " kr")}
+              {formatNumber(gameStats.totalBudgetSpent, " mrd NOK")}
             </span>
           </div>
           <div className="economics-item">
@@ -156,21 +158,21 @@ const CompactStatsPage: React.FC = () => {
               {gameStats.fieldsPhased > 0
                 ? formatNumber(
                     gameStats.totalBudgetSpent / gameStats.fieldsPhased,
-                    " kr",
+                    " mrd NOK",
                   )
-                : "0 kr"}
+                : "0 mrd NOK"}
             </span>
           </div>
           <div className="economics-item">
             <span className="economics-label">Gjenværende</span>
             <span className="economics-value">
-              {formatNumber(gameState.budget, " kr")}
+              {formatNumber(gameState.budget, " mrd NOK")}
             </span>
           </div>
           <div className="economics-item">
             <span className="economics-label">Estimert besparelse</span>
             <span className="economics-value green">
-              {formatNumber(gameStats.projectedSavings, " kr")}
+              {formatNumber(gameStats.projectedSavings, " mrd NOK")}
             </span>
           </div>
         </div>
@@ -191,7 +193,7 @@ const CompactStatsPage: React.FC = () => {
             <span className="benefit-icon">✅</span>
             <span>
               Karbonbesparelse:{" "}
-              {formatNumber(gameStats.projectedSavings, " kr")}
+              {formatNumber(gameStats.projectedSavings, " mrd NOK")}
             </span>
           </div>
           <div className="benefit-item neutral">
@@ -314,7 +316,9 @@ const CompactStatsPage: React.FC = () => {
     <>
       <div className="status-item">
         <span className="status-icon">💰</span>
-        <div className="status-value">{formatNumber(gameState.budget)}</div>
+        <div className="status-value">
+          {formatNumber(gameState.budget, " mrd NOK")}
+        </div>
         <div className="status-label">Budsjett</div>
       </div>
       <div className="status-item">

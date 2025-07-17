@@ -90,4 +90,5 @@ export type GameAction =
   | { type: "SELECT_FIELD"; payload: string }
   | { type: "DESELECT_FIELD"; payload: string }
   | { type: "MULTI_PHASE_OUT"; payload: string[] }
-  | { type: "UPDATE_BUDGET"; payload: number };
+  | { type: "UPDATE_BUDGET"; payload: number }
+  | { type: "CLEAR_BUDGET_WARNING" };
