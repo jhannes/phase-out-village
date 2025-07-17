@@ -119,6 +119,31 @@ export const gameReducer = (
         newState.newAchievements = immediateAchievements; // Show modal
         newState.showAchievementModal = true;
       }
+
+      // Update emissions and production statistics
+      const activeFields = newState.gameFields.filter(
+        (f) => f.status === "active",
+      );
+      newState.totalEmissions = activeFields.reduce(
+        (sum, f) => sum + f.emissions[0],
+        0,
+      );
+      newState.totalProduction = activeFields.reduce(
+        (sum, f) => sum + f.production,
+        0,
+      );
+
+      // Update climate metrics
+      const phasedFields = newState.gameFields.filter(
+        (f) => f.status === "closed",
+      );
+      const totalFields = newState.gameFields.length;
+      const phasedPercentage = (phasedFields.length / totalFields) * 100;
+      newState.sustainabilityScore = Math.min(
+        100,
+        Math.max(0, phasedPercentage),
+      );
+
       break;
     }
 
@@ -247,6 +272,30 @@ export const gameReducer = (
         newState.showGameOverModal = true;
       }
 
+      // Update emissions and production statistics
+      const activeFields = newState.gameFields.filter(
+        (f) => f.status === "active",
+      );
+      newState.totalEmissions = activeFields.reduce(
+        (sum, f) => sum + f.emissions[0],
+        0,
+      );
+      newState.totalProduction = activeFields.reduce(
+        (sum, f) => sum + f.production,
+        0,
+      );
+
+      // Update climate metrics
+      const phasedFields = newState.gameFields.filter(
+        (f) => f.status === "closed",
+      );
+      const totalFields = newState.gameFields.length;
+      const phasedPercentage = (phasedFields.length / totalFields) * 100;
+      newState.sustainabilityScore = Math.min(
+        100,
+        Math.max(0, phasedPercentage),
+      );
+
       return newState;
     }
 
@@ -339,6 +388,37 @@ export const gameReducer = (
         0,
       );
       return { ...state, totalEmissions, totalProduction };
+
+    case "UPDATE_CLIMATE_METRICS": {
+      const activeFields = state.gameFields.filter(
+        (f) => f.status === "active",
+      );
+      const phasedFields = state.gameFields.filter(
+        (f) => f.status === "closed",
+      );
+
+      // Calculate sustainability score based on phased out fields
+      const totalFields = state.gameFields.length;
+      const phasedPercentage = (phasedFields.length / totalFields) * 100;
+      const sustainabilityScore = Math.min(100, Math.max(0, phasedPercentage));
+
+      // Calculate climate damage based on remaining emissions
+      const totalEmissions = activeFields.reduce(
+        (sum, f) => sum + f.emissions[0],
+        0,
+      );
+      const climateDamage = Math.max(
+        0,
+        state.climateDamage + totalEmissions / 1000000,
+      );
+
+      return {
+        ...state,
+        sustainabilityScore,
+        climateDamage,
+        totalEmissions,
+      };
+    }
 
     case "SET_VIEW_MODE":
       return { ...state, currentView: action.payload };

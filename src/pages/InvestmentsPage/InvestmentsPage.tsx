@@ -2,6 +2,7 @@ import React from "react";
 import { useGameState } from "../../context/GameStateContext";
 import "./InvestmentsPage.css";
 import { Investment } from "../../types/types";
+import TopTabBar from "../../components/Navigation/TopTabBar";
 
 const InvestmentsPage: React.FC = () => {
   const { gameState, dispatch } = useGameState();
@@ -116,171 +117,190 @@ const InvestmentsPage: React.FC = () => {
   );
 
   return (
-    <div className="investments-page">
-      <div className="investments-header">
-        <h1>💰 Investeringer</h1>
-        <p>
-          Gjør strategiske investeringer for å påvirke Norges teknologiske
-          utvikling og klimamål
-        </p>
-      </div>
-
-      <div className="investments-overview">
-        <div className="overview-card">
-          <h3>📊 Portefølje Oversikt</h3>
-          <div className="overview-stats">
-            <div className="stat-item good">
-              <span className="stat-label">Gode investeringer:</span>
-              <span className="stat-value">{totalGoodInvestments} mrd NOK</span>
-            </div>
-            <div className="stat-item bad">
-              <span className="stat-label">Dårlige investeringer:</span>
-              <span className="stat-value">{totalBadInvestments} mrd NOK</span>
-            </div>
-            <div className="stat-item neutral">
-              <span className="stat-label">Tilgjengelig budsjett:</span>
-              <span className="stat-value">{gameState.budget} mrd NOK</span>
-            </div>
-            <div className="stat-item neutral">
-              <span className="stat-label">Norge Tech-Rank:</span>
-              <span className="stat-value">{gameState.norwayTechRank}%</span>
-            </div>
-          </div>
+    <>
+      <TopTabBar
+        items={[
+          // Add other tabs as needed, this is a placeholder
+          {
+            id: "investments",
+            label: "Investments",
+            icon: "💰",
+            active: true,
+            onClick: () => {},
+            ariaLabel: "Investments",
+          },
+        ]}
+      />
+      <div className="investments-page-content">
+        <div className="investments-header">
+          <h1>💰 Investeringer</h1>
+          <p>
+            Gjør strategiske investeringer for å påvirke Norges teknologiske
+            utvikling og klimamål
+          </p>
         </div>
-      </div>
 
-      <div className="investments-content">
-        {/* Gode investeringer */}
-        <div className="investment-section good">
-          <h2>
-            <span className="section-icon">🌱</span>
-            Gode Investeringer
-            <span className="section-subtitle">Øker Tech-Rank</span>
-          </h2>
-          <div className="investment-grid">
-            {goodInvestments.map((inv) => (
-              <div key={inv.type} className="investment-card">
-                <div className="investment-card-header">
-                  <h3 style={{ color: inv.color }}>{inv.label}</h3>
-                  <span className="investment-amount">
-                    {gameState.investments[inv.type] || 0} mrd NOK
-                  </span>
-                </div>
-                <p className="investment-description">{inv.description}</p>
-                <div className="investment-actions">
-                  <button
-                    className="invest-button"
-                    style={{
-                      backgroundColor: inv.color,
-                      opacity: gameState.budget >= 10 ? 1 : 0.5,
-                    }}
-                    disabled={gameState.budget < 10}
-                    onClick={() => handleInvest(inv.type, 10)}
-                  >
-                    +10 mrd
-                  </button>
-                  <button
-                    className="invest-button"
-                    style={{
-                      backgroundColor: inv.color,
-                      opacity: gameState.budget >= 50 ? 1 : 0.5,
-                    }}
-                    disabled={gameState.budget < 50}
-                    onClick={() => handleInvest(inv.type, 50)}
-                  >
-                    +50 mrd
-                  </button>
-                  <button
-                    className="invest-button"
-                    style={{
-                      backgroundColor: inv.color,
-                      opacity: gameState.budget >= 100 ? 1 : 0.5,
-                    }}
-                    disabled={gameState.budget < 100}
-                    onClick={() => handleInvest(inv.type, 100)}
-                  >
-                    +100 mrd
-                  </button>
-                </div>
+        <div className="investments-overview">
+          <div className="overview-card">
+            <h3>📊 Portefølje Oversikt</h3>
+            <div className="overview-stats">
+              <div className="stat-item good">
+                <span className="stat-label">Gode investeringer:</span>
+                <span className="stat-value">
+                  {totalGoodInvestments} mrd NOK
+                </span>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Dårlige investeringer */}
-        <div className="investment-section bad">
-          <h2>
-            <span className="section-icon">⚠️</span>
-            Dårlige Investeringer
-            <span className="section-subtitle">Reduserer Tech-Rank</span>
-          </h2>
-          <div className="investment-grid">
-            {badInvestments.map((inv) => (
-              <div key={inv.type} className="investment-card">
-                <div className="investment-card-header">
-                  <h3 style={{ color: inv.color }}>{inv.label}</h3>
-                  <span className="investment-amount">
-                    {gameState.investments[inv.type] || 0} mrd NOK
-                  </span>
-                </div>
-                <p className="investment-description">{inv.description}</p>
-                <div className="investment-actions">
-                  <button
-                    className="invest-button bad"
-                    style={{
-                      backgroundColor: inv.color,
-                      opacity: gameState.budget >= 10 ? 1 : 0.5,
-                    }}
-                    disabled={gameState.budget < 10}
-                    onClick={() => handleInvest(inv.type, 10)}
-                  >
-                    +10 mrd
-                  </button>
-                  <button
-                    className="invest-button bad"
-                    style={{
-                      backgroundColor: inv.color,
-                      opacity: gameState.budget >= 50 ? 1 : 0.5,
-                    }}
-                    disabled={gameState.budget < 50}
-                    onClick={() => handleInvest(inv.type, 50)}
-                  >
-                    +50 mrd
-                  </button>
-                  <button
-                    className="invest-button bad"
-                    style={{
-                      backgroundColor: inv.color,
-                      opacity: gameState.budget >= 100 ? 1 : 0.5,
-                    }}
-                    disabled={gameState.budget < 100}
-                    onClick={() => handleInvest(inv.type, 100)}
-                  >
-                    +100 mrd
-                  </button>
-                </div>
+              <div className="stat-item bad">
+                <span className="stat-label">Dårlige investeringer:</span>
+                <span className="stat-value">
+                  {totalBadInvestments} mrd NOK
+                </span>
               </div>
-            ))}
+              <div className="stat-item neutral">
+                <span className="stat-label">Tilgjengelig budsjett:</span>
+                <span className="stat-value">{gameState.budget} mrd NOK</span>
+              </div>
+              <div className="stat-item neutral">
+                <span className="stat-label">Norge Tech-Rank:</span>
+                <span className="stat-value">{gameState.norwayTechRank}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="investments-content">
+          {/* Gode investeringer */}
+          <div className="investment-section good">
+            <h2>
+              <span className="section-icon">🌱</span>
+              Gode Investeringer
+              <span className="section-subtitle">Øker Tech-Rank</span>
+            </h2>
+            <div className="investment-grid">
+              {goodInvestments.map((inv) => (
+                <div key={inv.type} className="investment-card">
+                  <div className="investment-card-header">
+                    <h3 style={{ color: inv.color }}>{inv.label}</h3>
+                    <span className="investment-amount">
+                      {gameState.investments[inv.type] || 0} mrd NOK
+                    </span>
+                  </div>
+                  <p className="investment-description">{inv.description}</p>
+                  <div className="investment-actions">
+                    <button
+                      className="invest-button"
+                      style={{
+                        backgroundColor: inv.color,
+                        opacity: gameState.budget >= 10 ? 1 : 0.5,
+                      }}
+                      disabled={gameState.budget < 10}
+                      onClick={() => handleInvest(inv.type, 10)}
+                    >
+                      +10 mrd
+                    </button>
+                    <button
+                      className="invest-button"
+                      style={{
+                        backgroundColor: inv.color,
+                        opacity: gameState.budget >= 50 ? 1 : 0.5,
+                      }}
+                      disabled={gameState.budget < 50}
+                      onClick={() => handleInvest(inv.type, 50)}
+                    >
+                      +50 mrd
+                    </button>
+                    <button
+                      className="invest-button"
+                      style={{
+                        backgroundColor: inv.color,
+                        opacity: gameState.budget >= 100 ? 1 : 0.5,
+                      }}
+                      disabled={gameState.budget < 100}
+                      onClick={() => handleInvest(inv.type, 100)}
+                    >
+                      +100 mrd
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Dårlige investeringer */}
+          <div className="investment-section bad">
+            <h2>
+              <span className="section-icon">⚠️</span>
+              Dårlige Investeringer
+              <span className="section-subtitle">Reduserer Tech-Rank</span>
+            </h2>
+            <div className="investment-grid">
+              {badInvestments.map((inv) => (
+                <div key={inv.type} className="investment-card">
+                  <div className="investment-card-header">
+                    <h3 style={{ color: inv.color }}>{inv.label}</h3>
+                    <span className="investment-amount">
+                      {gameState.investments[inv.type] || 0} mrd NOK
+                    </span>
+                  </div>
+                  <p className="investment-description">{inv.description}</p>
+                  <div className="investment-actions">
+                    <button
+                      className="invest-button bad"
+                      style={{
+                        backgroundColor: inv.color,
+                        opacity: gameState.budget >= 10 ? 1 : 0.5,
+                      }}
+                      disabled={gameState.budget < 10}
+                      onClick={() => handleInvest(inv.type, 10)}
+                    >
+                      +10 mrd
+                    </button>
+                    <button
+                      className="invest-button bad"
+                      style={{
+                        backgroundColor: inv.color,
+                        opacity: gameState.budget >= 50 ? 1 : 0.5,
+                      }}
+                      disabled={gameState.budget < 50}
+                      onClick={() => handleInvest(inv.type, 50)}
+                    >
+                      +50 mrd
+                    </button>
+                    <button
+                      className="invest-button bad"
+                      style={{
+                        backgroundColor: inv.color,
+                        opacity: gameState.budget >= 100 ? 1 : 0.5,
+                      }}
+                      disabled={gameState.budget < 100}
+                      onClick={() => handleInvest(inv.type, 100)}
+                    >
+                      +100 mrd
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="investments-info">
+          <div className="info-card">
+            <h3>💡 Investeringstips</h3>
+            <ul>
+              <li>Gode investeringer øker Norges teknologiske uavhengighet</li>
+              <li>
+                Høyere Tech-Rank gir større kapasitet til å fase ut oljefelt
+              </li>
+              <li>
+                Dårlige investeringer reduserer Tech-Rank og bremser fremgangen
+              </li>
+              <li>Balanser investeringene for optimal utvikling</li>
+            </ul>
           </div>
         </div>
       </div>
-
-      <div className="investments-info">
-        <div className="info-card">
-          <h3>💡 Investeringstips</h3>
-          <ul>
-            <li>Gode investeringer øker Norges teknologiske uavhengighet</li>
-            <li>
-              Høyere Tech-Rank gir større kapasitet til å fase ut oljefelt
-            </li>
-            <li>
-              Dårlige investeringer reduserer Tech-Rank og bremser fremgangen
-            </li>
-            <li>Balanser investeringene for optimal utvikling</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 

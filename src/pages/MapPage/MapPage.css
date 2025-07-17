@@ -1,12 +1,4 @@
 /* General Layout */
-.container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: #f3f4f6;
-  font-family: "Inter", sans-serif;
-}
-
 .header {
   padding: 16px;
   background-color: #ffffff;
@@ -82,12 +74,6 @@
 .view-button-active {
   color: #10b981;
   border-bottom: 2px solid #10b981;
-}
-
-.main-content-area {
-  flex-grow: 1;
-  padding: 16px;
-  overflow-y: auto;
 }
 
 /* Map specific styles */

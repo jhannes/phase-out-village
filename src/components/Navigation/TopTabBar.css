@@ -3,22 +3,11 @@
   justify-content: space-around;
   align-items: center;
   background: var(--color-bg-section, #fff);
-  border-top: 1px solid var(--color-border, #e5e7eb);
-  box-shadow: 0 -4px 20px var(--color-shadow, rgba(0, 0, 0, 0.05));
-  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  padding: 8px 0;
   z-index: 1000;
   gap: 0;
   width: 100%;
-  margin-top: 0;
-}
-
-.tab-bar-fixed {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  /* Safe area for iOS */
-  padding-bottom: max(8px, env(safe-area-inset-bottom));
 }
 
 .tab-bar-item {
@@ -42,18 +31,12 @@
 .tab-bar-item:hover,
 .tab-bar-item:focus {
   color: var(--color-text, #1e293b);
-  background: var(--color-border, #e5e7eb);
+  background: var(--color-bg-subtle, #f1f5f9);
 }
 
 .tab-bar-item.active {
-  color: var(--color-text-on-accent, #fff);
-  background: var(--color-accent, #3b82f6);
-  transform: scale(1.05);
-  box-shadow: 0 2px 8px var(--color-accent, #3b82f6, 0.2);
-}
-
-.tab-bar-item.active .tab-bar-icon {
-  transform: scale(1.2);
+  color: var(--color-accent, #3b82f6);
+  font-weight: 600;
 }
 
 .tab-bar-icon {
@@ -127,7 +110,7 @@
 @media (prefers-color-scheme: dark) {
   .tab-bar {
     background: var(--color-bg-section-dark, #0f172a);
-    border-top-color: var(--color-border-dark, #334155);
+    border-bottom-color: var(--color-border-dark, #334155);
   }
   .tab-bar-item {
     color: var(--color-text-muted-dark, #94a3b8);
@@ -135,10 +118,9 @@
   .tab-bar-item:hover,
   .tab-bar-item:focus {
     color: var(--color-text-dark, #f1f5f9);
-    background: var(--color-border-dark, #334155);
+    background: var(--color-bg-subtle-dark, #1e293b);
   }
   .tab-bar-item.active {
-    background: var(--color-accent-dark, #2563eb);
-    color: var(--color-text-on-accent-dark, #fff);
+    color: var(--color-accent-dark, #60a5fa);
   }
 }

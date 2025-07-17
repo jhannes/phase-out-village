@@ -1,20 +1,12 @@
 .desktop-status-bar {
-  position: fixed;
-  bottom: 0;
-  top: auto;
-  left: 0;
-  right: 0;
   background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border-top: 1px solid var(--color-border, #e5e7eb);
-  border-bottom: none;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 10px 0;
-  z-index: 101;
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
   gap: 10px;
 }
 

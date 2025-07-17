@@ -8,6 +8,7 @@ import React, {
 import { gameReducer } from "../state/GameReducer";
 import { GameState, GameAction } from "../interfaces/GameState";
 import { createFreshGameState } from "../utils/gameLogic";
+import { LOCAL_STORAGE_KEY } from "../constants";
 
 interface GameStateContextType {
   gameState: GameState;
@@ -135,10 +136,7 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
   useEffect(() => {
     const saveGameState = () => {
       try {
-        localStorage.setItem(
-          "phaseOutVillage_gameState",
-          JSON.stringify(gameState),
-        );
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gameState));
       } catch (error) {
         console.warn("Failed to save game state:", error);
       }
@@ -151,7 +149,7 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
   // Load from localStorage on mount
   useEffect(() => {
     try {
-      const savedState = localStorage.getItem("phaseOutVillage_gameState");
+      const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedState) {
         const parsedState = JSON.parse(savedState);
         dispatch({ type: "LOAD_GAME_STATE", payload: parsedState });

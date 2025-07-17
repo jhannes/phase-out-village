@@ -255,7 +255,9 @@ const MapPage: React.FC = () => {
             <div ref={mapRef} className="map-div" />
             <div className="map-hint">
               {gameState.multiPhaseOutMode
-                ? `⚡ Multi-utfasing: Klikk på opptil ${calculatePhaseOutCapacity(gameState)} felt å fase ut samtidig!`
+                ? `⚡ Multi-utfasing: Klikk på opptil ${calculatePhaseOutCapacity(
+                    gameState,
+                  )} felt å fase ut samtidig!`
                 : "Klikk på et oljefelt for å fase det ut! 🛢️ → 🌱"}
             </div>
           </div>
@@ -281,7 +283,7 @@ const MapPage: React.FC = () => {
   ];
 
   return (
-    <div className="container">
+    <>
       <TopTabBar
         items={tabs.map((tab) => ({
           id: tab.id,
@@ -294,156 +296,158 @@ const MapPage: React.FC = () => {
           ariaLabel: tab.title,
         }))}
       />
-      <main className="main-content-area">
-        <div
-          style={{
-            filter: `saturate(${gameState.saturationLevel}%) brightness(${gameState.saturationLevel > 60 ? 100 : 80}%)`,
-            transition: "filter 1s ease-in-out",
-          }}
-        >
-          <AchievementNotification achievements={gameState.achievements} />
 
-          {gameState.tutorialStep < 7 && (
-            <TutorialOverlay
-              step={gameState.tutorialStep}
-              onNext={() => dispatch({ type: "ADVANCE_TUTORIAL" })}
-              onSkip={() => dispatch({ type: "SKIP_TUTORIAL" })}
+      <div
+        className="page-content"
+        style={{
+          filter: `saturate(${gameState.saturationLevel}%) brightness(${
+            gameState.saturationLevel > 60 ? 100 : 80
+          }%)`,
+          transition: "filter 1s ease-in-out",
+        }}
+      >
+        <AchievementNotification achievements={gameState.achievements} />
+
+        {gameState.tutorialStep < 7 && (
+          <TutorialOverlay
+            step={gameState.tutorialStep}
+            onNext={() => dispatch({ type: "ADVANCE_TUTORIAL" })}
+            onSkip={() => dispatch({ type: "SKIP_TUTORIAL" })}
+          />
+        )}
+
+        <GameFeedback gameState={gameState} />
+        <AchievementDebugPanel gameState={gameState} />
+        <MultiSelectControls gameState={gameState} dispatch={dispatch} />
+
+        <div className="header">
+          <div className="header-top">
+            <h1 className="title">🌍 PHASE OUT VILLAGE</h1>
+            <div className="year-badge">TIL 2040!</div>
+          </div>
+
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{
+                width: `${
+                  ((gameFields.length -
+                    gameFields.filter((f) => f.status === "active").length) /
+                    gameFields.length) *
+                  100
+                }%`,
+              }}
             />
-          )}
+          </div>
 
-          <GameFeedback gameState={gameState} />
-
-          <AchievementDebugPanel gameState={gameState} />
-
-          <MultiSelectControls gameState={gameState} dispatch={dispatch} />
-
-          <div className="header">
-            <div className="header-top">
-              <h1 className="title">🌍 PHASE OUT VILLAGE</h1>
-              <div className="year-badge">TIL 2040!</div>
+          <div className="stats-grid">
+            <div className="stat-card stat-card-green">
+              <div className="stat-emoji">🌱</div>
+              <div className="stat-value" style={{ color: "#166534" }}>
+                {score}
+              </div>
+              <div className="stat-label" style={{ color: "#16A34A" }}>
+                Klimapoeng
+              </div>
             </div>
-
-            <div className="progress-bar">
-              <div
-                className="progress-fill"
-                style={{
-                  width: `${((gameFields.length - gameFields.filter((f) => f.status === "active").length) / gameFields.length) * 100}%`,
-                }}
-              />
+            <div className="stat-card stat-card-yellow">
+              <div className="stat-emoji">💰</div>
+              <div className="stat-value" style={{ color: "#92400E" }}>
+                {budget} mrd
+              </div>
+              <div className="stat-label" style={{ color: "#D97706" }}>
+                Budsjett
+              </div>
             </div>
-
-            <div className="stats-grid">
-              <div className="stat-card stat-card-green">
-                <div className="stat-emoji">🌱</div>
-                <div className="stat-value" style={{ color: "#166534" }}>
-                  {score}
-                </div>
-                <div className="stat-label" style={{ color: "#16A34A" }}>
-                  Klimapoeng
-                </div>
+            <div className="stat-card stat-card-blue">
+              <div className="stat-emoji">📅</div>
+              <div className="stat-value" style={{ color: "#1E40AF" }}>
+                {year}
               </div>
-              <div className="stat-card stat-card-yellow">
-                <div className="stat-emoji">💰</div>
-                <div className="stat-value" style={{ color: "#92400E" }}>
-                  {budget} mrd
-                </div>
-                <div className="stat-label" style={{ color: "#D97706" }}>
-                  Budsjett
-                </div>
+              <div className="stat-label" style={{ color: "#2563EB" }}>
+                År
               </div>
-              <div className="stat-card stat-card-blue">
-                <div className="stat-emoji">📅</div>
-                <div className="stat-value" style={{ color: "#1E40AF" }}>
-                  {year}
-                </div>
-                <div className="stat-label" style={{ color: "#2563EB" }}>
-                  År
-                </div>
+            </div>
+            <div className="stat-card stat-card-purple">
+              <div className="stat-emoji">🚀</div>
+              <div className="stat-value" style={{ color: "#7C3AED" }}>
+                {gameState.norwayTechRank}%
               </div>
-              <div className="stat-card stat-card-purple">
-                <div className="stat-emoji">🚀</div>
-                <div className="stat-value" style={{ color: "#7C3AED" }}>
-                  {gameState.norwayTechRank}%
-                </div>
-                <div className="stat-label" style={{ color: "#8B5CF6" }}>
-                  Tech-rank
-                </div>
+              <div className="stat-label" style={{ color: "#8B5CF6" }}>
+                Tech-rank
               </div>
             </div>
           </div>
-
-          {renderCurrentView()}
-
-          <div className="dashboard-grid">
-            <div className="dashboard-card">
-              <h3 className="dashboard-title">📊 Utslipp</h3>
-              <div className="dashboard-value">
-                {totalEmissions.toFixed(1)} Mt
-              </div>
-              <div className="dashboard-label">CO₂ per år</div>
-            </div>
-            <div className="dashboard-card">
-              <h3 className="dashboard-title">⚡ Produksjon</h3>
-              <div className="dashboard-value-orange">
-                {totalProduction.toFixed(1)} mill. boe
-              </div>
-              <div className="dashboard-label">per år</div>
-            </div>
-          </div>
-
-          <div className="achievement-card">
-            <h3 className="achievement-title">
-              🏆 Dine Prestasjoner ({achievements.length})
-            </h3>
-            {achievements.length === 0 ? (
-              <div className="no-achievements">
-                <p>
-                  Ingen prestasjoner ennå. Fase ut ditt første oljefelt for å få
-                  "Første Skritt"!
-                </p>
-              </div>
-            ) : (
-              <div className="achievement-list enhanced">
-                {achievements.map((achievement, index) => {
-                  const BadgeComponent = BadgeComponents[achievement];
-                  const badge = Object.values(ACHIEVEMENT_BADGES).find(
-                    (b) => b.title === achievement,
-                  );
-
-                  return (
-                    <div
-                      key={index}
-                      className="achievement-item"
-                      title={badge?.desc}
-                    >
-                      <div className="achievement-badge-display">
-                        {BadgeComponent ? (
-                          <BadgeComponent />
-                        ) : (
-                          <div className="fallback-badge">
-                            <span className="fallback-emoji">
-                              {badge?.emoji}
-                            </span>
-                            <span className="fallback-title">
-                              {badge?.title || achievement}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <span className="achievement-label">
-                        {badge?.title || achievement}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          <GameControlPanel gameState={gameState} dispatch={dispatch} />
-          <InvestmentPanel gameState={gameState} dispatch={dispatch} />
         </div>
 
+        {renderCurrentView()}
+
+        <div className="dashboard-grid">
+          <div className="dashboard-card">
+            <h3 className="dashboard-title">📊 Utslipp</h3>
+            <div className="dashboard-value">
+              {totalEmissions.toFixed(1)} Mt
+            </div>
+            <div className="dashboard-label">CO₂ per år</div>
+          </div>
+          <div className="dashboard-card">
+            <h3 className="dashboard-title">⚡ Produksjon</h3>
+            <div className="dashboard-value-orange">
+              {totalProduction.toFixed(1)} mill. boe
+            </div>
+            <div className="dashboard-label">per år</div>
+          </div>
+        </div>
+
+        <div className="achievement-card">
+          <h3 className="achievement-title">
+            🏆 Dine Prestasjoner ({achievements.length})
+          </h3>
+          {achievements.length === 0 ? (
+            <div className="no-achievements">
+              <p>
+                Ingen prestasjoner ennå. Fase ut ditt første oljefelt for å få
+                "Første Skritt"!
+              </p>
+            </div>
+          ) : (
+            <div className="achievement-list enhanced">
+              {achievements.map((achievement, index) => {
+                const BadgeComponent = BadgeComponents[achievement];
+                const badge = Object.values(ACHIEVEMENT_BADGES).find(
+                  (b) => b.title === achievement,
+                );
+
+                return (
+                  <div
+                    key={index}
+                    className="achievement-item"
+                    title={badge?.desc}
+                  >
+                    <div className="achievement-badge-display">
+                      {BadgeComponent ? (
+                        <BadgeComponent />
+                      ) : (
+                        <div className="fallback-badge">
+                          <span className="fallback-emoji">{badge?.emoji}</span>
+                          <span className="fallback-title">
+                            {badge?.title || achievement}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <span className="achievement-label">
+                      {badge?.title || achievement}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <GameControlPanel gameState={gameState} dispatch={dispatch} />
+        <InvestmentPanel gameState={gameState} dispatch={dispatch} />
         <ProgressiveDataPanel
           gameState={gameState}
           layer={gameState.dataLayerUnlocked}
@@ -489,7 +493,7 @@ const MapPage: React.FC = () => {
         <div
           className="educational-stats"
           style={{
-            position: "fixed",
+            position: "relative",
             top: "20px",
             right: "20px",
             background: "rgba(0, 0, 0, 0.8)",
@@ -570,8 +574,8 @@ const MapPage: React.FC = () => {
             </small>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </>
   );
 };
 

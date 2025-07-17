@@ -1,9 +1,8 @@
-.investments-page {
+.investments-page-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 2rem;
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  min-height: 100vh;
 }
 
 .investments-header {
@@ -253,7 +252,7 @@
 
 /* Mobile responsive */
 @media (max-width: 768px) {
-  .investments-page {
+  .investments-page-content {
     padding: 15px;
   }
 
@@ -279,7 +278,7 @@
 }
 
 /* Animation for page load */
-.investments-page > * {
+.investments-page-content > * {
   animation: fadeInUp 0.6s ease-out;
 }
 

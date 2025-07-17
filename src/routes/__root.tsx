@@ -15,6 +15,7 @@ import {
 import BottomNavBar from "../components/Navigation/BottomNavBar";
 import MobileStatusBar from "../components/Navigation/MobileStatusBar";
 import DesktopStatusBar from "../components/Navigation/DesktopStatusBar";
+import { LOCAL_STORAGE_KEY } from "../constants";
 
 // Desktop Navigation Component
 const DesktopNavigation: React.FC<{ currentPath: string }> = ({
@@ -43,7 +44,7 @@ const DesktopNavigation: React.FC<{ currentPath: string }> = ({
         "Er du sikker på at du vil starte spillet på nytt? All fremgang vil gå tapt.",
       )
     ) {
-      localStorage.removeItem("phaseOutVillage_gameState");
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
       dispatch({ type: "RESTART_GAME" });
     }
   };
@@ -140,7 +141,7 @@ const RootLayout: React.FC = () => {
             "Er du sikker på at du vil starte spillet på nytt? All fremgang vil gå tapt.",
           )
         ) {
-          localStorage.removeItem("phaseOutVillage_gameState");
+          localStorage.removeItem(LOCAL_STORAGE_KEY);
           dispatch({ type: "RESTART_GAME" });
         }
       },
@@ -150,14 +151,16 @@ const RootLayout: React.FC = () => {
 
   return (
     <div className="root-layout">
-      {/* Desktop Navigation */}
-      {!isMobile && <DesktopNavigation currentPath={currentPath} />}
-
-      {/* Desktop Status Bar */}
-      {!isMobile && <DesktopStatusBar />}
-
       {/* Main Content */}
       <main className={`main-content ${isMobile ? "mobile" : "desktop"}`}>
+        {/* Desktop Navigation - now inside main content */}
+        {!isMobile && (
+          <div className="sticky-nav-container">
+            <DesktopNavigation currentPath={currentPath} />
+            <DesktopStatusBar />
+          </div>
+        )}
+
         <Outlet />
       </main>
 
