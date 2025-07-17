@@ -16,7 +16,7 @@ export const ACHIEVEMENT_BADGES = {
   TECH_PIONEER: {
     emoji: "🚀",
     title: "Tech-Pioner",
-    desc: "Investerte 100+ mrd i norsk teknologi",
+    desc: "Investerte 200+ mrd i norsk teknologi",
   },
   GREEN_TRANSITION: {
     emoji: "🌱",

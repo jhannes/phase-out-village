@@ -249,14 +249,6 @@ export const gameReducer = (
         nextPhaseOutDiscount: undefined,
       };
 
-      // Update selectedFields to reflect new field statuses
-      newState.selectedFields = newState.selectedFields.map((field) => {
-        const updatedField = newState.gameFields.find(
-          (f) => f.name === field.name,
-        );
-        return updatedField || field;
-      });
-
       // Apply yearly consequences
       const yearlyConsequences = calculateYearlyConsequences(newState);
       newState.budget += yearlyConsequences.yearlyOilRevenue;
@@ -292,12 +284,14 @@ export const gameReducer = (
 
         if (successRate >= 0.8) {
           newState.gamePhase = "victory";
+          newState.showGameOverModal = true;
         } else if (successRate >= 0.5) {
           newState.gamePhase = "partial_success";
+          newState.showGameOverModal = true;
         } else {
           newState.gamePhase = "defeat";
+          newState.showGameOverModal = true;
         }
-        newState.showGameOverModal = true;
       }
 
       // Update emissions and production statistics
@@ -470,14 +464,6 @@ export const gameReducer = (
         ),
       };
 
-      // Update selectedFields to reflect new field statuses
-      newState.selectedFields = newState.selectedFields.map((field) => {
-        const updatedField = newState.gameFields.find(
-          (f) => f.name === field.name,
-        );
-        return updatedField || field;
-      });
-
       return newState;
     }
 
@@ -615,12 +601,14 @@ export const gameReducer = (
 
         if (successRate >= 0.8) {
           newState.gamePhase = "victory";
+          newState.showGameOverModal = true;
         } else if (successRate >= 0.5) {
           newState.gamePhase = "partial_success";
+          newState.showGameOverModal = true;
         } else {
           newState.gamePhase = "defeat";
+          newState.showGameOverModal = true;
         }
-        newState.showGameOverModal = true;
       }
 
       // Update emissions and production statistics
@@ -731,7 +719,11 @@ export const gameReducer = (
         newState.investments.green_tech +
         newState.investments.ai_research +
         newState.investments.renewable_energy;
-      const totalBadInvestments = newState.investments.foreign_cloud;
+      const totalBadInvestments =
+        newState.investments.foreign_cloud +
+        newState.investments.fossil_subsidies +
+        newState.investments.crypto_mining +
+        newState.investments.fast_fashion;
 
       // More realistic tech rank calculation: 50 billion NOK = 10% tech rank
       // This means 500 billion NOK = 100% tech rank

@@ -12,11 +12,11 @@ export const calculatePhaseOutCapacity = (state: GameState): number => {
 
   // Investment bonus: Capacity increases with total investments in green tech.
   // For every 100 billion NOK invested, capacity increases by 1.
-  const totalInvestment =
+  const totalGoodInvestments =
     state.investments.green_tech +
     state.investments.renewable_energy +
     state.investments.ai_research;
-  const investmentBonus = Math.floor(totalInvestment / 100);
+  const investmentBonus = Math.floor(totalGoodInvestments / 100);
 
   // The total capacity is the sum of base capacity and bonuses, with a maximum cap.
   const totalCapacity = baseCapacity + techBonus + investmentBonus;

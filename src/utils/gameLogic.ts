@@ -87,6 +87,63 @@ export const loadGameState = (): GameState => {
   if (typeof window === "undefined" || !window.localStorage) {
     console.warn("localStorage not available");
     // Fallback to default state
+    const realData = generateCompleteData(data);
+    const gameFields = Object.keys(realData).map((fieldName) =>
+      createFieldFromRealData(fieldName, realData),
+    );
+
+    return {
+      gameFields,
+      budget: INITIAL_BUDGET,
+      score: INITIAL_SCORE,
+      year: INITIAL_YEAR,
+      selectedField: null,
+      showFieldModal: false,
+      achievements: [],
+      totalEmissions: gameFields.reduce((sum, f) => sum + f.emissions[0], 0),
+      totalProduction: gameFields.reduce((sum, f) => sum + f.production, 0),
+      shutdowns: {},
+      realData,
+      currentView: "map",
+      investments: {
+        green_tech: 0,
+        ai_research: 0,
+        renewable_energy: 0,
+        carbon_capture: 0,
+        foreign_cloud: 0,
+        hydrogen_tech: 0,
+        quantum_computing: 0,
+        battery_tech: 0,
+        offshore_wind: 0,
+        geothermal_energy: 0,
+        space_tech: 0,
+        fossil_subsidies: 0,
+        crypto_mining: 0,
+        fast_fashion: 0,
+      },
+      globalTemperature: 1.1,
+      norwayTechRank: 0,
+      foreignDependency: 0,
+      climateDamage: 0,
+      sustainabilityScore: 0,
+      playerChoices: [],
+      dataLayerUnlocked: "basic",
+      saturationLevel: 100,
+      gamePhase: "learning",
+      tutorialStep: 0,
+      shownFacts: [],
+      badChoiceCount: 0,
+      goodChoiceStreak: 0,
+      selectedFields: [],
+      currentEvent: undefined,
+      showEventModal: false,
+      showAchievementModal: false,
+      showGameOverModal: false,
+      newAchievements: [],
+      nextPhaseOutDiscount: undefined,
+      multiPhaseOutMode: false,
+      yearlyPhaseOutCapacity: 3,
+    };
   }
 
   const realData = generateCompleteData(data);
@@ -435,7 +492,7 @@ export const calculateYearlyConsequences = (state: GameState) => {
   );
 
   // Pressure increases as we approach 2040
-  const urgencyMultiplier = Math.max(1, (15 - timeLeft) / 5);
+  const urgencyMultiplier = Math.max(1, timeLeft > 0 ? (15 - timeLeft) / 5 : 3);
 
   // Climate damage costs increase exponentially
   const climateCostIncrease =
