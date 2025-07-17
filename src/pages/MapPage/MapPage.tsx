@@ -30,7 +30,7 @@ import FieldModal from "../../components/modals/FieldModal";
 import AchievementModal from "../../components/modals/AchievementModal";
 import GameOverModal from "../../components/modals/GameOverModal";
 import GameControlPanel from "../../components/game/GameControlPanel";
-import TutorialOverlay from "../../components/game/TutorialOverlay";
+import TutorialModal from "../../components/modals/TutorialModal";
 import GameFeedback from "../../components/game/GameFeedback";
 import InvestmentPanel from "../../components/game/InvestmentPanel";
 import {
@@ -308,11 +308,14 @@ const MapPage: React.FC = () => {
       >
         <AchievementNotification achievements={gameState.achievements} />
 
-        {gameState.tutorialStep < 7 && (
-          <TutorialOverlay
-            step={gameState.tutorialStep}
+        {gameState.showTutorialModal && (
+          <TutorialModal
+            isOpen={gameState.showTutorialModal}
+            currentStep={gameState.tutorialStep}
             onNext={() => dispatch({ type: "ADVANCE_TUTORIAL" })}
+            onPrevious={() => dispatch({ type: "PREVIOUS_TUTORIAL" })}
             onSkip={() => dispatch({ type: "SKIP_TUTORIAL" })}
+            onClose={() => dispatch({ type: "CLOSE_TUTORIAL_MODAL" })}
           />
         )}
 

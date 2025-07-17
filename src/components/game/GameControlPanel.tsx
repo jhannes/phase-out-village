@@ -20,6 +20,7 @@ const GameControlPanel: React.FC<{
 
   const handleResetTutorial = () => {
     dispatch({ type: "RESET_TUTORIAL" });
+    dispatch({ type: "SHOW_TUTORIAL_MODAL" });
   };
 
   const handleClearStorage = () => {
@@ -131,6 +132,12 @@ const GameControlPanel: React.FC<{
           className="control-button tutorial-button"
         >
           📚 Vis tutorial igjen
+        </button>
+        <button
+          onClick={() => dispatch({ type: "SHOW_TUTORIAL_MODAL" })}
+          className="control-button show-tutorial-button"
+        >
+          🎓 Vis tutorial
         </button>
         <button
           onClick={handleClearStorage}

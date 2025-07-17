@@ -15,7 +15,11 @@ export const gameReducer = (
 
   // Handle actions that should not trigger localStorage saves
   if (action.type === "RESTART_GAME") {
-    return createFreshGameState();
+    const freshState = createFreshGameState();
+    return {
+      ...freshState,
+      showTutorialModal: true, // Ensure tutorial shows on restart
+    };
   }
 
   if (action.type === "LOAD_GAME_STATE") {
@@ -25,7 +29,7 @@ export const gameReducer = (
   // Process all other actions
   switch (action.type) {
     case "RESET_TUTORIAL":
-      newState = { ...state, tutorialStep: 0 };
+      newState = { ...state, tutorialStep: 0, showTutorialModal: true };
       break;
 
     case "PHASE_OUT_FIELD": {
@@ -761,10 +765,25 @@ export const gameReducer = (
       return newState;
 
     case "ADVANCE_TUTORIAL":
-      return { ...state, tutorialStep: state.tutorialStep + 1 };
+      const nextStep = state.tutorialStep + 1;
+      const isCompleted = nextStep >= 11; // 11 steps total (0-10)
+      return {
+        ...state,
+        tutorialStep: nextStep,
+        showTutorialModal: !isCompleted,
+      };
+
+    case "PREVIOUS_TUTORIAL":
+      return { ...state, tutorialStep: Math.max(0, state.tutorialStep - 1) };
 
     case "SKIP_TUTORIAL":
-      return { ...state, tutorialStep: 10 }; // Skip all tutorial steps
+      return { ...state, tutorialStep: 10, showTutorialModal: false }; // Skip all tutorial steps
+
+    case "SHOW_TUTORIAL_MODAL":
+      return { ...state, showTutorialModal: true };
+
+    case "CLOSE_TUTORIAL_MODAL":
+      return { ...state, showTutorialModal: false };
 
     default:
       return state;
@@ -811,6 +830,10 @@ export const gameReducer = (
         currentView: newState.currentView,
         multiPhaseOutMode: newState.multiPhaseOutMode,
         yearlyPhaseOutCapacity: newState.yearlyPhaseOutCapacity,
+        showAchievementModal: newState.showAchievementModal,
+        showGameOverModal: newState.showGameOverModal,
+        showTutorialModal: newState.showTutorialModal,
+        newAchievements: newState.newAchievements,
         // Include timestamp for debugging
         lastSaved: new Date().toISOString(),
       };

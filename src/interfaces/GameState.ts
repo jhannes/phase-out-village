@@ -47,6 +47,7 @@ export interface GameState {
   showEventModal: boolean;
   showAchievementModal: boolean;
   showGameOverModal: boolean;
+  showTutorialModal: boolean;
   newAchievements: string[];
   nextPhaseOutDiscount?: number;
   multiPhaseOutMode: boolean;
@@ -74,7 +75,10 @@ export type GameAction =
     }
   | { type: "UPDATE_CLIMATE_METRICS" }
   | { type: "ADVANCE_TUTORIAL" }
+  | { type: "PREVIOUS_TUTORIAL" }
   | { type: "SKIP_TUTORIAL" }
+  | { type: "SHOW_TUTORIAL_MODAL" }
+  | { type: "CLOSE_TUTORIAL_MODAL" }
   | { type: "RESTART_GAME" }
   | { type: "RESET_TUTORIAL" }
   | { type: "TOGGLE_MULTI_SELECT" }

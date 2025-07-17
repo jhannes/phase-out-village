@@ -139,6 +139,7 @@ export const loadGameState = (): GameState => {
       showEventModal: false,
       showAchievementModal: false,
       showGameOverModal: false,
+      showTutorialModal: true, // Show tutorial for new games
       newAchievements: [],
       nextPhaseOutDiscount: undefined,
       multiPhaseOutMode: false,
@@ -198,6 +199,7 @@ export const loadGameState = (): GameState => {
     showEventModal: false,
     showAchievementModal: false,
     showGameOverModal: false,
+    showTutorialModal: false,
     newAchievements: [],
     nextPhaseOutDiscount: undefined,
     multiPhaseOutMode: false,
@@ -377,6 +379,21 @@ export const loadGameState = (): GameState => {
                 })
                 .filter(Boolean)
             : defaultState.selectedFields,
+          showAchievementModal:
+            typeof parsed.showAchievementModal === "boolean"
+              ? parsed.showAchievementModal
+              : defaultState.showAchievementModal,
+          showGameOverModal:
+            typeof parsed.showGameOverModal === "boolean"
+              ? parsed.showGameOverModal
+              : defaultState.showGameOverModal,
+          showTutorialModal:
+            typeof parsed.showTutorialModal === "boolean"
+              ? parsed.showTutorialModal
+              : defaultState.showTutorialModal,
+          newAchievements: Array.isArray(parsed.newAchievements)
+            ? parsed.newAchievements
+            : defaultState.newAchievements,
         };
 
         console.log("Final merged state:", {
@@ -460,6 +477,7 @@ export const createFreshGameState = (): GameState => {
     showEventModal: false,
     showAchievementModal: false,
     showGameOverModal: false,
+    showTutorialModal: true, // Show tutorial for fresh games
     newAchievements: [],
     nextPhaseOutDiscount: undefined,
     multiPhaseOutMode: false,
