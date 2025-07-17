@@ -154,6 +154,7 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
         const parsedState = JSON.parse(savedState);
         dispatch({ type: "LOAD_GAME_STATE", payload: parsedState });
       }
+      // If no saved state, don't dispatch anything - use the initial fresh state
     } catch (error) {
       console.warn("Failed to load saved game state:", error);
     }

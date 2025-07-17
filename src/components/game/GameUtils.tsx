@@ -15,7 +15,14 @@ export const calculatePhaseOutCapacity = (state: GameState): number => {
   const totalGoodInvestments =
     state.investments.green_tech +
     state.investments.renewable_energy +
-    state.investments.ai_research;
+    state.investments.ai_research +
+    state.investments.carbon_capture +
+    state.investments.hydrogen_tech +
+    state.investments.quantum_computing +
+    state.investments.battery_tech +
+    state.investments.offshore_wind +
+    state.investments.geothermal_energy +
+    state.investments.space_tech;
   const investmentBonus = Math.floor(totalGoodInvestments / 100);
 
   // The total capacity is the sum of base capacity and bonuses, with a maximum cap.

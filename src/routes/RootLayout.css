@@ -18,11 +18,12 @@
   padding-bottom: 130px; /* Space for status bar + nav bar */
 }
 
-/* .main-content.desktop {
-  Removed padding-top since nav bars are now inside main content
-} */
+/* Desktop nav is now inside main content, so no padding needed */
+.main-content.desktop {
+  padding-top: 0;
+}
 
-/* New sticky container for desktop nav */
+/* Sticky container for desktop nav */
 .sticky-nav-container {
   position: sticky;
   top: 0;

@@ -139,7 +139,7 @@ export const loadGameState = (): GameState => {
       showEventModal: false,
       showAchievementModal: false,
       showGameOverModal: false,
-      showTutorialModal: true, // Show tutorial for new games
+      showTutorialModal: false, // Don't show tutorial if localStorage is not available
       newAchievements: [],
       nextPhaseOutDiscount: undefined,
       multiPhaseOutMode: false,
@@ -199,7 +199,7 @@ export const loadGameState = (): GameState => {
     showEventModal: false,
     showAchievementModal: false,
     showGameOverModal: false,
-    showTutorialModal: false,
+    showTutorialModal: false, // Will be set to true only for new games
     newAchievements: [],
     nextPhaseOutDiscount: undefined,
     multiPhaseOutMode: false,
@@ -390,7 +390,9 @@ export const loadGameState = (): GameState => {
           showTutorialModal:
             typeof parsed.showTutorialModal === "boolean"
               ? parsed.showTutorialModal
-              : defaultState.showTutorialModal,
+              : parsed.tutorialStep && parsed.tutorialStep >= 10
+                ? false // Don't show if tutorial is completed
+                : defaultState.showTutorialModal,
           newAchievements: Array.isArray(parsed.newAchievements)
             ? parsed.newAchievements
             : defaultState.newAchievements,
@@ -419,8 +421,11 @@ export const loadGameState = (): GameState => {
     localStorage.removeItem(LOCAL_STORAGE_KEY);
   }
 
-  console.log("Using default state");
-  return defaultState;
+  console.log("Using default state - new game, no tutorial");
+  return {
+    ...defaultState,
+    showTutorialModal: false, // Don't show tutorial for new games by default
+  };
 };
 
 // Game restart utility
@@ -477,11 +482,12 @@ export const createFreshGameState = (): GameState => {
     showEventModal: false,
     showAchievementModal: false,
     showGameOverModal: false,
-    showTutorialModal: true, // Show tutorial for fresh games
+    showTutorialModal: false, // Don't show tutorial by default on page load
     newAchievements: [],
     nextPhaseOutDiscount: undefined,
     multiPhaseOutMode: false,
     yearlyPhaseOutCapacity: 3, // Base capacity for initial state
+    isRestarting: false, // Not restarting by default
   };
 };
 

@@ -54,6 +54,7 @@ export interface GameState {
   yearlyPhaseOutCapacity: number; // How many fields can be phased out per year
   showBudgetWarning?: boolean;
   budgetWarningMessage?: string;
+  isRestarting?: boolean; // Flag to prevent LOAD_GAME_STATE from overriding tutorial on restart
 }
 
 export type GameAction =

@@ -6,6 +6,7 @@ import {
 } from "../utils/gameLogic";
 import { checkAndAwardAchievements } from "../achievements";
 import { calculatePhaseOutCapacity } from "../components/game/GameUtils";
+import { LOCAL_STORAGE_KEY } from "../constants";
 
 export const gameReducer = (
   state: GameState,
@@ -19,11 +20,17 @@ export const gameReducer = (
     return {
       ...freshState,
       showTutorialModal: true, // Ensure tutorial shows on restart
+      isRestarting: true, // Flag to prevent LOAD_GAME_STATE from overriding
     };
   }
 
   if (action.type === "LOAD_GAME_STATE") {
-    return { ...state, ...action.payload };
+    return {
+      ...state,
+      ...action.payload,
+      showTutorialModal: state.isRestarting ? true : false, // Keep tutorial if restarting, otherwise don't show
+      isRestarting: false, // Clear the flag after loading
+    };
   }
 
   // Process all other actions
@@ -162,7 +169,14 @@ export const gameReducer = (
       const totalGoodInvestments =
         newState.investments.green_tech +
         newState.investments.ai_research +
-        newState.investments.renewable_energy;
+        newState.investments.renewable_energy +
+        newState.investments.carbon_capture +
+        newState.investments.hydrogen_tech +
+        newState.investments.quantum_computing +
+        newState.investments.battery_tech +
+        newState.investments.offshore_wind +
+        newState.investments.geothermal_energy +
+        newState.investments.space_tech;
       const investmentBonus = Math.floor(totalGoodInvestments / 100);
       newState.yearlyPhaseOutCapacity = Math.min(
         8,
@@ -328,7 +342,14 @@ export const gameReducer = (
       const totalGoodInvestments =
         newState.investments.green_tech +
         newState.investments.ai_research +
-        newState.investments.renewable_energy;
+        newState.investments.renewable_energy +
+        newState.investments.carbon_capture +
+        newState.investments.hydrogen_tech +
+        newState.investments.quantum_computing +
+        newState.investments.battery_tech +
+        newState.investments.offshore_wind +
+        newState.investments.geothermal_energy +
+        newState.investments.space_tech;
       const investmentBonus = Math.floor(totalGoodInvestments / 100);
       newState.yearlyPhaseOutCapacity = Math.min(
         8,
@@ -722,7 +743,14 @@ export const gameReducer = (
       const totalGoodInvestments =
         newState.investments.green_tech +
         newState.investments.ai_research +
-        newState.investments.renewable_energy;
+        newState.investments.renewable_energy +
+        newState.investments.carbon_capture +
+        newState.investments.hydrogen_tech +
+        newState.investments.quantum_computing +
+        newState.investments.battery_tech +
+        newState.investments.offshore_wind +
+        newState.investments.geothermal_energy +
+        newState.investments.space_tech;
       const totalBadInvestments =
         newState.investments.foreign_cloud +
         newState.investments.fossil_subsidies +
@@ -839,7 +867,7 @@ export const gameReducer = (
       };
 
       const serializedState = JSON.stringify(stateToSave);
-      localStorage.setItem("phaseOutVillageGameState", serializedState);
+      localStorage.setItem(LOCAL_STORAGE_KEY, serializedState);
 
       const closedFieldsCount = stateToSave.gameFields.filter(
         (f) => f.status === "closed",
@@ -849,7 +877,7 @@ export const gameReducer = (
       );
 
       // Verify the save worked by reading it back
-      const verification = localStorage.getItem("phaseOutVillageGameState");
+      const verification = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (verification) {
         const parsed = JSON.parse(verification);
         const verifyClosedFields =
@@ -876,7 +904,7 @@ export const gameReducer = (
           achievements: newState.achievements,
         };
         localStorage.setItem(
-          "phaseOutVillageGameState" + "_backup",
+          LOCAL_STORAGE_KEY + "_backup",
           JSON.stringify(simplifiedState),
         );
         console.log("✅ Fallback save completed");
