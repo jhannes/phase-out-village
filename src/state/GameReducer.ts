@@ -17,6 +17,7 @@ export const gameReducer = (
   // Handle actions that should not trigger localStorage saves
   if (action.type === "RESTART_GAME") {
     const freshState = createFreshGameState();
+    console.log("🔄 RESTART_GAME action - setting showTutorialModal: true");
     return {
       ...freshState,
       showTutorialModal: true, // Ensure tutorial shows on restart
@@ -25,6 +26,12 @@ export const gameReducer = (
   }
 
   if (action.type === "LOAD_GAME_STATE") {
+    console.log(
+      "📥 LOAD_GAME_STATE action - isRestarting:",
+      state.isRestarting,
+      "showTutorialModal will be:",
+      state.isRestarting ? true : false,
+    );
     return {
       ...state,
       ...action.payload,
@@ -360,6 +367,12 @@ export const gameReducer = (
     }
 
     case "TOGGLE_MULTI_SELECT":
+      console.log(
+        "🔄 TOGGLE_MULTI_SELECT action - current mode:",
+        state.multiPhaseOutMode,
+        "new mode:",
+        !state.multiPhaseOutMode,
+      );
       return {
         ...state,
         multiPhaseOutMode: !state.multiPhaseOutMode,
@@ -369,15 +382,29 @@ export const gameReducer = (
       };
 
     case "SELECT_FIELD_FOR_MULTI":
+      console.log(
+        "🎯 SELECT_FIELD_FOR_MULTI action - field:",
+        action.payload.name,
+        "current selectedFields:",
+        state.selectedFields.map((f) => f.name),
+      );
       if (state.selectedFields.some((f) => f.name === action.payload.name)) {
+        console.log("❌ Field already selected, ignoring");
         return state; // Already selected
       }
+      console.log("✅ Adding field to selection");
       return {
         ...state,
         selectedFields: [...state.selectedFields, action.payload],
       };
 
     case "DESELECT_FIELD_FROM_MULTI":
+      console.log(
+        "🗑️ DESELECT_FIELD_FROM_MULTI action - field:",
+        action.payload,
+        "current selectedFields:",
+        state.selectedFields.map((f) => f.name),
+      );
       return {
         ...state,
         selectedFields: state.selectedFields.filter(

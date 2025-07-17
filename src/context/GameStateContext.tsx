@@ -3,6 +3,7 @@ import React, {
   useContext,
   useReducer,
   useEffect,
+  useState,
   ReactNode,
 } from "react";
 import { gameReducer } from "../state/GameReducer";
@@ -49,6 +50,7 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
   children,
 }) => {
   const [gameState, dispatch] = useReducer(gameReducer, createFreshGameState());
+  const [hasLoadedFromStorage, setHasLoadedFromStorage] = useState(false);
 
   // Computed statistics
   const computedStats = React.useMemo(() => {
@@ -151,12 +153,17 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
     try {
       const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedState) {
+        console.log("📥 Found saved state, dispatching LOAD_GAME_STATE");
         const parsedState = JSON.parse(savedState);
         dispatch({ type: "LOAD_GAME_STATE", payload: parsedState });
+      } else {
+        console.log("📥 No saved state found, using initial fresh state");
       }
+      setHasLoadedFromStorage(true);
       // If no saved state, don't dispatch anything - use the initial fresh state
     } catch (error) {
       console.warn("Failed to load saved game state:", error);
+      setHasLoadedFromStorage(true);
     }
   }, []);
 

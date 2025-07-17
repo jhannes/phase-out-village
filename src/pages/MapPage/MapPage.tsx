@@ -20,10 +20,10 @@ import { Fill, Stroke, Text } from "ol/style";
 import "ol/ol.css";
 import "./MapPage.css";
 
-import { gameReducer } from "../../state/GameReducer";
-import { loadGameState, getColorForIntensity } from "../../utils/gameLogic";
+import { getColorForIntensity } from "../../utils/gameLogic";
 import { GameState, Field } from "../../interfaces/GameState";
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM } from "../../constants";
+import { useGameState } from "../../context/GameStateContext";
 
 import { EmissionsView } from "../../components/charts/EmissionsView";
 import FieldModal from "../../components/modals/FieldModal";
@@ -45,11 +45,7 @@ import { BadgeComponents } from "../../components/modals/AchievementModal";
 import TopTabBar from "../../components/Navigation/TopTabBar";
 
 const MapPage: React.FC = () => {
-  const [gameState, dispatch] = useReducer(
-    gameReducer,
-    undefined,
-    loadGameState,
-  );
+  const { gameState, dispatch } = useGameState();
 
   const {
     gameFields,
@@ -71,10 +67,40 @@ const MapPage: React.FC = () => {
     dispatch({ type: "UPDATE_EMISSIONS_PRODUCTION" });
   }, []);
 
+  // Debug tutorial state
+  useEffect(() => {
+    console.log(
+      "🎯 Tutorial modal should show:",
+      gameState.showTutorialModal,
+      "tutorialStep:",
+      gameState.tutorialStep,
+    );
+  }, [gameState.showTutorialModal, gameState.tutorialStep]);
+
+  // Debug multi-select state
+  useEffect(() => {
+    console.log(
+      "📋 Multi-select mode:",
+      gameState.multiPhaseOutMode,
+      "selectedFields:",
+      gameState.selectedFields.map((f) => f.name),
+    );
+  }, [gameState.multiPhaseOutMode, gameState.selectedFields]);
+
   const handleFieldClick = useCallback(
     (field: Field) => {
+      console.log(
+        "🎯 Field clicked:",
+        field.name,
+        "multiPhaseOutMode:",
+        gameState.multiPhaseOutMode,
+        "field.status:",
+        field.status,
+      );
+
       if (gameState.multiPhaseOutMode) {
         if (field.status !== "active") {
+          console.log("❌ Field not active, cannot select");
           return;
         }
 
@@ -82,20 +108,38 @@ const MapPage: React.FC = () => {
           (f) => f.name === field.name,
         );
 
+        console.log(
+          "🎯 Field selection status:",
+          isSelected,
+          "current selectedFields:",
+          gameState.selectedFields.map((f) => f.name),
+        );
+
         if (isSelected) {
+          console.log("🗑️ Deselecting field:", field.name);
           dispatch({ type: "DESELECT_FIELD_FROM_MULTI", payload: field.name });
         } else {
           const capacity = calculatePhaseOutCapacity(gameState);
+          console.log(
+            "📊 Capacity check:",
+            gameState.selectedFields.length,
+            "/",
+            capacity,
+          );
           if (gameState.selectedFields.length < capacity) {
+            console.log("✅ Selecting field:", field.name);
             dispatch({ type: "SELECT_FIELD_FOR_MULTI", payload: field });
+          } else {
+            console.log("❌ At capacity, cannot select more fields");
           }
         }
       } else {
+        console.log("📋 Single field mode, opening modal");
         dispatch({ type: "SET_SELECTED_FIELD", payload: field });
         dispatch({ type: "TOGGLE_FIELD_MODAL", payload: true });
       }
     },
-    [gameState.multiPhaseOutMode, gameState.selectedFields, gameState],
+    [gameState.multiPhaseOutMode, gameState.selectedFields, dispatch],
   );
 
   useEffect(() => {
@@ -119,7 +163,8 @@ const MapPage: React.FC = () => {
         controls: [],
       });
 
-      mapInstanceRef.current.on("singleclick", (evt: any) => {
+      // Set up the click handler
+      const clickHandler = (evt: any) => {
         mapInstanceRef.current?.forEachFeatureAtPixel(
           evt.pixel,
           (feature: any) => {
@@ -129,7 +174,12 @@ const MapPage: React.FC = () => {
             }
           },
         );
-      });
+      };
+
+      mapInstanceRef.current.on("singleclick", clickHandler);
+
+      // Store the handler reference for cleanup
+      mapInstanceRef.current.set("clickHandler", clickHandler);
     }
 
     setTimeout(() => {
@@ -210,8 +260,34 @@ const MapPage: React.FC = () => {
     currentView,
     gameState.multiPhaseOutMode,
     gameState.selectedFields,
-    handleFieldClick,
   ]);
+
+  // Update click handler when handleFieldClick changes
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    // Remove old click handler
+    const oldHandler = mapInstanceRef.current.get("clickHandler");
+    if (oldHandler) {
+      mapInstanceRef.current.un("singleclick", oldHandler);
+    }
+
+    // Add new click handler
+    const newClickHandler = (evt: any) => {
+      mapInstanceRef.current?.forEachFeatureAtPixel(
+        evt.pixel,
+        (feature: any) => {
+          const fieldData = feature.get("fieldData");
+          if (fieldData) {
+            handleFieldClick(fieldData);
+          }
+        },
+      );
+    };
+
+    mapInstanceRef.current.on("singleclick", newClickHandler);
+    mapInstanceRef.current.set("clickHandler", newClickHandler);
+  }, [handleFieldClick]);
 
   const phaseOutField = useCallback((fieldName: string) => {
     dispatch({ type: "PHASE_OUT_FIELD", payload: fieldName });
