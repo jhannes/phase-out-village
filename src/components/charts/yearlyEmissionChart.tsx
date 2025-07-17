@@ -10,7 +10,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { YearlyIncome } from "../../types/interface";
+import { YearlyEmission } from "../../types/interface";
 
 ChartJS.register(
   CategoryScale,
@@ -22,17 +22,17 @@ ChartJS.register(
   Legend,
 );
 
-interface IncomeChartProps {
-  data: YearlyIncome[];
+interface YearlyEmissionProps {
+  data: YearlyEmission[];
 }
 
-export function IncomeChart({ data }: IncomeChartProps) {
+export function YearlyEmissionChart({ data }: YearlyEmissionProps) {
   const chartData = {
     labels: data.map((entry) => entry.year),
     datasets: [
       {
-        label: "Total Inntekt (USD)",
-        data: data.map((entry) => entry.totalIncome),
+        label: "Totalt utslipp (Tonn CO2)",
+        data: data.map((entry) => entry.totalEmission),
         borderColor: "#4a90e2",
         backgroundColor: "rgba(74, 144, 226, 0.2)",
         tension: 0.3,
@@ -49,7 +49,15 @@ export function IncomeChart({ data }: IncomeChartProps) {
       },
       title: {
         display: true,
-        text: "Årlig Inntekt fra Olje og Gass",
+        text: "Årlig utslipp fra norske oljefelt",
+      },
+      tooltip: {
+        callbacks: {
+          label: function (context: any) {
+            const value = context.parsed.y;
+            return `Utslipp: ${value.toLocaleString("nb-NO")} tonn CO₂`;
+          },
+        },
       },
     },
     scales: {
@@ -61,10 +69,10 @@ export function IncomeChart({ data }: IncomeChartProps) {
       y: {
         beginAtZero: true,
         min: 0,
-        max: 100_000_000_000,
+        max: 25_000_000,
         ticks: {
           callback: function (value: any) {
-            return `$${(value / 1_000_000).toFixed(1)}M`;
+            return `${(value / 1_000_000).toFixed(1)}M Tonn CO2`;
           },
         },
       },
