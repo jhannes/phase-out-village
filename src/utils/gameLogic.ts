@@ -144,7 +144,7 @@ export const loadGameState = (): GameState => {
     newAchievements: [],
     nextPhaseOutDiscount: undefined,
     multiPhaseOutMode: false,
-    yearlyPhaseOutCapacity: 0,
+    yearlyPhaseOutCapacity: 3, // Base capacity for initial state
   };
 
   try {
@@ -406,7 +406,7 @@ export const createFreshGameState = (): GameState => {
     newAchievements: [],
     nextPhaseOutDiscount: undefined,
     multiPhaseOutMode: false,
-    yearlyPhaseOutCapacity: 0,
+    yearlyPhaseOutCapacity: 3, // Base capacity for initial state
   };
 };
 

@@ -71,6 +71,14 @@ export const gameReducer = (
         nextPhaseOutDiscount: undefined, // Remove discount after use
       };
 
+      // Update selectedFields to reflect new field statuses
+      newState.selectedFields = newState.selectedFields.map((field) => {
+        const updatedField = newState.gameFields.find(
+          (f) => f.name === field.name,
+        );
+        return updatedField || field;
+      });
+
       // Apply yearly consequences
       const yearlyConsequences = calculateYearlyConsequences(newState);
 
@@ -239,8 +247,15 @@ export const gameReducer = (
         selectedFields: [],
         multiPhaseOutMode: false,
         nextPhaseOutDiscount: undefined,
-        yearlyPhaseOutCapacity: 1, // Set to a default value or calculate inline if needed
       };
+
+      // Update selectedFields to reflect new field statuses
+      newState.selectedFields = newState.selectedFields.map((field) => {
+        const updatedField = newState.gameFields.find(
+          (f) => f.name === field.name,
+        );
+        return updatedField || field;
+      });
 
       // Apply yearly consequences
       const yearlyConsequences = calculateYearlyConsequences(newState);
@@ -307,6 +322,19 @@ export const gameReducer = (
       newState.sustainabilityScore = Math.min(
         100,
         Math.max(0, phasedPercentage),
+      );
+
+      // Update yearly phase-out capacity
+      const baseCapacity = 3;
+      const techBonus = Math.floor(newState.norwayTechRank / 20);
+      const totalGoodInvestments =
+        newState.investments.green_tech +
+        newState.investments.ai_research +
+        newState.investments.renewable_energy;
+      const investmentBonus = Math.floor(totalGoodInvestments / 100);
+      newState.yearlyPhaseOutCapacity = Math.min(
+        8,
+        baseCapacity + techBonus + investmentBonus,
       );
 
       return newState;
@@ -395,7 +423,8 @@ export const gameReducer = (
               showEventModal: false,
             };
           }
-          break;
+          // If no valid choice, just close the modal
+          return { ...state, showEventModal: false };
 
         case "tech_breakthrough":
           // Already handled in the event action
@@ -404,8 +433,6 @@ export const gameReducer = (
         default:
           return { ...state, showEventModal: false };
       }
-
-      return { ...state, showEventModal: false };
     }
 
     case "CLOSE_ACHIEVEMENT_MODAL":
@@ -426,6 +453,33 @@ export const gameReducer = (
 
     case "UPDATE_BUDGET":
       return { ...state, budget: action.payload };
+
+    case "TRANSITION_FIELD": {
+      const { fieldName, newType } = action.payload;
+      const field = state.gameFields.find((f) => f.name === fieldName);
+
+      if (!field || field.status !== "active") {
+        return state;
+      }
+
+      // Transition the field to the new type
+      newState = {
+        ...state,
+        gameFields: state.gameFields.map((f) =>
+          f.name === fieldName ? { ...f, status: "transitioning" as const } : f,
+        ),
+      };
+
+      // Update selectedFields to reflect new field statuses
+      newState.selectedFields = newState.selectedFields.map((field) => {
+        const updatedField = newState.gameFields.find(
+          (f) => f.name === field.name,
+        );
+        return updatedField || field;
+      });
+
+      return newState;
+    }
 
     case "SET_SELECTED_FIELD":
       return { ...state, selectedField: action.payload };
@@ -517,6 +571,14 @@ export const gameReducer = (
         },
         nextPhaseOutDiscount: undefined,
       };
+
+      // Update selectedFields to reflect new field statuses
+      newState.selectedFields = newState.selectedFields.map((field) => {
+        const updatedField = newState.gameFields.find(
+          (f) => f.name === field.name,
+        );
+        return updatedField || field;
+      });
 
       // Apply yearly consequences
       const yearlyConsequences = calculateYearlyConsequences(newState);
