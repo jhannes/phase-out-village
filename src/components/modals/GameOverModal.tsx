@@ -73,7 +73,7 @@ const GameOverModal: React.FC<{
             🔄 Spill igjen
           </button>
           <button onClick={onClose} className="close-button">
-            📊 Se resultater
+            ❌ Lukk
           </button>
         </div>
       </div>

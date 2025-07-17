@@ -62,10 +62,9 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
     );
 
     // Calculate total emissions reduced (from phased out fields)
-    const totalEmissionsReduced =
-      phasedFields.reduce((total, field) => {
-        return total + (field.emissions?.[0] || 0);
-      }, 0) / 1000000; // Convert to Mt
+    const totalEmissionsReduced = phasedFields.reduce((total, field) => {
+      return total + (field.emissions?.[0] || 0);
+    }, 0); // Already in Mt from field creation
 
     // Calculate total budget spent
     const totalBudgetSpent = phasedFields.reduce((total, field) => {

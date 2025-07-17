@@ -739,7 +739,7 @@ export const gameReducer = (
       );
       const climateDamage = Math.max(
         0,
-        totalEmissions / 1000000, // Base climate damage on current emissions
+        totalEmissions / 1000, // Base climate damage on current emissions (convert Mt to thousands)
       );
 
       return {

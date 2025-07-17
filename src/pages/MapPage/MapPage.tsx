@@ -317,7 +317,11 @@ const MapPage: React.FC = () => {
               <h3>🎮 Din påvirkning</h3>
               <p>
                 Totale utslipp redusert:{" "}
-                {Object.keys(gameState.shutdowns).length * 2.5}Mt CO₂
+                {gameFields
+                  .filter((f) => f.status === "closed")
+                  .reduce((sum, f) => sum + (f.emissions[0] || 0), 0)
+                  .toFixed(1)}
+                Mt CO₂
               </p>
               <p>Felt faset ut: {Object.keys(gameState.shutdowns).length}</p>
             </div>
