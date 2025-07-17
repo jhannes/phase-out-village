@@ -1,300 +1,103 @@
 import React, {
-  useState,
-  useRef,
   useEffect,
+  useRef,
+  useReducer,
   useCallback,
   useMemo,
-  useReducer,
 } from "react";
 import OlMap from "ol/Map";
 import View from "ol/View";
 import { fromLonLat } from "ol/proj";
 import TileLayer from "ol/layer/Tile";
 import XYZ from "ol/source/XYZ";
-import Overlay from "ol/Overlay";
+import VectorLayer from "ol/layer/Vector";
+import VectorSource from "ol/source/Vector";
+import Feature from "ol/Feature";
+import Point from "ol/geom/Point";
+import Circle from "ol/style/Circle";
+import Style from "ol/style/Style";
+import { Fill, Stroke, Text } from "ol/style";
 import "ol/ol.css";
 import "./MapPage.css";
-import { EmissionsView } from "../../components/charts/EmissionsView";
-import { gameReducer, initialGameState } from "../../state/GameReducer";
+
+import { gameReducer } from "../../state/GameReducer";
+import { loadGameState, getColorForIntensity } from "../../utils/gameLogic";
 import { GameState, Field } from "../../interfaces/GameState";
+import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM } from "../../constants";
+
+import { EmissionsView } from "../../components/charts/EmissionsView";
+import FieldModal from "../../components/modals/FieldModal";
+import AchievementModal from "../../components/modals/AchievementModal";
+import GameOverModal from "../../components/modals/GameOverModal";
+import GameControlPanel from "../../components/game/GameControlPanel";
+import TutorialOverlay from "../../components/game/TutorialOverlay";
+import GameFeedback from "../../components/game/GameFeedback";
+import InvestmentPanel from "../../components/game/InvestmentPanel";
+import {
+  AchievementDebugPanel,
+  AchievementNotification,
+  calculatePhaseOutCapacity,
+  MultiSelectControls,
+} from "../../components/game/GameUtils";
+import ProgressiveDataPanel from "../../components/game/ProgressiveDataPanel";
+import { ACHIEVEMENT_BADGES } from "../../achievements";
+import { BadgeComponents } from "../../components/modals/AchievementModal";
 import TopTabBar from "../../components/Navigation/TopTabBar";
-import { data } from "../../generated/data";
-import MobileTabsLayout from "../../components/Layout/CompactMobileLayout";
-import MultiSelectControls from "../../components/MultiSelectControls";
 
-// Constants
-const LOCAL_STORAGE_KEY = "phaseOutVillageGameState";
-const DEFAULT_MAP_CENTER = [5.5, 62.0];
-const DEFAULT_MAP_ZOOM = 5;
+const MapPage: React.FC = () => {
+  const [gameState, dispatch] = useReducer(gameReducer, undefined, loadGameState);
 
-const getFieldAbbreviation = (fieldName: string): string => {
-  const abbreviations: Record<string, string> = {
-    "Johan Sverdrup": "JS",
-    Ekofisk: "EK",
-    Troll: "TR",
-    Oseberg: "OS",
-    Gullfaks: "GF",
-    Statfjord: "ST",
-    Snorre: "SN",
-    Kvitebjørn: "KB",
-    Heidrun: "HD",
-    Åsgard: "ÅS",
-  };
-  return abbreviations[fieldName] || fieldName.substring(0, 2).toUpperCase();
-};
+  const {
+    gameFields,
+    budget,
+    score,
+    year,
+    selectedField,
+    showFieldModal,
+    achievements,
+    totalEmissions,
+    totalProduction,
+    currentView,
+  } = gameState;
 
-const getColorForIntensity = (
-  intensity: number,
-  status: "active" | "closed" | "transitioning",
-): string => {
-  if (status === "closed") return "#10B981";
-  if (status === "transitioning") return "#F59E0B";
-  if (intensity > 15) return "#DC2626";
-  if (intensity > 8) return "#EF4444";
-  if (intensity > 3) return "#F97316";
-  return "#64748B";
-};
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<OlMap | null>(null);
 
-// Field Modal Component with auto-scroll
-const FieldModal: React.FC<{
-  selectedField: Field | null;
-  budget: number;
-  onPhaseOut: (fieldName: string) => void;
-  onClose: () => void;
-}> = ({ selectedField, budget, onPhaseOut, onClose }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  if (!selectedField) return null;
-
-  const canAfford = budget >= (selectedField.phaseOutCost || 0);
-
-  // Handle escape key
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [onClose]);
+    dispatch({ type: "UPDATE_EMISSIONS_PRODUCTION" });
+  }, []);
 
-  // Auto-scroll to modal when it opens
-  useEffect(() => {
-    if (modalRef.current) {
-      const timer = setTimeout(() => {
-        modalRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-          inline: "center",
-        });
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [selectedField?.name]);
+  const handleFieldClick = useCallback(
+    (field: Field) => {
+      if (gameState.multiPhaseOutMode) {
+        if (field.status !== "active") {
+          return;
+        }
 
-  return (
-    <div
-      className="modal field-modal"
-      ref={modalRef}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button
-          onClick={onClose}
-          className="modal-close-button"
-          aria-label="Lukk modal"
-        >
-          ×
-        </button>
+        const isSelected = gameState.selectedFields.some(
+          (f) => f.name === field.name,
+        );
 
-        <h2
-          style={{
-            marginTop: "8px",
-            marginBottom: "20px",
-            color: selectedField.status === "closed" ? "#10B981" : "#1F2937",
-          }}
-        >
-          {selectedField.status === "closed" ? "🌱" : "🛢️"} {selectedField.name}
-        </h2>
-
-        <div className="field-details">
-          <p>
-            <strong>Status:</strong>
-            <span className={`status-${selectedField.status}`}>
-              {selectedField.status === "active"
-                ? "Aktiv"
-                : selectedField.status === "closed"
-                  ? "Faset ut"
-                  : "Overgangsfase"}
-            </span>
-          </p>
-
-          {selectedField.status === "active" ? (
-            <>
-              <p>
-                <strong>Årlig produksjon:</strong>
-                <span>
-                  {(selectedField.production || 0).toFixed(1)} mill. boe
-                </span>
-              </p>
-              <p>
-                <strong>Årlige utslipp:</strong>
-                <span style={{ color: "#DC2626", fontWeight: "bold" }}>
-                  {(() => {
-                    const emissions =
-                      Array.isArray(selectedField.emissions) &&
-                      selectedField.emissions.length > 0
-                        ? selectedField.emissions[0]
-                        : 0;
-                    return (emissions || 0).toFixed(1);
-                  })()}{" "}
-                  Mt CO₂
-                </span>
-              </p>
-              <p>
-                <strong>Utslippsintensitet:</strong>
-                <span>
-                  {(selectedField.intensity || 0).toFixed(1)} kg CO₂/boe
-                </span>
-              </p>
-              <p>
-                <strong>Arbeidsplasser:</strong>
-                <span>~{(selectedField.workers || 0).toLocaleString()}</span>
-              </p>
-              <p>
-                <strong>Omstillingspotensial:</strong>
-                <span style={{ color: "#059669", fontWeight: "bold" }}>
-                  {(selectedField.transitionPotential || "unknown").replace(
-                    "_",
-                    " ",
-                  )}
-                </span>
-              </p>
-
-              <hr />
-
-              <div className="cost">
-                <strong>💥 Totalt livstidsutslipp ved forbrenning:</strong>
-                <div
-                  style={{
-                    fontSize: "1.2em",
-                    color: "#DC2626",
-                    marginTop: "8px",
-                  }}
-                >
-                  {((selectedField.totalLifetimeEmissions || 0) / 1000).toFixed(
-                    0,
-                  )}{" "}
-                  Mt CO₂
-                </div>
-                <small style={{ opacity: 0.8 }}>
-                  Dette er CO₂ som slippes ut når oljen brennes av forbrukere
-                </small>
-              </div>
-
-              <div className="cost">
-                <strong>💰 Kostnad for utfasing:</strong>
-                <div style={{ fontSize: "1.2em", marginTop: "8px" }}>
-                  {(selectedField.phaseOutCost || 0).toLocaleString()} mrd NOK
-                </div>
-              </div>
-            </>
-          ) : (
-            <div style={{ textAlign: "center", padding: "20px" }}>
-              <div style={{ fontSize: "3em", marginBottom: "16px" }}>🌱</div>
-              <p
-                style={{
-                  color: "#10B981",
-                  fontSize: "1.2em",
-                  fontWeight: "bold",
-                }}
-              >
-                Dette feltet er allerede faset ut!
-              </p>
-              <p style={{ color: "#6B7280", marginTop: "8px" }}>
-                Du hindrer nå{" "}
-                {((selectedField.totalLifetimeEmissions || 0) / 1000).toFixed(
-                  0,
-                )}{" "}
-                Mt CO₂ fra å bli sluppet ut i atmosfæren.
-              </p>
-            </div>
-          )}
-        </div>
-
-        <div className="modal-actions">
-          {selectedField.status === "active" ? (
-            <>
-              <button
-                onClick={() => onPhaseOut(selectedField.name)}
-                disabled={!canAfford}
-                className="phase-out-button"
-              >
-                {canAfford
-                  ? `🌱 Fase ut feltet (${(selectedField.phaseOutCost || 0).toLocaleString()} mrd NOK)`
-                  : `💰 Ikke nok penger (${(selectedField.phaseOutCost || 0).toLocaleString()} mrd NOK)`}
-              </button>
-              {!canAfford && (
-                <div className="budget-warning">
-                  Du mangler{" "}
-                  {(
-                    (selectedField.phaseOutCost || 0) - budget
-                  ).toLocaleString()}{" "}
-                  mrd NOK
-                </div>
-              )}
-            </>
-          ) : (
-            <button
-              onClick={onClose}
-              className="phase-out-button"
-              style={{ background: "#10B981" }}
-            >
-              ✅ Forstått
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+        if (isSelected) {
+          dispatch({ type: "DESELECT_FIELD_FROM_MULTI", payload: field.name });
+        } else {
+          const capacity = calculatePhaseOutCapacity(gameState);
+          if (gameState.selectedFields.length < capacity) {
+            dispatch({ type: "SELECT_FIELD_FOR_MULTI", payload: field });
+          }
+        }
+      } else {
+        dispatch({ type: "SET_SELECTED_FIELD", payload: field });
+        dispatch({ type: "TOGGLE_FIELD_MODAL", payload: true });
+      }
+    },
+    [gameState.multiPhaseOutMode, gameState.selectedFields, gameState],
   );
-};
 
-// --- Tab Content Components ---
-// (Define all tab content functions here, with all required props)
-
-// MapContent
-const MapContent: React.FC<{
-  mapRef: React.RefObject<HTMLDivElement | null>;
-  mapInstanceRef: React.RefObject<any>;
-  gameFields: Field[];
-  handleFieldClick: (field: Field) => void;
-  getFieldAbbreviation: (fieldName: string) => string;
-  getColorForIntensity: (
-    intensity: number,
-    status: "active" | "closed" | "transitioning",
-  ) => string;
-  showFieldModal: boolean;
-  selectedField: Field | null;
-  budget: number;
-  phaseOutField: (fieldName: string) => void;
-  dispatch: React.Dispatch<any>;
-}> = ({
-  mapRef,
-  mapInstanceRef,
-  gameFields,
-  handleFieldClick,
-  getFieldAbbreviation,
-  getColorForIntensity,
-  showFieldModal,
-  selectedField,
-  budget,
-  phaseOutField,
-  dispatch,
-}) => {
-  // Map initialization
   useEffect(() => {
-    if (!mapRef.current || mapInstanceRef.current) return;
+    if (!mapRef.current || currentView !== "map") return;
 
-    try {
+    if (!mapInstanceRef.current) {
       mapInstanceRef.current = new OlMap({
         target: mapRef.current,
         layers: [
@@ -312,426 +115,454 @@ const MapContent: React.FC<{
         controls: [],
       });
 
-      setTimeout(() => {
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.updateSize();
-        }
-      }, 100);
-    } catch (error) {
-      console.error("Failed to create map:", error);
+      mapInstanceRef.current.on("singleclick", (evt: any) => {
+        mapInstanceRef.current?.forEachFeatureAtPixel(
+          evt.pixel,
+          (feature: any) => {
+            const fieldData = feature.get("fieldData");
+            if (fieldData) {
+              handleFieldClick(fieldData);
+            }
+          },
+        );
+      });
     }
-  }, []);
 
-  // Update map with field overlays
-  useEffect(() => {
-    if (!mapInstanceRef.current || gameFields.length === 0) return;
+    setTimeout(() => {
+      mapInstanceRef.current?.updateSize();
+    }, 100);
 
     const map = mapInstanceRef.current;
-    map.getOverlays().clear();
+    let vectorLayer = map
+      .getLayers()
+      .getArray()
+      .find((layer) => layer instanceof VectorLayer) as
+      | VectorLayer<VectorSource>
+      | undefined;
 
-    gameFields.forEach((field) => {
-      const coordinates = fromLonLat([field.lon, field.lat]);
-      const element = document.createElement("div");
-      const abbrev = getFieldAbbreviation(field.name);
-      const color = getColorForIntensity(field.intensity || 0, field.status);
+    const vectorSource = new VectorSource({
+      features: gameFields.map((field) => {
+        const feature = new Feature({
+          geometry: new Point(fromLonLat([field.lon, field.lat])),
+          name: field.name,
+          fieldData: field,
+        });
 
-      element.style.cssText = `
-        font-size: 12px;
-        font-weight: bold;
-        color: ${field.status === "closed" ? "#FFFFFF" : "#1F2937"};
-        border: 2px solid #FFFFFF;
-        padding: 2px 4px;
-        border-radius: 3px;
-        background-color: ${color};
-        pointer-events: auto;
-        cursor: pointer;
-      `;
-      element.textContent = abbrev;
+        let color = getColorForIntensity(field.intensity, field.status);
+        let strokeColor = "#FFFFFF";
+        let strokeWidth = 2;
 
-      element.addEventListener("click", (event) => {
-        event.stopPropagation();
-        handleFieldClick(field);
-      });
-
-      const overlay = new Overlay({
-        position: coordinates,
-        element: element,
-        positioning: "center-center",
-      });
-
-      map.addOverlay(overlay);
-    });
-  }, [gameFields]);
-
-  return (
-    <div className="map-container">
-      <h2 className="map-title">🗺️ Norske Oljeområder</h2>
-      <div ref={mapRef} className="map-div" />
-      <div className="map-hint">
-        Klikk på et oljefelt for å fase det ut! 🛢️ → 🌱
-      </div>
-    </div>
-  );
-};
-
-// SelectionContent
-const SelectionContent: React.FC<{
-  gameFields: Field[];
-  handleFieldClick: (field: Field) => void;
-  getFieldAbbreviation: (fieldName: string) => string;
-  getColorForIntensity: (
-    intensity: number,
-    status: "active" | "closed" | "transitioning",
-  ) => string;
-  showFieldModal: boolean;
-  selectedField: Field | null;
-  budget: number;
-  phaseOutField: (fieldName: string) => void;
-  dispatch: React.Dispatch<any>;
-}> = ({
-  gameFields,
-  handleFieldClick,
-  getFieldAbbreviation,
-  getColorForIntensity,
-  showFieldModal,
-  selectedField,
-  budget,
-  phaseOutField,
-  dispatch,
-}) => {
-  return (
-    <div className="selection-content">
-      <h3>🛢️ Oljefelt for fasering</h3>
-      <div className="field-list">
-        {gameFields.map((field) => (
-          <div
-            key={field.name}
-            className="field-item"
-            onClick={() => handleFieldClick(field)}
-            style={{
-              backgroundColor: getColorForIntensity(
-                field.intensity || 0,
-                field.status,
-              ),
-              cursor: "pointer",
-            }}
-          >
-            <span>{getFieldAbbreviation(field.name)}</span>
-            <span>{field.name}</span>
-            <span>
-              {field.status === "active"
-                ? "Aktiv"
-                : field.status === "closed"
-                  ? "Faset ut"
-                  : "Overgangsfase"}
-            </span>
-          </div>
-        ))}
-      </div>
-      {showFieldModal && (
-        <FieldModal
-          selectedField={selectedField}
-          budget={budget}
-          onPhaseOut={phaseOutField}
-          onClose={() =>
-            dispatch({ type: "TOGGLE_FIELD_MODAL", payload: false })
+        if (gameState.multiPhaseOutMode) {
+          const isSelected = gameState.selectedFields.some(
+            (f) => f.name === field.name,
+          );
+          if (isSelected) {
+            strokeColor = "#FFD700";
+            strokeWidth = 4;
+          } else if (field.status === "active") {
+            strokeColor = "#00FF00";
+            strokeWidth = 3;
           }
-        />
-      )}
-    </div>
-  );
-};
+        }
 
-// EmissionsContent
-const EmissionsContent: React.FC<{
-  emissionsData: any[];
-  totalEmissions: number;
-  totalProduction: number;
-  year: number;
-  shutdowns: { [key: string]: number };
-}> = ({ emissionsData, totalEmissions, totalProduction, year, shutdowns }) => {
-  return (
-    <div className="view-container">
-      <EmissionsView data={emissionsData} />
-      <div className="game-impact-summary">
-        <h3>🎮 Din påvirkning</h3>
-        <p>
-          Totale utslipp redusert: {Object.keys(shutdowns).length * 2.5}Mt CO₂
-        </p>
-        <p>Felt faset ut: {Object.keys(shutdowns).length}</p>
-      </div>
-    </div>
-  );
-};
+        const size =
+          field.status === "closed"
+            ? 8
+            : Math.max(8, Math.min(16, field.production * 0.5));
 
-// AchievementsContent
-const AchievementsContent: React.FC<{
-  achievements: string[];
-}> = ({ achievements }) => {
-  return (
-    <div className="achievement-card">
-      <h3 className="achievement-title">
-        🏆 Dine Prestasjoner ({achievements.length})
-      </h3>
-      {achievements.length === 0 ? (
-        <div className="no-achievements">
-          <p>
-            Ingen prestasjoner ennå. Fase ut ditt første oljefelt for å få
-            "Første Skritt"!
-          </p>
-        </div>
-      ) : (
-        <div className="achievement-list">
-          {achievements.map((achievement, index) => (
-            <div key={index} className="achievement-badge">
-              {achievement}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
+        feature.setStyle(
+          new Style({
+            image: new Circle({
+              radius: size,
+              fill: new Fill({ color }),
+              stroke: new Stroke({ color: strokeColor, width: strokeWidth }),
+            }),
+            text: new Text({
+              text: field.status === "closed" ? "🌱" : "🛢️",
+              offsetY: -25,
+              font: "16px sans-serif",
+            }),
+          }),
+        );
+        return feature;
+      }),
+    });
 
-// DashboardContent
-const DashboardContent: React.FC<{
-  totalEmissions: number;
-  totalProduction: number;
-  year: number;
-}> = ({ totalEmissions, totalProduction, year }) => {
-  return (
-    <div className="dashboard-grid">
-      <div className="dashboard-card">
-        <h3 className="dashboard-title">📊 Utslipp</h3>
-        <div className="dashboard-value">{totalEmissions.toFixed(1)} Mt</div>
-        <div className="dashboard-label">CO₂ per år</div>
-      </div>
-      <div className="dashboard-card">
-        <h3 className="dashboard-title">⚡ Produksjon</h3>
-        <div className="dashboard-value-orange">
-          {totalProduction.toFixed(1)} mill. boe
-        </div>
-        <div className="dashboard-label">per år</div>
-      </div>
-    </div>
-  );
-};
-
-// --- Main MapPage Component ---
-const MapPage: React.FC = () => {
-  // --- All hooks at the top ---
-  const [gameState, dispatch] = useReducer(gameReducer, initialGameState);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const mapRef = useRef<HTMLDivElement | null>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // Aggregate total emissions per year across all fields for 2020-2025
-  const years = [2020, 2021, 2022, 2023, 2024, 2025];
-  const totalEmissionsByYear = years.map(
-    (year) =>
-      Object.values(data).reduce((sum, fieldData) => {
-        const yearData = fieldData[year.toString()];
-        return sum + (yearData?.emission || 0);
-      }, 0) / 1000, // convert to Mt
-  );
-  const emissionsData = [{ name: "Totalt", data: totalEmissionsByYear }];
-
-  // Initialize game state
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        dispatch({ type: "LOAD_GAME_STATE", payload: parsed });
-      }
-    } catch (e) {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-    }
-    setIsInitialized(true);
-  }, []);
-
-  // Safe game state access
-  const {
-    gameFields = [],
-    budget = 0,
-    score = 0,
-    year = 2025,
-    selectedField = null,
-    showFieldModal = false,
-    achievements = [],
-    totalEmissions = 0,
-    totalProduction = 0,
-    shutdowns = {},
-  } = gameState || {};
-
-  // Updated handleFieldClick for multi-select support
-  const handleFieldClick = (field: Field) => {
-    if (gameState.multiPhaseOutMode) {
-      // If already selected, deselect
-      if (gameState.selectedFields.some((f) => f.name === field.name)) {
-        dispatch({ type: "DESELECT_FIELD_FROM_MULTI", payload: field.name });
-      } else {
-        dispatch({ type: "SELECT_FIELD_FOR_MULTI", payload: field });
-      }
+    if (vectorLayer) {
+      vectorLayer.setSource(vectorSource);
     } else {
-      dispatch({ type: "SET_SELECTED_FIELD", payload: field });
-      dispatch({ type: "TOGGLE_FIELD_MODAL", payload: true });
+      vectorLayer = new VectorLayer({ source: vectorSource });
+      map.addLayer(vectorLayer);
     }
-  };
+
+    return () => {
+      if (mapInstanceRef.current && !mapRef.current) {
+        mapInstanceRef.current.setTarget(undefined);
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [
+    gameFields,
+    currentView,
+    gameState.multiPhaseOutMode,
+    gameState.selectedFields,
+    handleFieldClick,
+  ]);
 
   const phaseOutField = useCallback((fieldName: string) => {
     dispatch({ type: "PHASE_OUT_FIELD", payload: fieldName });
   }, []);
 
-  // --- Tab state ---
+  const emissionsData = useMemo(() => {
+    const years = Array.from({ length: year - 2020 + 1 }, (_, i) => 2020 + i);
+    return gameFields.map((field) => ({
+      name: field.name,
+      data: years.map((y) => {
+        const shutdownYear = gameState.shutdowns[field.name];
+        if (shutdownYear && y >= shutdownYear) {
+          return 0;
+        }
+        return field.emissions[0] || 0;
+      }),
+    }));
+  }, [gameFields, year, gameState.shutdowns]);
+
+  const renderCurrentView = () => {
+    switch (currentView) {
+      case "emissions":
+        return (
+          <div className="view-container">
+            <EmissionsView data={emissionsData} />
+            <div className="game-impact-summary">
+              <h3>🎮 Din påvirkning</h3>
+              <p>
+                Totale utslipp redusert:{" "}
+                {Object.keys(gameState.shutdowns).length * 2.5}Mt CO₂
+              </p>
+              <p>Felt faset ut: {Object.keys(gameState.shutdowns).length}</p>
+            </div>
+          </div>
+        );
+      case "map":
+      default:
+        return (
+          <div className="map-container">
+            <h2 className="map-title">🗺️ Norske Oljeområder</h2>
+            <div ref={mapRef} className="map-div" />
+            <div className="map-hint">
+              {gameState.multiPhaseOutMode
+                ? `⚡ Multi-utfasing: Klikk på opptil ${calculatePhaseOutCapacity(gameState)} felt å fase ut samtidig!`
+                : "Klikk på et oljefelt for å fase det ut! 🛢️ → 🌱"}
+            </div>
+          </div>
+        );
+    }
+  };
+
   const tabs = [
     {
       id: "map",
       title: "🗺️ Kart",
       icon: "🗺️",
-      content: (
-        <MapContent
-          mapRef={mapRef}
-          mapInstanceRef={mapInstanceRef}
-          gameFields={gameFields}
-          handleFieldClick={handleFieldClick}
-          getFieldAbbreviation={getFieldAbbreviation}
-          getColorForIntensity={getColorForIntensity}
-          showFieldModal={showFieldModal}
-          selectedField={selectedField}
-          budget={budget}
-          phaseOutField={phaseOutField}
-          dispatch={dispatch}
-        />
-      ),
+      content: renderCurrentView(),
       badge: undefined,
     },
     {
       id: "emissions",
       title: "📊 Utslipp",
       icon: "📊",
-      content: (
-        <EmissionsContent
-          emissionsData={emissionsData}
-          totalEmissions={totalEmissions}
-          totalProduction={totalProduction}
-          year={year}
-          shutdowns={shutdowns}
-        />
-      ),
-      badge: undefined,
-    },
-    {
-      id: "achievements",
-      title: "🏆 Prestasjoner",
-      icon: "🏆",
-      content: <AchievementsContent achievements={achievements} />,
-      badge: undefined,
-    },
-    {
-      id: "dashboard",
-      title: "📊 Dashboard",
-      icon: "📊",
-      content: (
-        <DashboardContent
-          totalEmissions={totalEmissions}
-          totalProduction={totalProduction}
-          year={year}
-        />
-      ),
+      content: renderCurrentView(),
       badge: undefined,
     },
   ];
-  const [activeTab, setActiveTab] = useState(tabs[0].id);
-  const activeTabData = tabs.find((tab) => tab.id === activeTab);
-  const isMobile =
-    typeof window !== "undefined" ? window.innerWidth < 768 : false;
 
-  // --- Early return for loading state ---
-  if (
-    !isInitialized ||
-    !gameState ||
-    !gameState.gameFields ||
-    gameState.gameFields.length === 0
-  ) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          flexDirection: "column",
-          gap: "16px",
-        }}
-      >
-        <div style={{ fontSize: "48px" }}>🔄</div>
-        <div>Loading game data...</div>
-      </div>
-    );
-  }
-
-  // --- Layout ---
-  if (isMobile) {
-    return (
-      <MobileTabsLayout
-        tabs={tabs}
-        defaultTab={tabs[0].id}
-        header={<></>}
-        floatingActions={<></>}
-      />
-    );
-  }
-
-  // --- Desktop Layout ---
   return (
-    <div className="desktop-map-content" style={{ padding: "0 0 68px 0" }}>
-      {/* Multi-Select Toggle Button in header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          marginBottom: 8,
-        }}
-      >
-        <TopTabBar
-          items={tabs.map((tab) => ({
-            id: tab.id,
-            icon: tab.icon,
-            label: tab.title,
-            badge: tab.badge,
-            active: activeTab === tab.id,
-            onClick: () => setActiveTab(tab.id),
-            ariaLabel: tab.title,
-          }))}
-          fixed={false}
-        />
-        {/* Multi-select toggle button */}
-        <button
-          onClick={() => dispatch({ type: "TOGGLE_MULTI_SELECT" })}
+    <div className="container">
+      <TopTabBar
+        items={tabs.map((tab) => ({
+          id: tab.id,
+          icon: tab.icon,
+          label: tab.title,
+          badge: tab.badge,
+          active: currentView === tab.id,
+          onClick: () => dispatch({ type: "SET_VIEW_MODE", payload: tab.id as any }),
+          ariaLabel: tab.title,
+        }))}
+      />
+      <main className="main-content-area">
+        <div
           style={{
-            background: gameState.multiPhaseOutMode ? "#22C55E" : "#64748B",
-            color: "white",
-            border: "none",
-            borderRadius: 6,
-            padding: "8px 16px",
-            fontWeight: 600,
-            cursor: "pointer",
-            marginLeft: 16,
+            filter: `saturate(${gameState.saturationLevel}%) brightness(${gameState.saturationLevel > 60 ? 100 : 80}%)`,
+            transition: "filter 1s ease-in-out",
           }}
         >
-          {gameState.multiPhaseOutMode
-            ? "Avslutt Multi-utfasing"
-            : "Batch-utfasing"}
-        </button>
-      </div>
-      <div className={`tab-content tab-${activeTab}`} style={{ padding: 24 }}>
-        {activeTabData?.content}
-      </div>
-      {/* MultiSelectControls overlays when active */}
-      <MultiSelectControls gameState={gameState} dispatch={dispatch} />
+          <AchievementNotification achievements={gameState.achievements} />
+
+          {gameState.tutorialStep < 7 && (
+            <TutorialOverlay
+              step={gameState.tutorialStep}
+              onNext={() => dispatch({ type: "ADVANCE_TUTORIAL" })}
+              onSkip={() => dispatch({ type: "SKIP_TUTORIAL" })}
+            />
+          )}
+
+          <GameFeedback gameState={gameState} />
+
+          <AchievementDebugPanel gameState={gameState} />
+
+          <MultiSelectControls gameState={gameState} dispatch={dispatch} />
+
+          <div className="header">
+            <div className="header-top">
+              <h1 className="title">🌍 PHASE OUT VILLAGE</h1>
+              <div className="year-badge">TIL 2040!</div>
+            </div>
+
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{
+                  width: `${((gameFields.length - gameFields.filter((f) => f.status === "active").length) / gameFields.length) * 100}%`,
+                }}
+              />
+            </div>
+
+            <div className="stats-grid">
+              <div className="stat-card stat-card-green">
+                <div className="stat-emoji">🌱</div>
+                <div className="stat-value" style={{ color: "#166534" }}>
+                  {score}
+                </div>
+                <div className="stat-label" style={{ color: "#16A34A" }}>
+                  Klimapoeng
+                </div>
+              </div>
+              <div className="stat-card stat-card-yellow">
+                <div className="stat-emoji">💰</div>
+                <div className="stat-value" style={{ color: "#92400E" }}>
+                  {budget} mrd
+                </div>
+                <div className="stat-label" style={{ color: "#D97706" }}>
+                  Budsjett
+                </div>
+              </div>
+              <div className="stat-card stat-card-blue">
+                <div className="stat-emoji">📅</div>
+                <div className="stat-value" style={{ color: "#1E40AF" }}>
+                  {year}
+                </div>
+                <div className="stat-label" style={{ color: "#2563EB" }}>
+                  År
+                </div>
+              </div>
+              <div className="stat-card stat-card-purple">
+                <div className="stat-emoji">🚀</div>
+                <div className="stat-value" style={{ color: "#7C3AED" }}>
+                  {gameState.norwayTechRank}%
+                </div>
+                <div className="stat-label" style={{ color: "#8B5CF6" }}>
+                  Tech-rank
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {renderCurrentView()}
+
+          <div className="dashboard-grid">
+            <div className="dashboard-card">
+              <h3 className="dashboard-title">📊 Utslipp</h3>
+              <div className="dashboard-value">
+                {totalEmissions.toFixed(1)} Mt
+              </div>
+              <div className="dashboard-label">CO₂ per år</div>
+            </div>
+            <div className="dashboard-card">
+              <h3 className="dashboard-title">⚡ Produksjon</h3>
+              <div className="dashboard-value-orange">
+                {totalProduction.toFixed(1)} mill. boe
+              </div>
+              <div className="dashboard-label">per år</div>
+            </div>
+          </div>
+
+          <div className="achievement-card">
+            <h3 className="achievement-title">
+              🏆 Dine Prestasjoner ({achievements.length})
+            </h3>
+            {achievements.length === 0 ? (
+              <div className="no-achievements">
+                <p>
+                  Ingen prestasjoner ennå. Fase ut ditt første oljefelt for å få
+                  "Første Skritt"!
+                </p>
+              </div>
+            ) : (
+              <div className="achievement-list enhanced">
+                {achievements.map((achievement, index) => {
+                  const BadgeComponent = BadgeComponents[achievement];
+                  const badge = Object.values(ACHIEVEMENT_BADGES).find(
+                    (b) => b.title === achievement,
+                  );
+
+                  return (
+                    <div
+                      key={index}
+                      className="achievement-item"
+                      title={badge?.desc}
+                    >
+                      <div className="achievement-badge-display">
+                        {BadgeComponent ? (
+                          <BadgeComponent />
+                        ) : (
+                          <div className="fallback-badge">
+                            <span className="fallback-emoji">{badge?.emoji}</span>
+                            <span className="fallback-title">
+                              {badge?.title || achievement}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <span className="achievement-label">
+                        {badge?.title || achievement}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <GameControlPanel gameState={gameState} dispatch={dispatch} />
+          <InvestmentPanel gameState={gameState} dispatch={dispatch} />
+        </div>
+
+        <ProgressiveDataPanel
+          gameState={gameState}
+          layer={gameState.dataLayerUnlocked}
+        />
+
+        {showFieldModal && (
+          <FieldModal
+            selectedField={selectedField}
+            budget={budget}
+            onPhaseOut={phaseOutField}
+            onClose={() =>
+              dispatch({ type: "TOGGLE_FIELD_MODAL", payload: false })
+            }
+          />
+        )}
+
+        {gameState.showAchievementModal && (
+          <AchievementModal
+            achievements={gameState.newAchievements || []}
+            onClose={() => dispatch({ type: "CLOSE_ACHIEVEMENT_MODAL" })}
+          />
+        )}
+
+        {gameState.showGameOverModal && (
+          <GameOverModal
+            gamePhase={gameState.gamePhase}
+            stats={{
+              phasedOut: Object.keys(gameState.shutdowns).length,
+              total: gameState.gameFields.length,
+              co2Saved: Math.round(
+                gameState.gameFields
+                  .filter((f) => f.status === "closed")
+                  .reduce((sum, f) => sum + f.totalLifetimeEmissions, 0) / 1000,
+              ),
+              finalYear: gameState.year,
+              achievements: gameState.achievements.length,
+            }}
+            onRestart={() => dispatch({ type: "RESTART_GAME" })}
+            onClose={() => dispatch({ type: "CLOSE_GAME_OVER_MODAL" })}
+          />
+        )}
+
+        <div
+          className="educational-stats"
+          style={{
+            position: "fixed",
+            top: "20px",
+            right: "20px",
+            background: "rgba(0, 0, 0, 0.8)",
+            padding: "15px",
+            borderRadius: "10px",
+            color: "white",
+            maxWidth: "300px",
+            fontSize: "14px",
+          }}
+        >
+          <h4 style={{ margin: "0 0 10px 0", color: "#22C55E" }}>📚 Læring</h4>
+          <div style={{ marginBottom: "8px" }}>
+            <strong>🌡️ Temperatur:</strong>{" "}
+            {gameState.globalTemperature.toFixed(2)}°C
+            <br />
+            <small
+              style={{
+                color: gameState.globalTemperature > 1.5 ? "#EF4444" : "#22C55E",
+              }}
+            >
+              {gameState.globalTemperature > 1.5
+                ? "⚠️ Over Paris-avtalen!"
+                : "✅ Under mål"}
+            </small>
+          </div>
+          <div style={{ marginBottom: "8px" }}>
+            <strong>💰 Budsjett:</strong> {gameState.budget.toLocaleString()} mrd
+            NOK
+            <br />
+            <small>Oljefondet: 15.000 mrd NOK</small>
+          </div>
+          <div style={{ marginBottom: "8px" }}>
+            <strong>🎯 Faset ut:</strong>{" "}
+            {Object.keys(gameState.shutdowns).length} /{" "}
+            {gameState.gameFields.length}
+            <br />
+            <small>
+              Mål: 80% ({Math.ceil(gameState.gameFields.length * 0.8)})
+            </small>
+          </div>
+          <div style={{ marginBottom: "8px" }}>
+            <strong>📈 Kapasitet:</strong> {calculatePhaseOutCapacity(gameState)}{" "}
+            felt/år
+            <br />
+            <small>Investeringer øker kapasitet!</small>
+          </div>
+          <div style={{ fontSize: "12px", opacity: 0.8 }}>
+            💡 <strong>Fakta:</strong> 90 til 95% av CO₂ kommer fra forbrenning,
+            ikke produksjon!
+          </div>
+        </div>
+
+        {gameState.year >= 2030 && (
+          <div
+            className="time-pressure-warning"
+            style={{
+              position: "fixed",
+              top: "20px",
+              left: "20px",
+              background:
+                gameState.year >= 2038
+                  ? "rgba(239, 68, 68, 0.9)"
+                  : "rgba(245, 158, 11, 0.9)",
+              padding: "15px",
+              borderRadius: "10px",
+              color: "white",
+              fontWeight: "bold",
+            }}
+          >
+            ⏰ {2040 - gameState.year} år igjen til 2040!
+            {gameState.year >= 2038 && (
+              <span style={{ color: "#FEF3C7" }}> KRITISK!</span>
+            )}
+            <br />
+            <small>
+              Kapasitet: {calculatePhaseOutCapacity(gameState)} felt/år
+            </small>
+          </div>
+        )}
+      </main>
     </div>
   );
 };

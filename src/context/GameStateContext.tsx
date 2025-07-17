@@ -5,8 +5,9 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { gameReducer, initialGameState } from "../state/GameReducer";
+import { gameReducer } from "../state/GameReducer";
 import { GameState, GameAction } from "../interfaces/GameState";
+import { createFreshGameState } from "../utils/gameLogic";
 
 interface GameStateContextType {
   gameState: GameState;
@@ -46,7 +47,7 @@ interface GameStateProviderProps {
 export const GameStateProvider: React.FC<GameStateProviderProps> = ({
   children,
 }) => {
-  const [gameState, dispatch] = useReducer(gameReducer, initialGameState);
+  const [gameState, dispatch] = useReducer(gameReducer, createFreshGameState());
 
   // Computed statistics
   const computedStats = React.useMemo(() => {

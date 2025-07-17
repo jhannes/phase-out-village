@@ -1,20 +1,7 @@
 import React from "react";
 import { useGameState } from "../../context/GameStateContext";
 import "./InvestmentsPage.css";
-
-type Investment =
-  | "green_tech"
-  | "ai_research"
-  | "renewable_energy"
-  | "carbon_capture"
-  | "hydrogen_tech"
-  | "quantum_computing"
-  | "battery_tech"
-  | "offshore_wind"
-  | "foreign_cloud"
-  | "fossil_subsidies"
-  | "crypto_mining"
-  | "fast_fashion";
+import { Investment } from "../../types/types";
 
 const InvestmentsPage: React.FC = () => {
   const { gameState, dispatch } = useGameState();

@@ -1,21 +1,59 @@
-export type Field = {
-  name: string;
-  lon: number;
-  lat: number;
-  emissions: number[];
-  intensity: number;
-  status: "active" | "closed" | "transitioning";
-  production: number;
-  workers: number;
-  phaseOutCost: number;
-  productionOil?: number;
-  productionGas?: number;
-  realEmission?: number;
-  realEmissionIntensity?: number;
-  yearlyRevenue: number;
-  totalLifetimeEmissions: number;
-  transitionPotential: "wind" | "solar" | "data_center" | "research_hub";
-};
+import {
+  DataLayer,
+  Field,
+  Investment,
+  ShutdownMap,
+  ViewMode,
+} from "../types/types";
+import { OilFieldDataset } from "../types/types";
+
+export type { Field } from "../types/types";
+
+export interface GameState {
+  gameFields: Field[];
+  budget: number;
+  score: number;
+  year: number;
+  selectedField: Field | null;
+  showFieldModal: boolean;
+  achievements: string[];
+  totalEmissions: number;
+  totalProduction: number;
+  shutdowns: ShutdownMap;
+  realData: OilFieldDataset;
+  currentView: ViewMode;
+  investments: Record<Investment, number>;
+  globalTemperature: number;
+  norwayTechRank: number;
+  foreignDependency: number;
+  climateDamage: number;
+  sustainabilityScore: number;
+  playerChoices: string[];
+  dataLayerUnlocked: DataLayer;
+  saturationLevel: number;
+  gamePhase:
+  | "learning"
+  | "action"
+  | "crisis"
+  | "victory"
+  | "defeat"
+  | "partial_success";
+  tutorialStep: number;
+  shownFacts: string[];
+  badChoiceCount: number;
+  goodChoiceStreak: number;
+  selectedFields: Field[]; // For multi-select
+  currentEvent?: any;
+  showEventModal: boolean;
+  showAchievementModal: boolean;
+  showGameOverModal: boolean;
+  newAchievements: string[];
+  nextPhaseOutDiscount?: number;
+  multiPhaseOutMode: boolean;
+  yearlyPhaseOutCapacity: number; // How many fields can be phased out per year
+  showBudgetWarning?: boolean;
+  budgetWarningMessage?: string;
+}
 
 export type GameAction =
   | { type: "PHASE_OUT_FIELD"; payload: string }
@@ -28,12 +66,12 @@ export type GameAction =
   | { type: "SET_VIEW_MODE"; payload: ViewMode }
   | { type: "MAKE_INVESTMENT"; payload: { type: Investment; amount: number } }
   | {
-      type: "TRANSITION_FIELD";
-      payload: {
-        fieldName: string;
-        newType: "wind" | "solar" | "data_center" | "research_hub";
-      };
-    }
+    type: "TRANSITION_FIELD";
+    payload: {
+      fieldName: string;
+      newType: "wind" | "solar" | "data_center" | "research_hub";
+    };
+  }
   | { type: "UPDATE_CLIMATE_METRICS" }
   | { type: "ADVANCE_TUTORIAL" }
   | { type: "SKIP_TUTORIAL" }
@@ -53,69 +91,3 @@ export type GameAction =
   | { type: "DESELECT_FIELD"; payload: string }
   | { type: "MULTI_PHASE_OUT"; payload: string[] }
   | { type: "UPDATE_BUDGET"; payload: number };
-
-export type Investment =
-  | "green_tech"
-  | "ai_research"
-  | "renewable_energy"
-  | "carbon_capture"
-  | "hydrogen_tech"
-  | "quantum_computing"
-  | "battery_tech"
-  | "offshore_wind"
-  | "foreign_cloud"
-  | "fossil_subsidies"
-  | "crypto_mining"
-  | "fast_fashion";
-
-export type ViewMode = "map" | "emissions" | "production" | "economics";
-
-export type DataLayer = "basic" | "intermediate" | "advanced" | "expert";
-
-export type ShutdownMap = Record<string, number>;
-
-export interface GameState {
-  gameFields: Field[];
-  budget: number;
-  score: number;
-  year: number;
-  selectedField: Field | null;
-  showFieldModal: boolean;
-  achievements: string[];
-  totalEmissions: number;
-  totalProduction: number;
-  shutdowns: ShutdownMap;
-  realData: any;
-  currentView: ViewMode;
-  investments: Record<Investment, number>;
-  globalTemperature: number;
-  norwayTechRank: number;
-  foreignDependency: number;
-  climateDamage: number;
-  sustainabilityScore: number;
-  playerChoices: string[];
-  dataLayerUnlocked: DataLayer;
-  saturationLevel: number;
-  gamePhase:
-    | "learning"
-    | "action"
-    | "crisis"
-    | "victory"
-    | "defeat"
-    | "partial_success";
-  tutorialStep: number;
-  shownFacts: string[];
-  badChoiceCount: number;
-  goodChoiceStreak: number;
-  selectedFields: Field[];
-  currentEvent?: any;
-  showEventModal: boolean;
-  showAchievementModal: boolean;
-  showGameOverModal: boolean;
-  newAchievements: string[];
-  nextPhaseOutDiscount?: number;
-  multiPhaseOutMode: boolean;
-  yearlyPhaseOutCapacity: number;
-  showBudgetWarning?: boolean;
-  budgetWarningMessage?: string;
-}

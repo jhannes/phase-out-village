@@ -1379,7 +1379,7 @@ const getRandomEvent = (state: GameState) => {
     {
       id: "oil_price_spike",
       condition: () => Math.random() < 0.3,
-      title: "🛢️ Oljepris-sjokkk!",
+      title: "🛢️ Oljepris-sjokk!",
       description:
         "Oljeprisen har steget dramatisk! Regjeringen presser på for å holde felt åpne.",
       effect: "Får 2000 mrd ekstra, men mister 20 klimapoeng",

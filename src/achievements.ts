@@ -1,79 +1,170 @@
 import { GameState } from "./interfaces/GameState";
+import { INITIAL_YEAR } from "./constants";
 
-export const achievementRules: {
-  name: string;
-  condition: (state: GameState) => boolean;
-}[] = [
-  {
-    name: "Første Skritt",
-    condition: (state) => Object.keys(state.shutdowns).length >= 1,
+// Enhanced badge system with educational messages
+export const ACHIEVEMENT_BADGES = {
+  FIRST_STEPS: {
+    emoji: "👶",
+    title: "Første Skritt",
+    desc: "Faset ut ditt første oljefelt",
   },
-  {
-    name: "Speedrunner",
-    condition: (state) =>
-      Object.keys(state.shutdowns).length >= 10 && state.year - 2025 <= 5,
+  CLIMATE_AWARE: {
+    emoji: "🌡️",
+    title: "Klimabevisst",
+    desc: "Holdt temperaturstigningen under 1.5°C",
   },
-  {
-    name: "Under Press",
-    condition: (state) => {
-      const phasedOutFields = Object.keys(state.shutdowns).length;
-      const totalFields = state.gameFields.length;
-      const progressPercent = (phasedOutFields / totalFields) * 100;
-      const timeLeft = 2040 - state.year;
-      return progressPercent >= 50 && timeLeft <= 5;
-    },
+  TECH_PIONEER: {
+    emoji: "🚀",
+    title: "Tech-Pioner",
+    desc: "Investerte 100+ mrd i norsk teknologi",
   },
-  {
-    name: "Klimabevisst",
-    condition: (state) =>
-      state.globalTemperature <= 1.2 &&
-      Object.keys(state.shutdowns).length >= 5,
+  GREEN_TRANSITION: {
+    emoji: "🌱",
+    title: "Grønn Omstilling",
+    desc: "Konverterte 5+ felt til fornybar energi",
   },
-  {
-    name: "Tech-Pioner",
-    condition: (state) => state.norwayTechRank >= 100,
+  INDEPENDENCE_HERO: {
+    emoji: "🇳🇴",
+    title: "Uavhengighets-Helt",
+    desc: "Nådde 80%+ teknologisk selvstendighet",
   },
-  {
-    name: "Grønn Omstilling",
-    condition: (state) => Object.keys(state.shutdowns).length >= 15,
+  PLANET_SAVER: {
+    emoji: "🌍",
+    title: "Planet-Redder",
+    desc: "Hindret 500+ Mt CO₂ fra å bli brent",
   },
-  {
-    name: "Perfekt Timing",
-    condition: (state) => {
-      const phasedOutFields = Object.keys(state.shutdowns).length;
-      const totalFields = state.gameFields.length;
-      return phasedOutFields === totalFields && state.year === 2040;
-    },
+  ECONOMIC_GENIUS: {
+    emoji: "💰",
+    title: "Økonomi-Geni",
+    desc: "Opprettholdt 1000+ mrd i budsjett",
   },
-  {
-    name: "Planet-Redder",
-    condition: (state) => {
-      const totalEmissionsSaved =
-        state.gameFields
-          .filter((f) => f.status === "closed")
-          .reduce((sum, f) => sum + f.totalLifetimeEmissions, 0) / 1000;
-      return totalEmissionsSaved >= 100;
-    },
+  FUTURE_BUILDER: {
+    emoji: "🏗️",
+    title: "Fremtidsbygger",
+    desc: "Vant spillet med perfekt balanse",
   },
-  {
-    name: "For Sent",
-    condition: (state) => {
-      const phasedOutFields = Object.keys(state.shutdowns).length;
-      const totalFields = state.gameFields.length;
-      return state.year >= 2040 && phasedOutFields < totalFields * 0.8;
-    },
+  CLIMATE_FAILURE: {
+    emoji: "🔥",
+    title: "Klimakatastrofe",
+    desc: "Lot temperaturen stige over 2°C",
   },
-  {
-    name: "Klimakatastrofe",
-    condition: (state) => state.globalTemperature > 1.8,
+  TECH_DEPENDENT: {
+    emoji: "🔗",
+    title: "Tech-Avhengig",
+    desc: "Ble for avhengig av utenlandsk teknologi",
   },
-];
+  SHORT_SIGHTED: {
+    emoji: "💸",
+    title: "Kortsiktig",
+    desc: "Prioriterte profitt over planet",
+  },
+};
 
+// Enhanced achievement checking system
 export const checkAndAwardAchievements = (state: GameState): string[] => {
-  return achievementRules
-    .filter(
-      (rule) =>
-        !state.achievements.includes(rule.name) && rule.condition(state),
-    )
-    .map((rule) => rule.name);
+  const newAchievements: string[] = [];
+  const phasedOutFields = Object.keys(state.shutdowns).length;
+  const totalTechInvestment = Object.values(state.investments).reduce(
+    (sum, inv) => sum + inv,
+    0,
+  );
+  const totalEmissionsSaved =
+    state.gameFields
+      .filter((f) => f.status === "closed")
+      .reduce((sum, f) => sum + f.totalLifetimeEmissions, 0) / 1000;
+  const timeLeft = 2040 - state.year;
+  const totalFields = state.gameFields.length;
+  const progressPercent = (phasedOutFields / totalFields) * 100;
+
+  console.log("Checking achievements:", {
+    phasedOutFields,
+    totalTechInvestment,
+    totalEmissionsSaved,
+    currentTemp: state.globalTemperature,
+    timeLeft,
+    progressPercent,
+  });
+
+  // FØRSTE SKRITT - Umiddelbart når du faser ut første felt
+  if (phasedOutFields >= 1 && !state.achievements.includes("Første Skritt")) {
+    newAchievements.push("Første Skritt");
+  }
+
+  // SPEEDRUNNER - Faset ut 10+ felt på under 5 år
+  if (
+    phasedOutFields >= 10 &&
+    state.year - INITIAL_YEAR <= 5 &&
+    !state.achievements.includes("Speedrunner")
+  ) {
+    newAchievements.push("Speedrunner");
+  }
+
+  // UNDER PRESS - Faset ut 50%+ av felt med mindre enn 5 år igjen
+  if (
+    progressPercent >= 50 &&
+    timeLeft <= 5 &&
+    !state.achievements.includes("Under Press")
+  ) {
+    newAchievements.push("Under Press");
+  }
+
+  // KLIMABEVISST - Holdt temperatur under 1.5°C og faset ut 5+ felt
+  if (
+    state.globalTemperature <= 1.2 &&
+    phasedOutFields >= 5 &&
+    !state.achievements.includes("Klimabevisst")
+  ) {
+    newAchievements.push("Klimabevisst");
+  }
+
+  // TECH-PIONER - 200+ milliarder i tech-investeringer (økt krav)
+  if (
+    totalTechInvestment >= 200 &&
+    !state.achievements.includes("Tech-Pioner")
+  ) {
+    newAchievements.push("Tech-Pioner");
+  }
+
+  // GRØNN OMSTILLING - 15+ felt faset ut (økt krav)
+  if (
+    phasedOutFields >= 15 &&
+    !state.achievements.includes("Grønn Omstilling")
+  ) {
+    newAchievements.push("Grønn Omstilling");
+  }
+
+  // PERFEKT TIMING - Faset ut alle felt akkurat på 2040
+  if (
+    phasedOutFields === totalFields &&
+    state.year === 2040 &&
+    !state.achievements.includes("Perfekt Timing")
+  ) {
+    newAchievements.push("Perfekt Timing");
+  }
+
+  // PLANET-REDDER - 100+ Mt CO₂ hindret (økt krav)
+  if (
+    totalEmissionsSaved >= 100 &&
+    !state.achievements.includes("Planet-Redder")
+  ) {
+    newAchievements.push("Planet-Redder");
+  }
+
+  // NEGATIVE ACHIEVEMENTS - nå strengere
+  if (
+    state.year >= 2040 &&
+    phasedOutFields < totalFields * 0.8 &&
+    !state.achievements.includes("For Sent")
+  ) {
+    newAchievements.push("For Sent");
+  }
+
+  if (
+    state.globalTemperature > 1.8 &&
+    !state.achievements.includes("Klimakatastrofe")
+  ) {
+    newAchievements.push("Klimakatastrofe");
+  }
+
+  return newAchievements;
 };
