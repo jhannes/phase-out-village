@@ -32,12 +32,12 @@ export interface GameState {
   dataLayerUnlocked: DataLayer;
   saturationLevel: number;
   gamePhase:
-  | "learning"
-  | "action"
-  | "crisis"
-  | "victory"
-  | "defeat"
-  | "partial_success";
+    | "learning"
+    | "action"
+    | "crisis"
+    | "victory"
+    | "defeat"
+    | "partial_success";
   tutorialStep: number;
   shownFacts: string[];
   badChoiceCount: number;
@@ -66,12 +66,12 @@ export type GameAction =
   | { type: "SET_VIEW_MODE"; payload: ViewMode }
   | { type: "MAKE_INVESTMENT"; payload: { type: Investment; amount: number } }
   | {
-    type: "TRANSITION_FIELD";
-    payload: {
-      fieldName: string;
-      newType: "wind" | "solar" | "data_center" | "research_hub";
-    };
-  }
+      type: "TRANSITION_FIELD";
+      payload: {
+        fieldName: string;
+        newType: "wind" | "solar" | "data_center" | "research_hub";
+      };
+    }
   | { type: "UPDATE_CLIMATE_METRICS" }
   | { type: "ADVANCE_TUTORIAL" }
   | { type: "SKIP_TUTORIAL" }

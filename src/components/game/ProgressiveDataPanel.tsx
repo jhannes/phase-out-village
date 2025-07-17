@@ -41,4 +41,4 @@ const ProgressiveDataPanel: React.FC<{
     </div>
   );
 };
-export default ProgressiveDataPanel; 
+export default ProgressiveDataPanel;

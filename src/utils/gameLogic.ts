@@ -121,7 +121,7 @@ export const loadGameState = (): GameState => {
       space_tech: 0,
       fossil_subsidies: 0,
       crypto_mining: 0,
-      fast_fashion: 0
+      fast_fashion: 0,
     },
     globalTemperature: 1.1,
     norwayTechRank: 0,
@@ -298,19 +298,19 @@ export const loadGameState = (): GameState => {
           // Restore selected fields with proper status
           selectedFields: Array.isArray(parsed.selectedFields)
             ? parsed.selectedFields
-              .map((savedField: any) => {
-                const baseField = gameFields.find(
-                  (f) => f.name === savedField.name,
-                );
-                if (baseField) {
-                  const savedStatus =
-                    savedFieldStatuses.get(savedField.name) ||
-                    savedField.status;
-                  return { ...baseField, status: savedStatus };
-                }
-                return null;
-              })
-              .filter(Boolean)
+                .map((savedField: any) => {
+                  const baseField = gameFields.find(
+                    (f) => f.name === savedField.name,
+                  );
+                  if (baseField) {
+                    const savedStatus =
+                      savedFieldStatuses.get(savedField.name) ||
+                      savedField.status;
+                    return { ...baseField, status: savedStatus };
+                  }
+                  return null;
+                })
+                .filter(Boolean)
             : defaultState.selectedFields,
         };
 
@@ -375,7 +375,7 @@ export const createFreshGameState = (): GameState => {
       space_tech: 0,
       fossil_subsidies: 0,
       crypto_mining: 0,
-      fast_fashion: 0
+      fast_fashion: 0,
     },
     globalTemperature: 1.1,
     norwayTechRank: 0,

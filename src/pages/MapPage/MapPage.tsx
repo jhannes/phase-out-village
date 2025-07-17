@@ -45,7 +45,11 @@ import { BadgeComponents } from "../../components/modals/AchievementModal";
 import TopTabBar from "../../components/Navigation/TopTabBar";
 
 const MapPage: React.FC = () => {
-  const [gameState, dispatch] = useReducer(gameReducer, undefined, loadGameState);
+  const [gameState, dispatch] = useReducer(
+    gameReducer,
+    undefined,
+    loadGameState,
+  );
 
   const {
     gameFields,
@@ -285,7 +289,8 @@ const MapPage: React.FC = () => {
           label: tab.title,
           badge: tab.badge,
           active: currentView === tab.id,
-          onClick: () => dispatch({ type: "SET_VIEW_MODE", payload: tab.id as any }),
+          onClick: () =>
+            dispatch({ type: "SET_VIEW_MODE", payload: tab.id as any }),
           ariaLabel: tab.title,
         }))}
       />
@@ -416,7 +421,9 @@ const MapPage: React.FC = () => {
                           <BadgeComponent />
                         ) : (
                           <div className="fallback-badge">
-                            <span className="fallback-emoji">{badge?.emoji}</span>
+                            <span className="fallback-emoji">
+                              {badge?.emoji}
+                            </span>
                             <span className="fallback-title">
                               {badge?.title || achievement}
                             </span>
@@ -500,7 +507,8 @@ const MapPage: React.FC = () => {
             <br />
             <small
               style={{
-                color: gameState.globalTemperature > 1.5 ? "#EF4444" : "#22C55E",
+                color:
+                  gameState.globalTemperature > 1.5 ? "#EF4444" : "#22C55E",
               }}
             >
               {gameState.globalTemperature > 1.5
@@ -509,8 +517,8 @@ const MapPage: React.FC = () => {
             </small>
           </div>
           <div style={{ marginBottom: "8px" }}>
-            <strong>💰 Budsjett:</strong> {gameState.budget.toLocaleString()} mrd
-            NOK
+            <strong>💰 Budsjett:</strong> {gameState.budget.toLocaleString()}{" "}
+            mrd NOK
             <br />
             <small>Oljefondet: 15.000 mrd NOK</small>
           </div>
@@ -524,8 +532,8 @@ const MapPage: React.FC = () => {
             </small>
           </div>
           <div style={{ marginBottom: "8px" }}>
-            <strong>📈 Kapasitet:</strong> {calculatePhaseOutCapacity(gameState)}{" "}
-            felt/år
+            <strong>📈 Kapasitet:</strong>{" "}
+            {calculatePhaseOutCapacity(gameState)} felt/år
             <br />
             <small>Investeringer øker kapasitet!</small>
           </div>
