@@ -1,5 +1,21 @@
 /* Compact Map Page - Mobile First Design */
 
+.desktop-nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  z-index: 9999;
+  background: var(--color-bg, #fff);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px var(--color-shadow);
+}
+
+.desktop-nav-content {
+  /* padding-top: 70px; */
+  position: fixed;
+  padding-top: 80px;
+}
+
 .map-content {
   height: 100%;
   display: flex;

@@ -20,6 +20,7 @@ import { GameState, Field } from "../../interfaces/GameState";
 import TopTabBar from "../../components/Navigation/TopTabBar";
 import { data } from "../../generated/data";
 import MobileTabsLayout from "../../components/Layout/CompactMobileLayout";
+import MultiSelectControls from "../../components/MultiSelectControls";
 
 // Constants
 const LOCAL_STORAGE_KEY = "phaseOutVillageGameState";
@@ -564,9 +565,19 @@ const MapPage: React.FC = () => {
     shutdowns = {},
   } = gameState || {};
 
+  // Updated handleFieldClick for multi-select support
   const handleFieldClick = (field: Field) => {
-    dispatch({ type: "SET_SELECTED_FIELD", payload: field });
-    dispatch({ type: "TOGGLE_FIELD_MODAL", payload: true });
+    if (gameState.multiPhaseOutMode) {
+      // If already selected, deselect
+      if (gameState.selectedFields.some((f) => f.name === field.name)) {
+        dispatch({ type: "DESELECT_FIELD_FROM_MULTI", payload: field.name });
+      } else {
+        dispatch({ type: "SELECT_FIELD_FOR_MULTI", payload: field });
+      }
+    } else {
+      dispatch({ type: "SET_SELECTED_FIELD", payload: field });
+      dispatch({ type: "TOGGLE_FIELD_MODAL", payload: true });
+    }
   };
 
   const phaseOutField = useCallback((fieldName: string) => {
@@ -676,21 +687,51 @@ const MapPage: React.FC = () => {
   // --- Desktop Layout ---
   return (
     <div className="desktop-map-content" style={{ padding: "0 0 68px 0" }}>
-      <TopTabBar
-        items={tabs.map((tab) => ({
-          id: tab.id,
-          icon: tab.icon,
-          label: tab.title,
-          badge: tab.badge,
-          active: activeTab === tab.id,
-          onClick: () => setActiveTab(tab.id),
-          ariaLabel: tab.title,
-        }))}
-        fixed={false}
-      />
+      {/* Multi-Select Toggle Button in header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          marginBottom: 8,
+        }}
+      >
+        <TopTabBar
+          items={tabs.map((tab) => ({
+            id: tab.id,
+            icon: tab.icon,
+            label: tab.title,
+            badge: tab.badge,
+            active: activeTab === tab.id,
+            onClick: () => setActiveTab(tab.id),
+            ariaLabel: tab.title,
+          }))}
+          fixed={false}
+        />
+        {/* Multi-select toggle button */}
+        <button
+          onClick={() => dispatch({ type: "TOGGLE_MULTI_SELECT" })}
+          style={{
+            background: gameState.multiPhaseOutMode ? "#22C55E" : "#64748B",
+            color: "white",
+            border: "none",
+            borderRadius: 6,
+            padding: "8px 16px",
+            fontWeight: 600,
+            cursor: "pointer",
+            marginLeft: 16,
+          }}
+        >
+          {gameState.multiPhaseOutMode
+            ? "Avslutt Multi-utfasing"
+            : "Batch-utfasing"}
+        </button>
+      </div>
       <div className={`tab-content tab-${activeTab}`} style={{ padding: 24 }}>
         {activeTabData?.content}
       </div>
+      {/* MultiSelectControls overlays when active */}
+      <MultiSelectControls gameState={gameState} dispatch={dispatch} />
     </div>
   );
 };
