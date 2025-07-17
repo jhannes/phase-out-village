@@ -1,6 +1,6 @@
 /* Bottom Navigation Styles - Mobile First */
 :root {
-  --bottom-nav-height: 70px;
+  --bottom-nav-height: 35px;
   --status-bar-height: 48px;
   --color-text-on-accent: var(--color-text);
 }
@@ -10,7 +10,7 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background: var(--color-bg-section, #fff);
+  background: var(--color-bg-navbars), #fff;
   border-top: 1px solid var(--color-border, #e5e7eb);
   box-shadow: 0 -4px 20px var(--color-shadow, rgba(0, 0, 0, 0.05));
   padding: 8px 0 max(8px, env(safe-area-inset-bottom));
@@ -190,7 +190,7 @@
 
 @media (prefers-color-scheme: dark) {
   .bottom-nav-bar {
-    background: var(--color-bg-section-dark, #0f172a);
+    background: var(--color-bg-navbars);
     border-top-color: var(--color-border-dark, #334155);
   }
   .bottom-nav-bar-item {
