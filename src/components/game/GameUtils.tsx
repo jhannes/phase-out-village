@@ -1,5 +1,6 @@
 import React from "react";
 import { GameState } from "../../interfaces/GameState";
+import { Investment } from "../../types/types";
 
 // This function should be moved outside the component to be accessible by the reducer.
 export const calculatePhaseOutCapacity = (state: GameState): number => {
@@ -12,17 +13,7 @@ export const calculatePhaseOutCapacity = (state: GameState): number => {
 
   // Investment bonus: Capacity increases with total investments in green tech.
   // For every 100 billion NOK invested, capacity increases by 1.
-  const totalGoodInvestments =
-    state.investments.green_tech +
-    state.investments.renewable_energy +
-    state.investments.ai_research +
-    state.investments.carbon_capture +
-    state.investments.hydrogen_tech +
-    state.investments.quantum_computing +
-    state.investments.battery_tech +
-    state.investments.offshore_wind +
-    state.investments.geothermal_energy +
-    state.investments.space_tech;
+  const totalGoodInvestments = calculateTotalGoodInvestments(state.investments);
   const investmentBonus = Math.floor(totalGoodInvestments / 100);
 
   // The total capacity is the sum of base capacity and bonuses, with a maximum cap.
@@ -30,6 +21,46 @@ export const calculatePhaseOutCapacity = (state: GameState): number => {
 
   // Cap the maximum number of fields that can be phased out in a single year.
   return Math.min(8, totalCapacity);
+};
+
+// Consolidated function to calculate total good investments
+export const calculateTotalGoodInvestments = (
+  investments: Record<Investment, number>,
+): number => {
+  return (
+    investments.green_tech +
+    investments.ai_research +
+    investments.renewable_energy +
+    investments.carbon_capture +
+    investments.hydrogen_tech +
+    investments.quantum_computing +
+    investments.battery_tech +
+    investments.offshore_wind +
+    investments.geothermal_energy +
+    investments.space_tech
+  );
+};
+
+// Consolidated function to calculate total bad investments
+export const calculateTotalBadInvestments = (
+  investments: Record<Investment, number>,
+): number => {
+  return (
+    investments.foreign_cloud +
+    investments.fossil_subsidies +
+    investments.crypto_mining +
+    investments.fast_fashion
+  );
+};
+
+// Function to calculate emissions saved (lifetime emissions)
+export const calculateEmissionsSaved = (fields: any[]): number => {
+  return fields.reduce((sum, field) => sum + field.totalLifetimeEmissions, 0);
+};
+
+// Function to calculate emissions reduction (current yearly emissions)
+export const calculateEmissionsReduction = (fields: any[]): number => {
+  return fields.reduce((sum, field) => sum + (field.emissions[0] || 0), 0);
 };
 
 // The following components are not defined in the provided code.

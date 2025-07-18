@@ -84,8 +84,9 @@
 
 .map-div {
   height: 500px;
-  width: 100%;
+  width: 60%;
   border-radius: 8px;
+  box-shadow: 0 0 10px rgba(40, 0, 0, 0.8);
 }
 
 /* Modals */

@@ -5,7 +5,13 @@ import {
   getRandomEvent,
 } from "../utils/gameLogic";
 import { checkAndAwardAchievements } from "../achievements";
-import { calculatePhaseOutCapacity } from "../components/game/GameUtils";
+import {
+  calculatePhaseOutCapacity,
+  calculateTotalGoodInvestments,
+  calculateTotalBadInvestments,
+  calculateEmissionsSaved,
+  calculateEmissionsReduction,
+} from "../components/game/GameUtils";
 import { LOCAL_STORAGE_KEY } from "../constants";
 
 export const gameReducer = (
@@ -235,14 +241,8 @@ export const gameReducer = (
         };
       }
 
-      const totalEmissionsSaved = actualFields.reduce(
-        (sum, field) => sum + field.totalLifetimeEmissions,
-        0,
-      );
-      const totalEmissionsReduction = actualFields.reduce(
-        (sum, field) => sum + field.totalLifetimeEmissions,
-        0,
-      );
+      const totalEmissionsSaved = calculateEmissionsSaved(actualFields);
+      const totalEmissionsReduction = calculateEmissionsReduction(actualFields);
 
       newState = {
         ...state,
@@ -352,24 +352,7 @@ export const gameReducer = (
       );
 
       // Update yearly phase-out capacity
-      const baseCapacity = 3;
-      const techBonus = Math.floor(newState.norwayTechRank / 20);
-      const totalGoodInvestments =
-        newState.investments.green_tech +
-        newState.investments.ai_research +
-        newState.investments.renewable_energy +
-        newState.investments.carbon_capture +
-        newState.investments.hydrogen_tech +
-        newState.investments.quantum_computing +
-        newState.investments.battery_tech +
-        newState.investments.offshore_wind +
-        newState.investments.geothermal_energy +
-        newState.investments.space_tech;
-      const investmentBonus = Math.floor(totalGoodInvestments / 100);
-      newState.yearlyPhaseOutCapacity = Math.min(
-        8,
-        baseCapacity + techBonus + investmentBonus,
-      );
+      newState.yearlyPhaseOutCapacity = calculatePhaseOutCapacity(newState);
 
       return newState;
     }
@@ -573,14 +556,8 @@ export const gameReducer = (
         };
       }
 
-      const totalEmissionsSaved = actualFields.reduce(
-        (sum, field) => sum + field.totalLifetimeEmissions,
-        0,
-      );
-      const totalEmissionsReduction = actualFields.reduce(
-        (sum, field) => sum + field.totalLifetimeEmissions,
-        0,
-      );
+      const totalEmissionsSaved = calculateEmissionsSaved(actualFields);
+      const totalEmissionsReduction = calculateEmissionsReduction(actualFields);
 
       newState = {
         ...state,
@@ -697,19 +674,7 @@ export const gameReducer = (
       );
 
       // Update yearly phase-out capacity
-      const baseCapacityForMulti = 3;
-      const techBonusForMulti = Math.floor(newState.norwayTechRank / 20);
-      const totalGoodInvestmentsForMulti =
-        newState.investments.green_tech +
-        newState.investments.ai_research +
-        newState.investments.renewable_energy;
-      const investmentBonusForMulti = Math.floor(
-        totalGoodInvestmentsForMulti / 100,
-      );
-      newState.yearlyPhaseOutCapacity = Math.min(
-        8,
-        baseCapacityForMulti + techBonusForMulti + investmentBonusForMulti,
-      );
+      newState.yearlyPhaseOutCapacity = calculatePhaseOutCapacity(newState);
 
       return newState;
 
@@ -775,22 +740,12 @@ export const gameReducer = (
       };
 
       // Update tech rank based on investments
-      const totalGoodInvestments =
-        newState.investments.green_tech +
-        newState.investments.ai_research +
-        newState.investments.renewable_energy +
-        newState.investments.carbon_capture +
-        newState.investments.hydrogen_tech +
-        newState.investments.quantum_computing +
-        newState.investments.battery_tech +
-        newState.investments.offshore_wind +
-        newState.investments.geothermal_energy +
-        newState.investments.space_tech;
-      const totalBadInvestments =
-        newState.investments.foreign_cloud +
-        newState.investments.fossil_subsidies +
-        newState.investments.crypto_mining +
-        newState.investments.fast_fashion;
+      const totalGoodInvestments = calculateTotalGoodInvestments(
+        newState.investments,
+      );
+      const totalBadInvestments = calculateTotalBadInvestments(
+        newState.investments,
+      );
 
       // More realistic tech rank calculation: 50 billion NOK = 10% tech rank
       // This means 500 billion NOK = 100% tech rank
@@ -800,13 +755,7 @@ export const gameReducer = (
       );
 
       // Calculate yearly phase-out capacity based on tech rank and investments
-      const baseCapacity = 3;
-      const techBonus = Math.floor(newState.norwayTechRank / 20);
-      const investmentBonus = Math.floor(totalGoodInvestments / 100);
-      newState.yearlyPhaseOutCapacity = Math.min(
-        8,
-        baseCapacity + techBonus + investmentBonus,
-      );
+      newState.yearlyPhaseOutCapacity = calculatePhaseOutCapacity(newState);
 
       // Calculate foreign dependency based on bad investments
       newState.foreignDependency = Math.min(
