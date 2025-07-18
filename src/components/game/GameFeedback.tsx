@@ -1,5 +1,6 @@
 import React from "react";
 import { GameState } from "../../interfaces/GameState";
+import { sanitizeString } from "../../utils/security";
 
 // Environmental consequences system
 export const calculateEnvironmentalState = (gameState: GameState) => {
@@ -13,31 +14,31 @@ export const calculateEnvironmentalState = (gameState: GameState) => {
     return {
       phase: "crisis",
       saturation: 20,
-      message: "🔥 KLIMAKATASTROFE! Verden brenner!",
+      message: sanitizeString("🔥 KLIMAKATASTROFE! Verden brenner!"),
     };
   if (temp > 2.0)
     return {
       phase: "danger",
       saturation: 40,
-      message: "⚠️ KRITISK! Temperaturen stiger farlig!",
+      message: sanitizeString("⚠️ KRITISK! Temperaturen stiger farlig!"),
     };
   if (temp > 1.5)
     return {
       phase: "warning",
       saturation: 70,
-      message: "⚡ ADVARSEL! Klimamålene er i fare!",
+      message: sanitizeString("⚡ ADVARSEL! Klimamålene er i fare!"),
     };
   if (activeFields / totalFields < 0.3)
     return {
       phase: "victory",
       saturation: 100,
-      message: "🌟 FANTASTISK! Du redder verden!",
+      message: sanitizeString("🌟 FANTASTISK! Du redder verden!"),
     };
 
   return {
     phase: "normal",
     saturation: 85,
-    message: "🎯 Fortsett arbeidet for klimaet!",
+    message: sanitizeString("🎯 Fortsett arbeidet for klimaet!"),
   };
 };
 

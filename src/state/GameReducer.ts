@@ -112,7 +112,7 @@ export const gameReducer = (
             : f,
         ),
         playerChoices: [
-          ...state.playerChoices,
+          ...state.playerChoices.slice(-49), // Keep only last 50 choices
           `Faset ut ${fieldName} - Hindret ${(field.totalLifetimeEmissions / 1000).toFixed(0)} Mt CO2`,
         ],
         year: state.year + 1, // Each phase-out takes 1 year

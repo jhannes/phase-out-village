@@ -70,6 +70,7 @@ const MobileTabsLayout: React.FC<MobileTabsLayoutProps> = ({
         contentElement.removeEventListener("scroll", handleScroll);
         if (scrollTimeoutRef.current) {
           window.clearTimeout(scrollTimeoutRef.current);
+          scrollTimeoutRef.current = undefined;
         }
       };
     }
