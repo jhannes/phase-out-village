@@ -10,6 +10,8 @@ import { data } from "../generated/data";
 import { GameState } from "../interfaces/GameState";
 import { Field, OilFieldDataset } from "../types/types";
 import { logger } from "./logger";
+import { SafeStorage } from "./storage";
+import { safeJsonParse } from "./security";
 
 export const createFieldFromRealData = (
   fieldName: string,
@@ -226,13 +228,17 @@ export const loadGameState = (): GameState => {
   };
 
   try {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const saved = SafeStorage.getItem(LOCAL_STORAGE_KEY);
     console.log(
       "Loading game state from localStorage:",
       saved ? "found" : "not found",
     );
     if (saved) {
-      const parsed = JSON.parse(saved);
+      const parsed = safeJsonParse(saved) as any;
+      if (!parsed) {
+        logger.warn("Failed to parse saved state, using default");
+        return defaultState;
+      }
       console.log("Parsed saved state:", {
         hasGameFields: !!parsed.gameFields,
         gameFieldsCount: parsed.gameFields?.length,
@@ -437,7 +443,7 @@ export const loadGameState = (): GameState => {
   } catch (e) {
     console.error("Failed to load game state:", e);
     // If there's any error loading the saved state, clear it and start fresh
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    SafeStorage.removeItem(LOCAL_STORAGE_KEY);
   }
 
   console.log("Using default state - new game, no tutorial");

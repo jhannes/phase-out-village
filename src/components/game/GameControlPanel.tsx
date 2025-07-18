@@ -2,6 +2,8 @@ import React from "react";
 import { GameState } from "../../interfaces/GameState";
 import { LOCAL_STORAGE_KEY } from "../../constants";
 import { SafeStorage } from "../../utils/storage";
+import { logger } from "../../utils/logger";
+import { safeJsonParse } from "../../utils/security";
 
 // Game Control Panel Component
 const GameControlPanel: React.FC<{
@@ -32,12 +34,12 @@ const GameControlPanel: React.FC<{
   };
 
   const handleTestStorage = () => {
-    console.log("=== localStorage Test ===");
+    logger.debug("=== localStorage Test ===");
 
     // Test 1: Basic localStorage functionality
     const basicSuccess = SafeStorage.setItem("test-basic", "hello");
     const basicTest = SafeStorage.getItem("test-basic");
-    console.log("Basic test:", basicTest === "hello" ? "PASS" : "FAIL");
+    logger.debug("Basic test:", basicTest === "hello" ? "PASS" : "FAIL");
 
     // Test 2: JSON functionality
     const testData = { test: "data", timestamp: Date.now() };
@@ -46,27 +48,29 @@ const GameControlPanel: React.FC<{
       JSON.stringify(testData),
     );
     const retrieved = SafeStorage.getItem("test-json");
-    const parsed = JSON.parse(retrieved || "{}");
-    console.log(
+    const parsed = safeJsonParse(retrieved || "{}");
+    logger.debug(
       "JSON test:",
       JSON.stringify(parsed) === JSON.stringify(testData) ? "PASS" : "FAIL",
     );
 
     // Test 3: Check current game state
     const currentGameState = SafeStorage.getItem(LOCAL_STORAGE_KEY);
-    console.log(
+    logger.debug(
       "Current game state:",
       currentGameState ? "EXISTS" : "NOT FOUND",
     );
     if (currentGameState) {
-      const parsed = JSON.parse(currentGameState);
-      console.log("Game state details:", {
-        hasGameFields: !!parsed.gameFields,
-        gameFieldsCount: parsed.gameFields?.length,
-        closedFields: parsed.gameFields?.filter(
-          (f: any) => f.status === "closed",
-        )?.length,
-      });
+      const parsed = safeJsonParse(currentGameState) as any;
+      if (parsed) {
+        logger.debug("Game state details:", {
+          hasGameFields: !!parsed.gameFields,
+          gameFieldsCount: parsed.gameFields?.length,
+          closedFields: parsed.gameFields?.filter(
+            (f: any) => f.status === "closed",
+          )?.length,
+        });
+      }
     }
 
     // Test 4: Try to save a simple game state
@@ -79,33 +83,40 @@ const GameControlPanel: React.FC<{
       LOCAL_STORAGE_KEY,
       JSON.stringify(simpleState),
     );
-    console.log("Save test:", saveSuccess ? "PASS" : "FAIL");
+    logger.debug("Save test:", saveSuccess ? "PASS" : "FAIL");
 
     alert("Check console for detailed localStorage test results");
   };
 
   const handleManualSave = () => {
-    console.log("=== Manual Save Test ===");
+    logger.debug("=== Manual Save Test ===");
     try {
       const simpleState = {
         gameFields: [{ name: "Test Field", status: "closed" }],
         budget: 1000,
         year: 2025,
       };
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(simpleState));
-      console.log("Manual save: SUCCESS");
-      alert("Manual save completed - refresh to test loading");
+      const success = SafeStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify(simpleState),
+      );
+      logger.debug("Manual save:", success ? "SUCCESS" : "FAIL");
+      alert(
+        success
+          ? "Manual save completed - refresh to test loading"
+          : "Manual save failed",
+      );
     } catch (e) {
-      console.log("Manual save: FAIL -", e);
+      logger.debug("Manual save: FAIL -", e);
       alert("Manual save failed: " + e);
     }
   };
 
   const handleTestPhaseOut = () => {
-    console.log("=== Testing Phase Out ===");
+    logger.debug("=== Testing Phase Out ===");
     // Dispatch a test phase out action
     dispatch({ type: "PHASE_OUT_FIELD", payload: "Ekofisk" });
-    console.log("Dispatched PHASE_OUT_FIELD action");
+    logger.debug("Dispatched PHASE_OUT_FIELD action");
   };
 
   return (
@@ -156,7 +167,7 @@ const GameControlPanel: React.FC<{
         </button>
         <button
           onClick={() => {
-            console.log(
+            logger.debug(
               "Toggling multi-select mode. Current:",
               gameState.multiPhaseOutMode,
             );
@@ -171,7 +182,7 @@ const GameControlPanel: React.FC<{
         </button>
         <button
           onClick={() => {
-            console.log("Advancing year. Current year:", gameState.year);
+            logger.debug("Advancing year. Current year:", gameState.year);
             dispatch({ type: "ADVANCE_YEAR_MANUALLY" });
           }}
           className="control-button advance-year-button"

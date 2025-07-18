@@ -177,7 +177,7 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
         JSON.stringify(gameState),
       );
       if (!success) {
-        console.warn("Failed to save game state to localStorage");
+        logger.warn("Failed to save game state to localStorage");
       }
     };
 
