@@ -24,6 +24,7 @@ import { getColorForIntensity } from "../../utils/gameLogic";
 import { GameState, Field } from "../../interfaces/GameState";
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM } from "../../constants";
 import { useGameState } from "../../context/GameStateContext";
+import { logger } from "../../utils/logger";
 
 import { EmissionsView } from "../../components/charts/EmissionsView";
 import FieldModal from "../../components/modals/FieldModal";
@@ -69,7 +70,7 @@ const MapPage: React.FC = () => {
 
   // Debug tutorial state
   useEffect(() => {
-    console.log(
+    logger.debug(
       "🎯 Tutorial modal should show:",
       gameState.showTutorialModal,
       "tutorialStep:",
@@ -79,7 +80,7 @@ const MapPage: React.FC = () => {
 
   // Debug multi-select state
   useEffect(() => {
-    console.log(
+    logger.debug(
       "📋 Multi-select mode:",
       gameState.multiPhaseOutMode,
       "selectedFields:",
@@ -89,7 +90,7 @@ const MapPage: React.FC = () => {
 
   const handleFieldClick = useCallback(
     (field: Field) => {
-      console.log(
+      logger.debug(
         "🎯 Field clicked:",
         field.name,
         "multiPhaseOutMode:",
@@ -100,7 +101,7 @@ const MapPage: React.FC = () => {
 
       if (gameState.multiPhaseOutMode) {
         if (field.status !== "active") {
-          console.log("❌ Field not active, cannot select");
+          logger.debug("❌ Field not active, cannot select");
           return;
         }
 
@@ -108,7 +109,7 @@ const MapPage: React.FC = () => {
           (f) => f.name === field.name,
         );
 
-        console.log(
+        logger.debug(
           "🎯 Field selection status:",
           isSelected,
           "current selectedFields:",
@@ -116,25 +117,25 @@ const MapPage: React.FC = () => {
         );
 
         if (isSelected) {
-          console.log("🗑️ Deselecting field:", field.name);
+          logger.debug("🗑️ Deselecting field:", field.name);
           dispatch({ type: "DESELECT_FIELD_FROM_MULTI", payload: field.name });
         } else {
           const capacity = calculatePhaseOutCapacity(gameState);
-          console.log(
+          logger.debug(
             "📊 Capacity check:",
             gameState.selectedFields.length,
             "/",
             capacity,
           );
           if (gameState.selectedFields.length < capacity) {
-            console.log("✅ Selecting field:", field.name);
+            logger.debug("✅ Selecting field:", field.name);
             dispatch({ type: "SELECT_FIELD_FOR_MULTI", payload: field });
           } else {
-            console.log("❌ At capacity, cannot select more fields");
+            logger.debug("❌ At capacity, cannot select more fields");
           }
         }
       } else {
-        console.log("📋 Single field mode, opening modal");
+        logger.debug("📋 Single field mode, opening modal");
         dispatch({ type: "SET_SELECTED_FIELD", payload: field });
         dispatch({ type: "TOGGLE_FIELD_MODAL", payload: true });
       }

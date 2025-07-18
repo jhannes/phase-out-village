@@ -1,6 +1,7 @@
 import { GameState } from "./interfaces/GameState";
 import { INITIAL_YEAR } from "./constants";
 import { calculateTotalGoodTechInvestment } from "./components/game/GameUtils";
+import { logger } from "./utils/logger";
 
 // Enhanced badge system with educational messages
 export const ACHIEVEMENT_BADGES = {
@@ -77,7 +78,7 @@ export const checkAndAwardAchievements = (state: GameState): string[] => {
   const totalFields = state.gameFields.length;
   const progressPercent = (phasedOutFields / totalFields) * 100;
 
-  console.log("Checking achievements:", {
+  logger.debug("Checking achievements:", {
     phasedOutFields,
     totalTechInvestment,
     totalEmissionsSaved,

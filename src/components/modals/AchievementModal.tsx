@@ -1,5 +1,6 @@
 import React from "react";
 import { ACHIEVEMENT_BADGES } from "../../achievements";
+import { logger } from "../../utils/logger";
 
 // Try to import badge components, fallback if they don't exist
 export let BadgeComponents: Record<string, React.ComponentType> = {};
@@ -19,7 +20,7 @@ try {
     Kortsiktig: badges.ShortSighted,
   };
 } catch (e) {
-  console.log("Badge components not found, using fallback display");
+  logger.debug("Badge components not found, using fallback display");
 }
 
 // Enhanced Achievement Modal with your badge images

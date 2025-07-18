@@ -401,7 +401,7 @@ export const gameReducer = (
     }
 
     case "TOGGLE_MULTI_SELECT":
-      console.log(
+      logger.debug(
         "🔄 TOGGLE_MULTI_SELECT action - current mode:",
         state.multiPhaseOutMode,
         "new mode:",
@@ -416,24 +416,24 @@ export const gameReducer = (
       };
 
     case "SELECT_FIELD_FOR_MULTI":
-      console.log(
+      logger.debug(
         "🎯 SELECT_FIELD_FOR_MULTI action - field:",
         action.payload.name,
         "current selectedFields:",
         state.selectedFields.map((f) => f.name),
       );
       if (state.selectedFields.some((f) => f.name === action.payload.name)) {
-        console.log("❌ Field already selected, ignoring");
+        logger.debug("❌ Field already selected, ignoring");
         return state; // Already selected
       }
-      console.log("✅ Adding field to selection");
+      logger.debug("✅ Adding field to selection");
       return {
         ...state,
         selectedFields: [...state.selectedFields, action.payload],
       };
 
     case "DESELECT_FIELD_FROM_MULTI":
-      console.log(
+      logger.debug(
         "🗑️ DESELECT_FIELD_FROM_MULTI action - field:",
         action.payload,
         "current selectedFields:",

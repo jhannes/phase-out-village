@@ -229,7 +229,7 @@ export const loadGameState = (): GameState => {
 
   try {
     const saved = SafeStorage.getItem(LOCAL_STORAGE_KEY);
-    console.log(
+    logger.debug(
       "Loading game state from localStorage:",
       saved ? "found" : "not found",
     );
@@ -239,7 +239,7 @@ export const loadGameState = (): GameState => {
         logger.warn("Failed to parse saved state, using default");
         return defaultState;
       }
-      console.log("Parsed saved state:", {
+      logger.debug("Parsed saved state:", {
         hasGameFields: !!parsed.gameFields,
         gameFieldsCount: parsed.gameFields?.length,
         hasShutdowns: !!parsed.shutdowns,
@@ -267,7 +267,7 @@ export const loadGameState = (): GameState => {
                 | "transitioning";
               if (["active", "closed", "transitioning"].includes(status)) {
                 savedFieldStatuses.set(savedField.name, status);
-                console.log(
+                logger.debug(
                   `Found saved field: ${savedField.name} = ${status}`,
                 );
               }
@@ -280,12 +280,12 @@ export const loadGameState = (): GameState => {
           Object.keys(parsed.shutdowns).forEach((fieldName) => {
             if (!savedFieldStatuses.has(fieldName)) {
               savedFieldStatuses.set(fieldName, "closed");
-              console.log(`Found field in shutdowns: ${fieldName} = closed`);
+              logger.debug(`Found field in shutdowns: ${fieldName} = closed`);
             }
           });
         }
 
-        console.log("Total saved field statuses:", savedFieldStatuses.size);
+        logger.debug("Total saved field statuses:", savedFieldStatuses.size);
 
         // Create merged state with proper field statuses
         const mergedState: GameState = {
@@ -379,7 +379,7 @@ export const loadGameState = (): GameState => {
           gameFields: gameFields.map((field) => {
             const savedStatus = savedFieldStatuses.get(field.name);
             if (savedStatus) {
-              console.log(
+              logger.debug(
                 `Applying saved status to ${field.name}: ${savedStatus}`,
               );
               return { ...field, status: savedStatus };
@@ -423,7 +423,7 @@ export const loadGameState = (): GameState => {
             : defaultState.newAchievements,
         };
 
-        console.log("Final merged state:", {
+        logger.debug("Final merged state:", {
           totalFields: mergedState.gameFields.length,
           closedFields: mergedState.gameFields.filter(
             (f: Field) => f.status === "closed",
@@ -441,12 +441,12 @@ export const loadGameState = (): GameState => {
       }
     }
   } catch (e) {
-    console.error("Failed to load game state:", e);
+    logger.error("Failed to load game state:", e);
     // If there's any error loading the saved state, clear it and start fresh
     SafeStorage.removeItem(LOCAL_STORAGE_KEY);
   }
 
-  console.log("Using default state - new game, no tutorial");
+  logger.debug("Using default state - new game, no tutorial");
   return {
     ...defaultState,
     showTutorialModal: false, // Don't show tutorial for new games by default
@@ -455,7 +455,7 @@ export const loadGameState = (): GameState => {
 
 // Game restart utility
 export const createFreshGameState = (): GameState => {
-  console.log("🔍 DEBUG - createFreshGameState called");
+  logger.debug("🔍 DEBUG - createFreshGameState called");
 
   const realData = generateCompleteData(data);
   const gameFields = Object.keys(realData).map((fieldName) =>
@@ -467,20 +467,20 @@ export const createFreshGameState = (): GameState => {
   const njord = gameFields.find((f) => f.name === "Njord");
   const ormenLange = gameFields.find((f) => f.name === "Ormen Lange");
 
-  console.log("🔍 DEBUG - Field status in createFreshGameState:");
-  console.log(
+  logger.debug("🔍 DEBUG - Field status in createFreshGameState:");
+  logger.debug(
     "Johan Castberg:",
     johanCastberg?.status,
     johanCastberg?.production,
   );
-  console.log("Njord:", njord?.status, njord?.production);
-  console.log("Ormen Lange:", ormenLange?.status, ormenLange?.production);
-  console.log("Total fields:", gameFields.length);
-  console.log(
+  logger.debug("Njord:", njord?.status, njord?.production);
+  logger.debug("Ormen Lange:", ormenLange?.status, ormenLange?.production);
+  logger.debug("Total fields:", gameFields.length);
+  logger.debug(
     "Active fields:",
     gameFields.filter((f) => f.status === "active").length,
   );
-  console.log(
+  logger.debug(
     "Closed fields:",
     gameFields.filter((f) => f.status === "closed").length,
   );

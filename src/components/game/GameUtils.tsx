@@ -1,6 +1,7 @@
 import React from "react";
 import { GameState } from "../../interfaces/GameState";
 import { Investment } from "../../types/types";
+import { logger } from "../../utils/logger";
 
 // This function should be moved outside the component to be accessible by the reducer.
 export const calculatePhaseOutCapacity = (state: GameState): number => {
@@ -133,7 +134,7 @@ export const MultiSelectControls: React.FC<{
   gameState: GameState;
   dispatch: Function;
 }> = ({ gameState, dispatch }) => {
-  console.log(
+  logger.debug(
     "MultiSelectControls render - multiPhaseOutMode:",
     gameState.multiPhaseOutMode,
     "selectedFields:",
