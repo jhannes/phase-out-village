@@ -10,8 +10,14 @@ export interface ValidatedGameState {
   budget?: number;
   score?: number;
   year?: number;
+  selectedField?: any;
+  showFieldModal?: boolean;
   achievements?: string[];
+  totalEmissions?: number;
+  totalProduction?: number;
   shutdowns?: Record<string, number>;
+  realData?: any;
+  currentView?: string;
   investments?: Record<string, number>;
   globalTemperature?: number;
   norwayTechRank?: number;
@@ -27,13 +33,18 @@ export interface ValidatedGameState {
   badChoiceCount?: number;
   goodChoiceStreak?: number;
   selectedFields?: Array<{ name: string; status: string }>;
-  currentView?: string;
-  multiPhaseOutMode?: boolean;
-  yearlyPhaseOutCapacity?: number;
+  currentEvent?: any;
+  showEventModal?: boolean;
   showAchievementModal?: boolean;
   showGameOverModal?: boolean;
   showTutorialModal?: boolean;
   newAchievements?: string[];
+  nextPhaseOutDiscount?: number;
+  multiPhaseOutMode?: boolean;
+  yearlyPhaseOutCapacity?: number;
+  showBudgetWarning?: boolean;
+  budgetWarningMessage?: string;
+  isRestarting?: boolean;
 }
 
 export function validateGameState(data: unknown): ValidatedGameState | null {

@@ -1,6 +1,7 @@
 import React from "react";
 import { GameState } from "../../interfaces/GameState";
 import { LOCAL_STORAGE_KEY } from "../../constants";
+import { SafeStorage } from "../../utils/storage";
 
 // Game Control Panel Component
 const GameControlPanel: React.FC<{
@@ -13,7 +14,7 @@ const GameControlPanel: React.FC<{
         "Er du sikker på at du vil starte spillet på nytt? All fremgang vil gå tapt.",
       )
     ) {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      SafeStorage.removeItem(LOCAL_STORAGE_KEY);
       dispatch({ type: "RESTART_GAME" });
     }
   };
@@ -25,7 +26,7 @@ const GameControlPanel: React.FC<{
 
   const handleClearStorage = () => {
     if (window.confirm("Er du sikker på at du vil slette all lagret data?")) {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      SafeStorage.removeItem(LOCAL_STORAGE_KEY);
       window.location.reload();
     }
   };
@@ -34,61 +35,51 @@ const GameControlPanel: React.FC<{
     console.log("=== localStorage Test ===");
 
     // Test 1: Basic localStorage functionality
-    try {
-      localStorage.setItem("test-basic", "hello");
-      const basicTest = localStorage.getItem("test-basic");
-      console.log("Basic test:", basicTest === "hello" ? "PASS" : "FAIL");
-    } catch (e) {
-      console.log("Basic test: FAIL -", e);
-    }
+    const basicSuccess = SafeStorage.setItem("test-basic", "hello");
+    const basicTest = SafeStorage.getItem("test-basic");
+    console.log("Basic test:", basicTest === "hello" ? "PASS" : "FAIL");
 
     // Test 2: JSON functionality
-    try {
-      const testData = { test: "data", timestamp: Date.now() };
-      localStorage.setItem("test-json", JSON.stringify(testData));
-      const retrieved = localStorage.getItem("test-json");
-      const parsed = JSON.parse(retrieved || "{}");
-      console.log(
-        "JSON test:",
-        JSON.stringify(parsed) === JSON.stringify(testData) ? "PASS" : "FAIL",
-      );
-    } catch (e) {
-      console.log("JSON test: FAIL -", e);
-    }
+    const testData = { test: "data", timestamp: Date.now() };
+    const jsonSuccess = SafeStorage.setItem(
+      "test-json",
+      JSON.stringify(testData),
+    );
+    const retrieved = SafeStorage.getItem("test-json");
+    const parsed = JSON.parse(retrieved || "{}");
+    console.log(
+      "JSON test:",
+      JSON.stringify(parsed) === JSON.stringify(testData) ? "PASS" : "FAIL",
+    );
 
     // Test 3: Check current game state
-    try {
-      const currentGameState = localStorage.getItem(LOCAL_STORAGE_KEY);
-      console.log(
-        "Current game state:",
-        currentGameState ? "EXISTS" : "NOT FOUND",
-      );
-      if (currentGameState) {
-        const parsed = JSON.parse(currentGameState);
-        console.log("Game state details:", {
-          hasGameFields: !!parsed.gameFields,
-          gameFieldsCount: parsed.gameFields?.length,
-          closedFields: parsed.gameFields?.filter(
-            (f: any) => f.status === "closed",
-          )?.length,
-        });
-      }
-    } catch (e) {
-      console.log("Game state check: FAIL -", e);
+    const currentGameState = SafeStorage.getItem(LOCAL_STORAGE_KEY);
+    console.log(
+      "Current game state:",
+      currentGameState ? "EXISTS" : "NOT FOUND",
+    );
+    if (currentGameState) {
+      const parsed = JSON.parse(currentGameState);
+      console.log("Game state details:", {
+        hasGameFields: !!parsed.gameFields,
+        gameFieldsCount: parsed.gameFields?.length,
+        closedFields: parsed.gameFields?.filter(
+          (f: any) => f.status === "closed",
+        )?.length,
+      });
     }
 
     // Test 4: Try to save a simple game state
-    try {
-      const simpleState = {
-        gameFields: [{ name: "Test Field", status: "closed" }],
-        budget: 1000,
-        year: 2025,
-      };
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(simpleState));
-      console.log("Save test: PASS");
-    } catch (e) {
-      console.log("Save test: FAIL -", e);
-    }
+    const simpleState = {
+      gameFields: [{ name: "Test Field", status: "closed" }],
+      budget: 1000,
+      year: 2025,
+    };
+    const saveSuccess = SafeStorage.setItem(
+      LOCAL_STORAGE_KEY,
+      JSON.stringify(simpleState),
+    );
+    console.log("Save test:", saveSuccess ? "PASS" : "FAIL");
 
     alert("Check console for detailed localStorage test results");
   };

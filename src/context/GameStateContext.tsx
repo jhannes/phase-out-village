@@ -11,6 +11,9 @@ import { gameReducer } from "../state/GameReducer";
 import { GameState, GameAction } from "../interfaces/GameState";
 import { createFreshGameState } from "../utils/gameLogic";
 import { LOCAL_STORAGE_KEY } from "../constants";
+import { SafeStorage } from "../utils/storage";
+import { safeJsonParse, validateGameState } from "../utils/security";
+import { logger } from "../utils/logger";
 
 interface GameStateContextType {
   gameState: GameState;
@@ -50,7 +53,7 @@ interface GameStateProviderProps {
 export const GameStateProvider: React.FC<GameStateProviderProps> = ({
   children,
 }) => {
-  console.log("🔍 DEBUG - GameStateProvider initializing");
+  logger.debug("GameStateProvider initializing");
 
   const [gameState, dispatch] = useReducer(gameReducer, createFreshGameState());
   const [hasLoadedFromStorage, setHasLoadedFromStorage] = useState(false);
@@ -58,7 +61,7 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
 
   // Debug: Check field status after state creation
   React.useEffect(() => {
-    console.log("🔍 DEBUG - GameStateProvider useEffect triggered");
+    logger.debug("GameStateProvider useEffect triggered");
     const johanCastberg = gameState.gameFields.find(
       (f) => f.name === "Johan Castberg",
     );
@@ -67,23 +70,22 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
       (f) => f.name === "Ormen Lange",
     );
 
-    console.log("🔍 DEBUG - Field status in GameStateProvider:");
-    console.log(
-      "Johan Castberg:",
-      johanCastberg?.status,
-      johanCastberg?.production,
-    );
-    console.log("Njord:", njord?.status, njord?.production);
-    console.log("Ormen Lange:", ormenLange?.status, ormenLange?.production);
-    console.log("Total fields:", gameState.gameFields.length);
-    console.log(
-      "Active fields:",
-      gameState.gameFields.filter((f) => f.status === "active").length,
-    );
-    console.log(
-      "Closed fields:",
-      gameState.gameFields.filter((f) => f.status === "closed").length,
-    );
+    logger.debug("Field status in GameStateProvider:", {
+      johanCastberg: {
+        status: johanCastberg?.status,
+        production: johanCastberg?.production,
+      },
+      njord: { status: njord?.status, production: njord?.production },
+      ormenLange: {
+        status: ormenLange?.status,
+        production: ormenLange?.production,
+      },
+      totalFields: gameState.gameFields.length,
+      activeFields: gameState.gameFields.filter((f) => f.status === "active")
+        .length,
+      closedFields: gameState.gameFields.filter((f) => f.status === "closed")
+        .length,
+    });
   }, [gameState.gameFields]);
 
   // Computed statistics
@@ -170,10 +172,12 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
   // Reactivate: Auto-save to localStorage
   useEffect(() => {
     const saveGameState = () => {
-      try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gameState));
-      } catch (error) {
-        console.warn("Failed to save game state:", error);
+      const success = SafeStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify(gameState),
+      );
+      if (!success) {
+        console.warn("Failed to save game state to localStorage");
       }
     };
 
@@ -190,29 +194,28 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
 
     // Don't load from localStorage if we're restarting
     if (gameState.isRestarting) {
-      console.log("🔄 Skipping localStorage load due to restart");
+      logger.debug("Skipping localStorage load due to restart");
       setHasLoadedFromStorage(true);
       hasLoadedRef.current = true;
       return;
     }
 
-    try {
-      const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (savedState && savedState !== "null" && savedState !== "undefined") {
-        console.log("📥 Found saved state, dispatching LOAD_GAME_STATE");
-        const parsedState = JSON.parse(savedState);
+    const savedState = SafeStorage.getItem(LOCAL_STORAGE_KEY);
+    if (savedState && savedState !== "null" && savedState !== "undefined") {
+      logger.debug("Found saved state, dispatching LOAD_GAME_STATE");
+      // For now, use the original approach without validation to avoid type issues
+      const parsedState = safeJsonParse(savedState) as GameState;
+      if (parsedState) {
         dispatch({ type: "LOAD_GAME_STATE", payload: parsedState });
       } else {
-        console.log("📥 No saved state found, using initial fresh state");
+        logger.warn("Invalid saved state, using fresh state");
       }
-      setHasLoadedFromStorage(true);
-      hasLoadedRef.current = true;
-      // If no saved state, don't dispatch anything - use the initial fresh state
-    } catch (error) {
-      console.warn("Failed to load saved game state:", error);
-      setHasLoadedFromStorage(true);
-      hasLoadedRef.current = true;
+    } else {
+      logger.debug("No saved state found, using initial fresh state");
     }
+    setHasLoadedFromStorage(true);
+    hasLoadedRef.current = true;
+    // If no saved state, don't dispatch anything - use the initial fresh state
   }, [gameState.isRestarting]);
 
   // Reset the loaded ref when restarting
@@ -224,7 +227,7 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
 
   // Force fresh start - always use initial state
   useEffect(() => {
-    console.log("🚀 FORCING FRESH START - localStorage loading disabled");
+    logger.debug("FORCING FRESH START - localStorage loading disabled");
     setHasLoadedFromStorage(true);
     hasLoadedRef.current = true;
   }, []);

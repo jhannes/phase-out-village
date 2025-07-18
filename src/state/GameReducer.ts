@@ -16,6 +16,9 @@ import {
   calculateClimateDamage,
 } from "../components/game/GameUtils";
 import { LOCAL_STORAGE_KEY } from "../constants";
+import { safeAdd, safeSubtract, safeRound, clamp } from "../utils/math";
+import { SafeStorage } from "../utils/storage";
+import { logger } from "../utils/logger";
 
 export const gameReducer = (
   state: GameState,
@@ -26,15 +29,15 @@ export const gameReducer = (
   // Handle actions that should not trigger localStorage saves
   if (action.type === "RESTART_GAME") {
     // Clear localStorage to ensure fresh start
-    try {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-      console.log("🗑️ RESTART_GAME action - cleared localStorage");
-    } catch (error) {
-      console.warn("Failed to clear localStorage:", error);
+    const cleared = SafeStorage.removeItem(LOCAL_STORAGE_KEY);
+    if (cleared) {
+      logger.debug("RESTART_GAME action - cleared localStorage");
+    } else {
+      logger.warn("Failed to clear localStorage");
     }
 
     const freshState = createFreshGameState();
-    console.log("🔄 RESTART_GAME action - setting showTutorialModal: true");
+    logger.debug("RESTART_GAME action - setting showTutorialModal: true");
     return {
       ...freshState,
       showTutorialModal: true, // Ensure tutorial shows on restart
@@ -43,12 +46,10 @@ export const gameReducer = (
   }
 
   if (action.type === "LOAD_GAME_STATE") {
-    console.log(
-      "📥 LOAD_GAME_STATE action - isRestarting:",
-      state.isRestarting,
-      "showTutorialModal will be:",
-      state.isRestarting ? true : false,
-    );
+    logger.debug("LOAD_GAME_STATE action", {
+      isRestarting: state.isRestarting,
+      showTutorialModal: state.isRestarting ? true : false,
+    });
     return {
       ...state,
       ...action.payload,
@@ -95,16 +96,28 @@ export const gameReducer = (
 
       newState = {
         ...state,
-        budget:
-          state.budget -
-          actualCost +
-          yearlyConsequences.yearlyOilRevenue -
-          yearlyConsequences.climateCostIncrease,
-        score: state.score + calculateScore(field.totalLifetimeEmissions),
-        globalTemperature: Math.max(
-          1.1,
-          state.globalTemperature -
+        budget: clamp(
+          safeAdd(
+            safeSubtract(state.budget, actualCost),
+            safeSubtract(
+              yearlyConsequences.yearlyOilRevenue,
+              yearlyConsequences.climateCostIncrease,
+            ),
+          ),
+          0,
+          100000,
+        ),
+        score: safeAdd(
+          state.score,
+          calculateScore(field.totalLifetimeEmissions),
+        ),
+        globalTemperature: clamp(
+          safeSubtract(
+            state.globalTemperature,
             calculateTemperatureReduction(field.emissions[0]),
+          ),
+          1.1,
+          5.0,
         ),
         gameFields: state.gameFields.map((f) =>
           f.name === fieldName

@@ -16,19 +16,13 @@ import BottomNavBar from "../components/Navigation/BottomNavBar";
 import MobileStatusBar from "../components/Navigation/MobileStatusBar";
 import DesktopStatusBar from "../components/Navigation/DesktopStatusBar";
 import { LOCAL_STORAGE_KEY } from "../constants";
+import { SafeStorage } from "../utils/storage";
 
 // Desktop Navigation Component
 const DesktopNavigation: React.FC<{ currentPath: string }> = ({
   currentPath,
 }) => {
-  // Use try-catch to handle context not being available
-  let dispatch;
-  try {
-    const { dispatch: gameDispatch } = useGameState();
-    dispatch = gameDispatch;
-  } catch {
-    dispatch = () => {};
-  }
+  const { dispatch } = useGameState();
 
   const navItems = [
     { label: "Hjem", path: "/" },
@@ -44,7 +38,7 @@ const DesktopNavigation: React.FC<{ currentPath: string }> = ({
         "Er du sikker på at du vil starte spillet på nytt? All fremgang vil gå tapt.",
       )
     ) {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      SafeStorage.removeItem(LOCAL_STORAGE_KEY);
       dispatch({ type: "RESTART_GAME" });
     }
   };
@@ -81,26 +75,13 @@ const DesktopNavigation: React.FC<{ currentPath: string }> = ({
   );
 };
 
-// Root Layout Component
-const RootLayout: React.FC = () => {
-  const router = useRouterState();
-  const currentPath = router.location.pathname;
-  const [isMobile, setIsMobile] = useState(false);
+// Mobile Navigation Component
+const MobileNavigation: React.FC<{ currentPath: string }> = ({
+  currentPath,
+}) => {
   const { dispatch } = useGameState();
   const navigate = useNavigate();
 
-  // Detect mobile/desktop
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkIsMobile();
-    window.addEventListener("resize", checkIsMobile);
-    return () => window.removeEventListener("resize", checkIsMobile);
-  }, []);
-
-  // BottomNavBar items for mobile
   const mobileNavItems = [
     {
       id: "game",
@@ -141,13 +122,33 @@ const RootLayout: React.FC = () => {
             "Er du sikker på at du vil starte spillet på nytt? All fremgang vil gå tapt.",
           )
         ) {
-          localStorage.removeItem(LOCAL_STORAGE_KEY);
+          SafeStorage.removeItem(LOCAL_STORAGE_KEY);
           dispatch({ type: "RESTART_GAME" });
         }
       },
       ariaLabel: "Start på nytt",
     },
   ];
+
+  return <BottomNavBar items={mobileNavItems} />;
+};
+
+// Root Layout Component
+const RootLayout: React.FC = () => {
+  const router = useRouterState();
+  const currentPath = router.location.pathname;
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile/desktop
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
 
   return (
     <div className="root-layout">
@@ -168,14 +169,13 @@ const RootLayout: React.FC = () => {
       {isMobile && <MobileStatusBar />}
 
       {/* Mobile Navigation */}
-      {isMobile && <BottomNavBar items={mobileNavItems} />}
+      {isMobile && <MobileNavigation currentPath={currentPath} />}
     </div>
   );
 };
 
 // Wrapper component that provides game state context
 const RootLayoutWithContext: React.FC = () => {
-  console.log("🚀 RootLayoutWithContext - GameStateProvider wrapper");
   return (
     <GameStateProvider>
       <RootLayout />

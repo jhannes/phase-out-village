@@ -9,12 +9,13 @@ import { generateCompleteData } from "./projections";
 import { data } from "../generated/data";
 import { GameState } from "../interfaces/GameState";
 import { Field, OilFieldDataset } from "../types/types";
+import { logger } from "./logger";
 
 export const createFieldFromRealData = (
   fieldName: string,
   realData: OilFieldDataset,
 ): Field => {
-  console.log(`🔍 DEBUG - createFieldFromRealData called for: ${fieldName}`);
+  logger.debug(`createFieldFromRealData called for: ${fieldName}`);
 
   const yearlyData = realData[fieldName];
   const latestYear = Math.max(...Object.keys(yearlyData).map(Number));
@@ -38,7 +39,7 @@ export const createFieldFromRealData = (
     fieldName === "Njord" ||
     fieldName === "Ormen Lange"
   ) {
-    console.log(`🔍 DEBUG - Creating field ${fieldName}:`, {
+    logger.debug(`Creating field ${fieldName}:`, {
       latestYear,
       latestData,
       currentProduction,

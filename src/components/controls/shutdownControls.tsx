@@ -14,9 +14,12 @@ export function ShutdownControls({
           <label>{fieldName}</label>
           <select
             value={shutdowns[fieldName] ?? 2040}
-            onChange={(e) =>
-              onShutdownChange(fieldName, parseInt(e.target.value))
-            }
+            onChange={(e) => {
+              const year = parseInt(e.target.value);
+              if (!isNaN(year) && year >= 2023 && year <= 2040) {
+                onShutdownChange(fieldName, year);
+              }
+            }}
           >
             {Array.from({ length: 2040 - 2023 + 1 }, (_, i) => 2023 + i).map(
               (year) => (
