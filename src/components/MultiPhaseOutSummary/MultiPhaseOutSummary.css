@@ -1,0 +1,222 @@
+:root {
+  --color-bg: #fff;
+  --color-text: #1e293b;
+  --color-border: #e5e7eb;
+  --color-positive: #16a34a;
+  --color-negative: #dc2626;
+  --color-muted: #6b7280;
+  --color-accent: #10b981;
+  --color-bg-section: #f8fafc;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #23272e;
+    --color-text: #f3f4f6;
+    --color-border: #3a3f47;
+    --color-positive: #22c55e;
+    --color-negative: #ef4444;
+    --color-muted: #94a3b8;
+    --color-accent: #22c55e;
+    --color-bg-section: #2a2e36;
+  }
+}
+
+/* Minimalistisk variant for MultiPhaseOutSummary */
+.multi-phaseout-summary.minimal {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  margin-bottom: 32px;
+}
+
+.multi-phaseout-summary.minimal header {
+  border: none;
+  background: none;
+  padding: 0;
+  margin-bottom: 24px;
+}
+
+.multi-phaseout-summary.minimal h2 {
+  color: var(--color-text);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Header and title */
+.mpo-header {
+  margin-bottom: 24px;
+}
+.mpo-title {
+  font-weight: 600;
+  font-size: 20px;
+  margin: 0;
+  letter-spacing: 0.5px;
+  color: var(--color-text);
+}
+.mpo-afford {
+  font-size: 14px;
+  color: var(--color-positive);
+  margin-top: 4px;
+}
+.mpo-shortfall {
+  font-size: 14px;
+  color: var(--color-negative);
+  margin-top: 4px;
+}
+
+/* Grid layout */
+.mpo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 24px;
+}
+
+.mpo-grid > div {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.mpo-grid > div[style*="border-top"] {
+  border-top: 1px solid var(--color-border) !important;
+  margin-top: 0;
+}
+
+.mpo-grid ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 14px;
+}
+
+.mpo-grid li {
+  margin-bottom: 2px;
+}
+
+/* Fargekoder for tall */
+.mpo-grid .positive,
+.multi-phaseout-positive-change {
+  color: var(--color-positive);
+}
+.mpo-grid .negative,
+.multi-phaseout-negative-change {
+  color: var(--color-negative);
+}
+
+.mpo-grid .neutral {
+  color: var(--color-muted);
+}
+
+.mpo-label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+.mpo-label-small {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+.mpo-value {
+  font-size: 18px;
+  color: var(--color-text);
+  font-weight: 400;
+}
+.mpo-value-large {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.mpo-section {
+  grid-column: 1 / span 2;
+  border-top: 1px solid var(--color-border);
+  padding-top: 16px;
+}
+
+.mpo-workers-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+.mpo-arrow {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+.mpo-positive {
+  font-size: 14px;
+  color: var(--color-positive);
+  margin-left: 8px;
+}
+.mpo-negative {
+  font-size: 14px;
+  color: var(--color-negative);
+  margin-left: 8px;
+}
+.mpo-breakdown {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.mpo-footer {
+  margin-top: 24px;
+  text-align: right;
+}
+
+.phase-out-button {
+  background: var(--color-accent-2);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.phase-out-button:disabled {
+  background: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* Fjern gamle stiler for .multi-phaseout-summary hvis .minimal er satt */
+.multi-phaseout-summary.minimal,
+.multi-phaseout-summary.minimal * {
+  box-shadow: none !important;
+  background: none !important;
+  border-radius: 0 !important;
+}
+
+/* Subtil seksjonsinndeling */
+.mpo-grid > div + div {
+  margin-top: 0;
+}
+
+/* Fjerner gamle mørke bakgrunner og rammer */
+.multi-phaseout-summary,
+.multi-phaseout-header,
+.multi-phaseout-economics,
+.multi-phaseout-climate,
+.multi-phaseout-transition-content {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Typografi */
+.multi-phaseout-summary.minimal,
+.multi-phaseout-summary.minimal h2,
+.multi-phaseout-summary.minimal div,
+.multi-phaseout-summary.minimal ul,
+.multi-phaseout-summary.minimal li {
+  font-family: inherit;
+  letter-spacing: 0;
+}

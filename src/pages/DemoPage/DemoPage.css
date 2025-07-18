@@ -1,0 +1,410 @@
+.demo-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: "Inter", Arial, sans-serif;
+  background: #f8fafc;
+  color: #222;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+}
+
+.demo-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.demo-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.demo-icon {
+  font-size: 2.5rem;
+}
+
+.demo-subtitle {
+  color: #555;
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.demo-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.demo-nav-btn {
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  min-width: 180px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  text-align: left;
+  outline: none;
+}
+
+.demo-nav-btn.active,
+.demo-nav-btn:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 2px 16px rgba(56, 189, 248, 0.08);
+}
+
+.demo-nav-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.demo-nav-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.demo-nav-desc {
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.demo-main {
+  margin-bottom: 2rem;
+}
+
+.demo-section {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  padding: 2rem 1.5rem;
+}
+
+.demo-section-header h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.demo-section-header p {
+  color: #555;
+  margin-bottom: 1.2rem;
+}
+
+.demo-content h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.feature-card {
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
+}
+
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.demo-footer {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.tech-stack h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.7rem;
+}
+
+.tech-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.tech-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: 8px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  box-shadow: 0 1px 4px rgba(56, 189, 248, 0.07);
+}
+
+/* Navigation Demo */
+.phone-mockup {
+  background: #222;
+  border-radius: 32px;
+  width: 320px;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  padding: 1.2rem 0.7rem;
+}
+
+.phone-content {
+  background: #fff;
+  border-radius: 24px;
+  padding: 1rem;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.demo-header h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+}
+
+.demo-btn {
+  background: #38bdf8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+.demo-main p {
+  margin-bottom: 0.7rem;
+}
+
+.demo-cards {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.demo-card {
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.demo-status-bar {
+  display: flex;
+  justify-content: space-between;
+  background: #e0e7ef;
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.demo-bottom-nav {
+  display: flex;
+  justify-content: space-between;
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 0.6rem 0.3rem;
+  font-size: 0.95rem;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #555;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.nav-item.active {
+  background: #38bdf8;
+  color: #fff;
+}
+
+/* Responsive Demo */
+.device-showcase {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.device {
+  background: #f1f5f9;
+  border-radius: 14px;
+  padding: 1rem;
+  min-width: 180px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+}
+
+.device-header {
+  font-weight: 600;
+  margin-bottom: 0.7rem;
+  font-size: 1rem;
+}
+
+.device-content {
+  background: #fff;
+  border-radius: 10px;
+  padding: 0.7rem;
+}
+
+.mobile-layout,
+.tablet-layout,
+.desktop-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.tablet-layout {
+  flex-direction: row;
+  gap: 0.7rem;
+}
+
+.tablet-nav {
+  background: #e0f2fe;
+  border-radius: 8px;
+  padding: 0.7rem;
+  min-width: 80px;
+  text-align: center;
+}
+
+.tablet-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.desktop-layout {
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.desktop-header {
+  background: #e0f2fe;
+  border-radius: 8px;
+  padding: 0.7rem;
+  font-weight: 600;
+}
+
+.desktop-main {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.desktop-sidebar {
+  background: #e0e7ef;
+  border-radius: 8px;
+  padding: 0.7rem;
+  min-width: 80px;
+  text-align: center;
+}
+
+.desktop-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.7rem;
+  flex: 1;
+}
+
+/* Performance Demo */
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.performance-card {
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
+}
+
+.perf-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.perf-details {
+  background: #e0f2fe;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  margin-top: 0.5rem;
+  font-size: 0.92rem;
+  color: #0369a1;
+}
+
+/* Accessibility Demo */
+.a11y-checklist {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.a11y-item {
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
+}
+
+.a11y-status {
+  font-size: 1.5rem;
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+  .demo-page {
+    padding: 1rem 0.3rem;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .demo-section {
+    padding: 1rem 0.5rem;
+  }
+  .device-showcase {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .phone-mockup {
+    width: 100%;
+    min-width: 0;
+    border-radius: 18px;
+    padding: 0.7rem 0.2rem;
+  }
+}

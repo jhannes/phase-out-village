@@ -1,0 +1,209 @@
+import React from "react";
+import { GameState } from "../../interfaces/GameState";
+import { LOCAL_STORAGE_KEY } from "../../constants";
+import { SafeStorage } from "../../utils/storage";
+import { logger } from "../../utils/logger";
+import { safeJsonParse } from "../../utils/security";
+
+// Game Control Panel Component
+const GameControlPanel: React.FC<{
+  gameState: GameState;
+  dispatch: Function;
+}> = ({ gameState, dispatch }) => {
+  const handleRestart = () => {
+    if (
+      window.confirm(
+        "Er du sikker på at du vil starte spillet på nytt? All fremgang vil gå tapt.",
+      )
+    ) {
+      SafeStorage.removeItem(LOCAL_STORAGE_KEY);
+      dispatch({ type: "RESTART_GAME" });
+    }
+  };
+
+  const handleResetTutorial = () => {
+    dispatch({ type: "RESET_TUTORIAL" });
+    dispatch({ type: "SHOW_TUTORIAL_MODAL" });
+  };
+
+  const handleClearStorage = () => {
+    if (window.confirm("Er du sikker på at du vil slette all lagret data?")) {
+      SafeStorage.removeItem(LOCAL_STORAGE_KEY);
+      window.location.reload();
+    }
+  };
+
+  const handleTestStorage = () => {
+    logger.debug("=== localStorage Test ===");
+
+    // Test 1: Basic localStorage functionality
+    const basicSuccess = SafeStorage.setItem("test-basic", "hello");
+    const basicTest = SafeStorage.getItem("test-basic");
+    logger.debug("Basic test:", basicTest === "hello" ? "PASS" : "FAIL");
+
+    // Test 2: JSON functionality
+    const testData = { test: "data", timestamp: Date.now() };
+    const jsonSuccess = SafeStorage.setItem(
+      "test-json",
+      JSON.stringify(testData),
+    );
+    const retrieved = SafeStorage.getItem("test-json");
+    const parsed = safeJsonParse(retrieved || "{}");
+    logger.debug(
+      "JSON test:",
+      JSON.stringify(parsed) === JSON.stringify(testData) ? "PASS" : "FAIL",
+    );
+
+    // Test 3: Check current game state
+    const currentGameState = SafeStorage.getItem(LOCAL_STORAGE_KEY);
+    logger.debug(
+      "Current game state:",
+      currentGameState ? "EXISTS" : "NOT FOUND",
+    );
+    if (currentGameState) {
+      const parsed = safeJsonParse(currentGameState) as any;
+      if (parsed) {
+        logger.debug("Game state details:", {
+          hasGameFields: !!parsed.gameFields,
+          gameFieldsCount: parsed.gameFields?.length,
+          closedFields: parsed.gameFields?.filter(
+            (f: any) => f.status === "closed",
+          )?.length,
+        });
+      }
+    }
+
+    // Test 4: Try to save a simple game state
+    const simpleState = {
+      gameFields: [{ name: "Test Field", status: "closed" }],
+      budget: 1000,
+      year: 2025,
+    };
+    const saveSuccess = SafeStorage.setItem(
+      LOCAL_STORAGE_KEY,
+      JSON.stringify(simpleState),
+    );
+    logger.debug("Save test:", saveSuccess ? "PASS" : "FAIL");
+
+    alert("Check console for detailed localStorage test results");
+  };
+
+  const handleManualSave = () => {
+    logger.debug("=== Manual Save Test ===");
+    try {
+      const simpleState = {
+        gameFields: [{ name: "Test Field", status: "closed" }],
+        budget: 1000,
+        year: 2025,
+      };
+      const success = SafeStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify(simpleState),
+      );
+      logger.debug("Manual save:", success ? "SUCCESS" : "FAIL");
+      alert(
+        success
+          ? "Manual save completed - refresh to test loading"
+          : "Manual save failed",
+      );
+    } catch (e) {
+      logger.debug("Manual save: FAIL -", e);
+      alert("Manual save failed: " + e);
+    }
+  };
+
+  const handleTestPhaseOut = () => {
+    logger.debug("=== Testing Phase Out ===");
+    // Dispatch a test phase out action
+    dispatch({ type: "PHASE_OUT_FIELD", payload: "Ekofisk" });
+    logger.debug("Dispatched PHASE_OUT_FIELD action");
+  };
+
+  return (
+    <div className="game-control-panel">
+      <h3>⚙️ Spillinnstillinger</h3>
+      <div className="control-buttons">
+        <button
+          onClick={handleRestart}
+          className="control-button restart-button"
+        >
+          🔄 Start på nytt
+        </button>
+        <button
+          onClick={handleResetTutorial}
+          className="control-button tutorial-button"
+        >
+          📚 Vis tutorial igjen
+        </button>
+        <button
+          onClick={() => dispatch({ type: "SHOW_TUTORIAL_MODAL" })}
+          className="control-button show-tutorial-button"
+        >
+          🎓 Vis tutorial
+        </button>
+        <button
+          onClick={handleClearStorage}
+          className="control-button clear-storage-button"
+        >
+          🗑️ Slett lagret data
+        </button>
+        <button
+          onClick={handleTestStorage}
+          className="control-button test-storage-button"
+        >
+          🧪 Test localStorage
+        </button>
+        <button
+          onClick={handleManualSave}
+          className="control-button manual-save-button"
+        >
+          💾 Manual Save
+        </button>
+        <button
+          onClick={handleTestPhaseOut}
+          className="control-button test-phaseout-button"
+        >
+          🧪 Test Phase Out
+        </button>
+        <button
+          onClick={() => {
+            logger.debug(
+              "Toggling multi-select mode. Current:",
+              gameState.multiPhaseOutMode,
+            );
+            dispatch({ type: "TOGGLE_MULTI_SELECT" });
+          }}
+          className="control-button multi-select-button"
+          style={{
+            background: gameState.multiPhaseOutMode ? "#22C55E" : "#6B7280",
+          }}
+        >
+          {gameState.multiPhaseOutMode ? "✅" : "📋"} Multi-Select Mode
+        </button>
+        <button
+          onClick={() => {
+            logger.debug("Advancing year. Current year:", gameState.year);
+            dispatch({ type: "ADVANCE_YEAR_MANUALLY" });
+          }}
+          className="control-button advance-year-button"
+        >
+          ⏰ Gå til neste år ({gameState.year})
+        </button>
+        <div className="game-info">
+          <small>Spillfremgang lagres automatisk</small>
+          <small>
+            Environment: {typeof window !== "undefined" ? "Browser" : "Server"}
+          </small>
+          <small>
+            localStorage:{" "}
+            {typeof window !== "undefined" && window.localStorage
+              ? "Available"
+              : "Not Available"}
+          </small>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default GameControlPanel;

@@ -3,6 +3,7 @@ import { Map, View } from "ol";
 import { OSM } from "ol/source";
 import TileLayer from "ol/layer/Tile";
 import { useGeographic } from "ol/proj";
+import { logger } from "../../utils/logger";
 
 import "ol/ol.css";
 import VectorLayer from "ol/layer/Vector";
@@ -41,7 +42,7 @@ export function OilFieldMap() {
     map.setTarget(mapRef.current!);
     map.on("click", (e) => {
       const features = map.getFeaturesAtPixel(e.pixel);
-      console.log({ features });
+      logger.debug("Map click features:", { features });
       if (features.length === 1) {
         const { geometry, ...properties } = features[0].getProperties();
         alert(JSON.stringify(properties));

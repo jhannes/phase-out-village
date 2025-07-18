@@ -1,0 +1,188 @@
+import {
+  createRootRoute,
+  Link,
+  Outlet,
+  useRouterState,
+  useNavigate,
+} from "@tanstack/react-router";
+import React, { useState, useEffect } from "react";
+import "./RootLayout.css";
+import {
+  GameStateProvider,
+  useGameStats,
+  useGameState,
+} from "../context/GameStateContext";
+import BottomNavBar from "../components/Navigation/BottomNavBar";
+import MobileStatusBar from "../components/Navigation/MobileStatusBar";
+import DesktopStatusBar from "../components/Navigation/DesktopStatusBar";
+import { LOCAL_STORAGE_KEY } from "../constants";
+import { SafeStorage } from "../utils/storage";
+
+// Desktop Navigation Component
+const DesktopNavigation: React.FC<{ currentPath: string }> = ({
+  currentPath,
+}) => {
+  const { dispatch } = useGameState();
+
+  const navItems = [
+    { label: "Hjem", path: "/" },
+    { label: "Spill", path: "/phase-out-game" },
+    { label: "Investeringer", path: "/investments" },
+    { label: "Statistikk", path: "/stats" },
+    { label: "Om", path: "/about" },
+  ];
+
+  const handleRestart = () => {
+    if (
+      window.confirm(
+        "Er du sikker på at du vil starte spillet på nytt? All fremgang vil gå tapt.",
+      )
+    ) {
+      SafeStorage.removeItem(LOCAL_STORAGE_KEY);
+      dispatch({ type: "RESTART_GAME" });
+    }
+  };
+
+  return (
+    <nav className="desktop-nav">
+      <div className="desktop-nav-content">
+        <div className="nav-brand">
+          <span className="brand-icon">🛢️</span>
+          <span className="brand-text">Phase Out Village</span>
+        </div>
+
+        <div className="nav-links">
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`nav-link${currentPath === item.path ? " active" : ""}`}
+              // No onClick or preventDefault, let router handle navigation
+            >
+              {item.label}
+            </Link>
+          ))}
+          <button
+            onClick={handleRestart}
+            className="desktop-restart-button"
+            title="Start på nytt"
+          >
+            🔄 Start på nytt
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+// Mobile Navigation Component
+const MobileNavigation: React.FC<{ currentPath: string }> = ({
+  currentPath,
+}) => {
+  const { dispatch } = useGameState();
+  const navigate = useNavigate();
+
+  const mobileNavItems = [
+    {
+      id: "game",
+      icon: "🎮",
+      label: "Spill",
+      active: currentPath === "/phase-out-game",
+      onClick: () => navigate({ to: "/phase-out-game" }),
+    },
+    {
+      id: "investments",
+      icon: "💰",
+      label: "Investering",
+      active: currentPath === "/investments",
+      onClick: () => navigate({ to: "/investments" }),
+    },
+    {
+      id: "stats",
+      icon: "📊",
+      label: "Statistikk",
+      active: currentPath === "/stats",
+      onClick: () => navigate({ to: "/stats" }),
+    },
+    {
+      id: "about",
+      icon: "ℹ️",
+      label: "Om",
+      active: currentPath === "/about",
+      onClick: () => navigate({ to: "/about" }),
+    },
+    {
+      id: "restart",
+      icon: "🔄",
+      label: "Start på nytt",
+      active: false,
+      onClick: () => {
+        if (
+          window.confirm(
+            "Er du sikker på at du vil starte spillet på nytt? All fremgang vil gå tapt.",
+          )
+        ) {
+          SafeStorage.removeItem(LOCAL_STORAGE_KEY);
+          dispatch({ type: "RESTART_GAME" });
+        }
+      },
+      ariaLabel: "Start på nytt",
+    },
+  ];
+
+  return <BottomNavBar items={mobileNavItems} />;
+};
+
+// Root Layout Component
+const RootLayout: React.FC = () => {
+  const router = useRouterState();
+  const currentPath = router.location.pathname;
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile/desktop
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
+
+  return (
+    <div className="root-layout">
+      {/* Main Content */}
+      <main className={`main-content ${isMobile ? "mobile" : "desktop"}`}>
+        {/* Desktop Navigation - now inside main content */}
+        {!isMobile && (
+          <div className="sticky-nav-container">
+            <DesktopNavigation currentPath={currentPath} />
+            <DesktopStatusBar />
+          </div>
+        )}
+
+        <Outlet />
+      </main>
+
+      {/* Mobile Status Bar */}
+      {isMobile && <MobileStatusBar />}
+
+      {/* Mobile Navigation */}
+      {isMobile && <MobileNavigation currentPath={currentPath} />}
+    </div>
+  );
+};
+
+// Wrapper component that provides game state context
+const RootLayoutWithContext: React.FC = () => {
+  return (
+    <GameStateProvider>
+      <RootLayout />
+    </GameStateProvider>
+  );
+};
+
+export const Route = createRootRoute({
+  component: RootLayoutWithContext,
+});
