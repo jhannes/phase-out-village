@@ -5,6 +5,8 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import "./application.css";
 
+console.log("🚀 APP STARTING - main.tsx loaded");
+
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
   interface Register {

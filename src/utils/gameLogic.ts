@@ -14,6 +14,8 @@ export const createFieldFromRealData = (
   fieldName: string,
   realData: OilFieldDataset,
 ): Field => {
+  console.log(`🔍 DEBUG - createFieldFromRealData called for: ${fieldName}`);
+
   const yearlyData = realData[fieldName];
   const latestYear = Math.max(...Object.keys(yearlyData).map(Number));
   const latestData = yearlyData[latestYear.toString()];
@@ -29,6 +31,22 @@ export const createFieldFromRealData = (
 
   const currentProduction =
     (latestData?.productionOil || 0) + (latestData?.productionGas || 0);
+
+  // Debug specific fields
+  if (
+    fieldName === "Johan Castberg" ||
+    fieldName === "Njord" ||
+    fieldName === "Ormen Lange"
+  ) {
+    console.log(`🔍 DEBUG - Creating field ${fieldName}:`, {
+      latestYear,
+      latestData,
+      currentProduction,
+      hasProductionData:
+        !!latestData?.productionOil || !!latestData?.productionGas,
+      hasEmissionData: !!latestData?.emission,
+    });
+  }
 
   // Calculate more realistic lifetime emissions based on actual data
   const yearlyEmissionMt = (latestData?.emission || 0) / 1000;
@@ -430,9 +448,34 @@ export const loadGameState = (): GameState => {
 
 // Game restart utility
 export const createFreshGameState = (): GameState => {
+  console.log("🔍 DEBUG - createFreshGameState called");
+
   const realData = generateCompleteData(data);
   const gameFields = Object.keys(realData).map((fieldName) =>
     createFieldFromRealData(fieldName, realData),
+  );
+
+  // Debug: Check specific fields
+  const johanCastberg = gameFields.find((f) => f.name === "Johan Castberg");
+  const njord = gameFields.find((f) => f.name === "Njord");
+  const ormenLange = gameFields.find((f) => f.name === "Ormen Lange");
+
+  console.log("🔍 DEBUG - Field status in createFreshGameState:");
+  console.log(
+    "Johan Castberg:",
+    johanCastberg?.status,
+    johanCastberg?.production,
+  );
+  console.log("Njord:", njord?.status, njord?.production);
+  console.log("Ormen Lange:", ormenLange?.status, ormenLange?.production);
+  console.log("Total fields:", gameFields.length);
+  console.log(
+    "Active fields:",
+    gameFields.filter((f) => f.status === "active").length,
+  );
+  console.log(
+    "Closed fields:",
+    gameFields.filter((f) => f.status === "closed").length,
   );
 
   return {

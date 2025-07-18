@@ -50,9 +50,41 @@ interface GameStateProviderProps {
 export const GameStateProvider: React.FC<GameStateProviderProps> = ({
   children,
 }) => {
+  console.log("🔍 DEBUG - GameStateProvider initializing");
+
   const [gameState, dispatch] = useReducer(gameReducer, createFreshGameState());
   const [hasLoadedFromStorage, setHasLoadedFromStorage] = useState(false);
   const hasLoadedRef = useRef(false);
+
+  // Debug: Check field status after state creation
+  React.useEffect(() => {
+    console.log("🔍 DEBUG - GameStateProvider useEffect triggered");
+    const johanCastberg = gameState.gameFields.find(
+      (f) => f.name === "Johan Castberg",
+    );
+    const njord = gameState.gameFields.find((f) => f.name === "Njord");
+    const ormenLange = gameState.gameFields.find(
+      (f) => f.name === "Ormen Lange",
+    );
+
+    console.log("🔍 DEBUG - Field status in GameStateProvider:");
+    console.log(
+      "Johan Castberg:",
+      johanCastberg?.status,
+      johanCastberg?.production,
+    );
+    console.log("Njord:", njord?.status, njord?.production);
+    console.log("Ormen Lange:", ormenLange?.status, ormenLange?.production);
+    console.log("Total fields:", gameState.gameFields.length);
+    console.log(
+      "Active fields:",
+      gameState.gameFields.filter((f) => f.status === "active").length,
+    );
+    console.log(
+      "Closed fields:",
+      gameState.gameFields.filter((f) => f.status === "closed").length,
+    );
+  }, [gameState.gameFields]);
 
   // Computed statistics
   const computedStats = React.useMemo(() => {
@@ -135,53 +167,53 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({
     [],
   );
 
-  // TEMPORARILY DISABLED: Auto-save to localStorage
-  // useEffect(() => {
-  //   const saveGameState = () => {
-  //     try {
-  //       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gameState));
-  //     } catch (error) {
-  //       console.warn("Failed to save game state:", error);
-  //     }
-  //   };
+  // Reactivate: Auto-save to localStorage
+  useEffect(() => {
+    const saveGameState = () => {
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gameState));
+      } catch (error) {
+        console.warn("Failed to save game state:", error);
+      }
+    };
 
-  //   const timeoutId = setTimeout(saveGameState, 1000); // Debounce saves
-  //   return () => clearTimeout(timeoutId);
-  // }, [gameState]);
+    const timeoutId = setTimeout(saveGameState, 1000); // Debounce saves
+    return () => clearTimeout(timeoutId);
+  }, [gameState]);
 
-  // TEMPORARILY DISABLED: Load from localStorage on mount
-  // useEffect(() => {
-  //   // Only load from localStorage once on mount
-  //   if (hasLoadedRef.current) {
-  //     return;
-  //   }
+  // Reactivate: Load from localStorage on mount
+  useEffect(() => {
+    // Only load from localStorage once on mount
+    if (hasLoadedRef.current) {
+      return;
+    }
 
-  //   // Don't load from localStorage if we're restarting
-  //   if (gameState.isRestarting) {
-  //     console.log("🔄 Skipping localStorage load due to restart");
-  //     setHasLoadedFromStorage(true);
-  //     hasLoadedRef.current = true;
-  //     return;
-  //   }
+    // Don't load from localStorage if we're restarting
+    if (gameState.isRestarting) {
+      console.log("🔄 Skipping localStorage load due to restart");
+      setHasLoadedFromStorage(true);
+      hasLoadedRef.current = true;
+      return;
+    }
 
-  //   try {
-  //     const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
-  //     if (savedState && savedState !== "null" && savedState !== "undefined") {
-  //       console.log("📥 Found saved state, dispatching LOAD_GAME_STATE");
-  //       const parsedState = JSON.parse(savedState);
-  //       dispatch({ type: "LOAD_GAME_STATE", payload: parsedState });
-  //     } else {
-  //       console.log("📥 No saved state found, using initial fresh state");
-  //     }
-  //     setHasLoadedFromStorage(true);
-  //     hasLoadedRef.current = true;
-  //     // If no saved state, don't dispatch anything - use the initial fresh state
-  //   } catch (error) {
-  //     console.warn("Failed to load saved game state:", error);
-  //     setHasLoadedFromStorage(true);
-  //     hasLoadedRef.current = true;
-  //   }
-  // }, []); // Empty dependency array - only run once on mount
+    try {
+      const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedState && savedState !== "null" && savedState !== "undefined") {
+        console.log("📥 Found saved state, dispatching LOAD_GAME_STATE");
+        const parsedState = JSON.parse(savedState);
+        dispatch({ type: "LOAD_GAME_STATE", payload: parsedState });
+      } else {
+        console.log("📥 No saved state found, using initial fresh state");
+      }
+      setHasLoadedFromStorage(true);
+      hasLoadedRef.current = true;
+      // If no saved state, don't dispatch anything - use the initial fresh state
+    } catch (error) {
+      console.warn("Failed to load saved game state:", error);
+      setHasLoadedFromStorage(true);
+      hasLoadedRef.current = true;
+    }
+  }, [gameState.isRestarting]);
 
   // Reset the loaded ref when restarting
   useEffect(() => {

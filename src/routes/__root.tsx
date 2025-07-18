@@ -175,6 +175,7 @@ const RootLayout: React.FC = () => {
 
 // Wrapper component that provides game state context
 const RootLayoutWithContext: React.FC = () => {
+  console.log("🚀 RootLayoutWithContext - GameStateProvider wrapper");
   return (
     <GameStateProvider>
       <RootLayout />

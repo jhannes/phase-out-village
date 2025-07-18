@@ -509,7 +509,7 @@ export const gameReducer = (
       return { ...state, budget: action.payload };
 
     case "TRANSITION_FIELD": {
-      const { fieldName, newType } = action.payload;
+      const { fieldName } = action.payload;
       const field = state.gameFields.find((f) => f.name === fieldName);
 
       if (!field || field.status !== "active") {
@@ -851,105 +851,107 @@ export const gameReducer = (
     default:
       return state;
   }
-  // Save to localStorage - improved saving logic
-  if (newState) {
-    console.log("Saving state for action:", action.type);
-    try {
-      // Create a complete state object for saving that preserves field statuses
-      const stateToSave = {
-        // Save complete field data with status
-        gameFields: newState.gameFields.map((field) => ({
-          name: field.name,
-          status: field.status,
-          // Include other essential field properties that might have changed
-          phaseOutCost: field.phaseOutCost,
-          production: field.production,
-        })),
-        budget: newState.budget,
-        score: newState.score,
-        year: newState.year,
-        totalEmissions: newState.totalEmissions,
-        totalProduction: newState.totalProduction,
-        achievements: newState.achievements,
-        shutdowns: newState.shutdowns,
-        investments: newState.investments,
-        globalTemperature: newState.globalTemperature,
-        norwayTechRank: newState.norwayTechRank,
-        foreignDependency: newState.foreignDependency,
-        climateDamage: newState.climateDamage,
-        sustainabilityScore: newState.sustainabilityScore,
-        playerChoices: newState.playerChoices,
-        dataLayerUnlocked: newState.dataLayerUnlocked,
-        saturationLevel: newState.saturationLevel,
-        gamePhase: newState.gamePhase,
-        tutorialStep: newState.tutorialStep,
-        shownFacts: newState.shownFacts,
-        badChoiceCount: newState.badChoiceCount,
-        goodChoiceStreak: newState.goodChoiceStreak,
-        selectedFields: newState.selectedFields.map((field) => ({
-          name: field.name,
-          status: field.status,
-        })),
-        currentView: newState.currentView,
-        multiPhaseOutMode: newState.multiPhaseOutMode,
-        yearlyPhaseOutCapacity: newState.yearlyPhaseOutCapacity,
-        showAchievementModal: newState.showAchievementModal,
-        showGameOverModal: newState.showGameOverModal,
-        showTutorialModal: newState.showTutorialModal,
-        newAchievements: newState.newAchievements,
-        // Include timestamp for debugging
-        lastSaved: new Date().toISOString(),
-      };
+  // TEMPORARILY DISABLED: Save to localStorage - improved saving logic
+  // if (newState) {
+  //   console.log("Saving state for action:", action.type);
+  //   try {
+  //     // Create a complete state object for saving that preserves field statuses
+  //     const stateToSave = {
+  //       // Save complete field data with status
+  //       gameFields: newState.gameFields.map((field) => ({
+  //         name: field.name,
+  //         status: field.status,
+  //         // Include other essential field properties that might have changed
+  //         phaseOutCost: field.phaseOutCost,
+  //         production: field.production,
+  //       })),
+  //       budget: newState.budget,
+  //       score: newState.score,
+  //       year: newState.year,
+  //       totalEmissions: newState.totalEmissions,
+  //       totalProduction: newState.totalProduction,
+  //       achievements: newState.achievements,
+  //       shutdowns: newState.shutdowns,
+  //       investments: newState.investments,
+  //       globalTemperature: newState.globalTemperature,
+  //       norwayTechRank: newState.norwayTechRank,
+  //       foreignDependency: newState.foreignDependency,
+  //       climateDamage: newState.climateDamage,
+  //       sustainabilityScore: newState.sustainabilityScore,
+  //       playerChoices: newState.playerChoices,
+  //       dataLayerUnlocked: newState.dataLayerUnlocked,
+  //       saturationLevel: newState.saturationLevel,
+  //       gamePhase: newState.gamePhase,
+  //       tutorialStep: newState.tutorialStep,
+  //       shownFacts: newState.shownFacts,
+  //       badChoiceCount: newState.badChoiceCount,
+  //       goodChoiceStreak: newState.goodChoiceStreak,
+  //       selectedFields: newState.selectedFields.map((field) => ({
+  //         name: field.name,
+  //         status: field.status,
+  //       })),
+  //       currentView: newState.currentView,
+  //       multiPhaseOutMode: newState.multiPhaseOutMode,
+  //       yearlyPhaseOutCapacity: newState.yearlyPhaseOutCapacity,
+  //       showAchievementModal: newState.showAchievementModal,
+  //       showGameOverModal: newState.showGameOverModal,
+  //       showTutorialModal: newState.showTutorialModal,
+  //       newAchievements: newState.newAchievements,
+  //       // Include timestamp for debugging
+  //       lastSaved: new Date().toISOString(),
+  //     };
 
-      const serializedState = JSON.stringify(stateToSave);
-      localStorage.setItem(LOCAL_STORAGE_KEY, serializedState);
+  //     const serializedState = JSON.stringify(stateToSave);
+  //     localStorage.setItem(LOCAL_STORAGE_KEY, serializedState);
 
-      const closedFieldsCount = stateToSave.gameFields.filter(
-        (f) => f.status === "closed",
-      ).length;
-      console.log(
-        `✅ Saved game state - Action: ${action.type}, Closed fields: ${closedFieldsCount}, Shutdowns: ${Object.keys(stateToSave.shutdowns).length}`,
-      );
+  //     const closedFieldsCount = stateToSave.gameFields.filter(
+  //       (f) => f.status === "closed",
+  //     ).length;
+  //     console.log(
+  //       `✅ Saved game state - Action: ${action.type}, Closed fields: ${closedFieldsCount}, Shutdowns: ${Object.keys(stateToSave.shutdowns).length}`,
+  //     );
 
-      // Verify the save worked by reading it back
-      const verification = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (verification) {
-        const parsed = JSON.parse(verification);
-        const verifyClosedFields =
-          parsed.gameFields?.filter((f: any) => f.status === "closed")
-            ?.length || 0;
-        console.log(
-          `✅ Verification: ${verifyClosedFields} closed fields saved correctly`,
-        );
-      }
-    } catch (error) {
-      console.error("❌ Failed to save game state:", error);
+  //     // Verify the save worked by reading it back
+  //     const verification = localStorage.getItem(LOCAL_STORAGE_KEY);
+  //     if (verification) {
+  //         const parsed = JSON.parse(verification);
+  //         const verifyClosedFields =
+  //           parsed.gameFields?.filter((f: any) => f.status === "closed")
+  //             ?.length || 0;
+  //         console.log(
+  //           `✅ Verification: ${verifyClosedFields} closed fields saved correctly`,
+  //         );
+  //       }
+  //   } catch (error) {
+  //     console.error("❌ Failed to save game state:", error);
 
-      // Try a simpler save as fallback
-      try {
-        const simplifiedState = {
-          gameFields: newState.gameFields.map((f) => ({
-            name: f.name,
-            status: f.status,
-          })),
-          shutdowns: newState.shutdowns,
-          budget: newState.budget,
-          score: newState.score,
-          year: newState.year,
-          achievements: newState.achievements,
-        };
-        localStorage.setItem(
-          LOCAL_STORAGE_KEY + "_backup",
-          JSON.stringify(simplifiedState),
-        );
-        console.log("✅ Fallback save completed");
-      } catch (fallbackError) {
-        console.error("❌ Even fallback save failed:", fallbackError);
-      }
-    }
+  //     // Try a simpler save as fallback
+  //     try {
+  //       const simplifiedState = {
+  //         gameFields: newState.gameFields.map((f) => ({
+  //           name: f.name,
+  //           status: f.status,
+  //         })),
+  //         shutdowns: newState.shutdowns,
+  //         budget: newState.budget,
+  //         score: newState.score,
+  //         year: newState.year,
+  //         achievements: newState.achievements,
+  //       };
+  //       localStorage.setItem(
+  //         LOCAL_STORAGE_KEY + "_backup",
+  //         JSON.stringify(simplifiedState),
+  //       );
+  //       console.log("✅ Fallback save completed");
+  //     } catch (fallbackError) {
+  //       console.error("❌ Even fallback save failed:", fallbackError);
+  //     }
+  //   }
 
-    return newState;
-  }
+  //   return newState;
+  // }
 
-  return state;
+  // return newState;
+
+  return newState ?? state;
 };

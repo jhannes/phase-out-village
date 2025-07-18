@@ -3,6 +3,7 @@ import { useGameState } from "../../context/GameStateContext";
 import "./InvestmentsPage.css";
 import { Investment } from "../../types/types";
 import TopTabBar from "../../components/Navigation/TopTabBar";
+import AchievementModal from "../../components/modals/AchievementModal";
 
 const InvestmentsPage: React.FC = () => {
   const { gameState, dispatch } = useGameState();
@@ -304,6 +305,13 @@ const InvestmentsPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {gameState.showAchievementModal && (
+        <AchievementModal
+          achievements={gameState.newAchievements || []}
+          onClose={() => dispatch({ type: "CLOSE_ACHIEVEMENT_MODAL" })}
+        />
+      )}
     </>
   );
 };
