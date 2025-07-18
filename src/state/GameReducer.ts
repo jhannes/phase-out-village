@@ -11,6 +11,9 @@ import {
   calculateTotalBadInvestments,
   calculateEmissionsSaved,
   calculateEmissionsReduction,
+  calculateScore,
+  calculateTemperatureReduction,
+  calculateClimateDamage,
 } from "../components/game/GameUtils";
 import { LOCAL_STORAGE_KEY } from "../constants";
 
@@ -77,13 +80,31 @@ export const gameReducer = (
         ? field.phaseOutCost * (1 - state.nextPhaseOutDiscount)
         : field.phaseOutCost;
 
+      // Calculate yearly consequences BEFORE updating state
+      const tempState = {
+        ...state,
+        gameFields: state.gameFields.map((f) =>
+          f.name === fieldName
+            ? { ...f, status: "closed" as const, production: 0 }
+            : f,
+        ),
+        year: state.year + 1,
+        shutdowns: { ...state.shutdowns, [fieldName]: state.year + 1 },
+      };
+      const yearlyConsequences = calculateYearlyConsequences(tempState);
+
       newState = {
         ...state,
-        budget: state.budget - actualCost,
-        score: state.score + Math.floor(field.totalLifetimeEmissions / 1000),
+        budget:
+          state.budget -
+          actualCost +
+          yearlyConsequences.yearlyOilRevenue -
+          yearlyConsequences.climateCostIncrease,
+        score: state.score + calculateScore(field.totalLifetimeEmissions),
         globalTemperature: Math.max(
           1.1,
-          state.globalTemperature - field.emissions[0] * 0.001,
+          state.globalTemperature -
+            calculateTemperatureReduction(field.emissions[0]),
         ),
         gameFields: state.gameFields.map((f) =>
           f.name === fieldName
@@ -101,6 +122,8 @@ export const gameReducer = (
         showFieldModal: false,
         selectedField: null,
         nextPhaseOutDiscount: undefined, // Remove discount after use
+        climateDamage:
+          state.climateDamage + yearlyConsequences.climateCostIncrease,
       };
 
       // Update selectedFields to reflect new field statuses
@@ -110,19 +133,6 @@ export const gameReducer = (
         );
         return updatedField || field;
       });
-
-      // Apply yearly consequences
-      const yearlyConsequences = calculateYearlyConsequences(newState);
-
-      // Add oil revenue temptation
-      newState.budget += yearlyConsequences.yearlyOilRevenue;
-
-      // Apply climate costs
-      newState.budget = Math.max(
-        0,
-        newState.budget - yearlyConsequences.climateCostIncrease,
-      );
-      newState.climateDamage += yearlyConsequences.climateCostIncrease;
 
       // Check for random events
       const randomEvent = getRandomEvent(newState);
@@ -244,13 +254,40 @@ export const gameReducer = (
       const totalEmissionsSaved = calculateEmissionsSaved(actualFields);
       const totalEmissionsReduction = calculateEmissionsReduction(actualFields);
 
+      // Calculate yearly consequences BEFORE updating state
+      const tempState = {
+        ...state,
+        gameFields: state.gameFields.map((field) => {
+          const isBeingPhasedOut = actualFields.some(
+            (f) => f.name === field.name,
+          );
+          return isBeingPhasedOut
+            ? { ...field, status: "closed" as const, production: 0 }
+            : field;
+        }),
+        year: state.year + 1,
+        shutdowns: {
+          ...state.shutdowns,
+          ...actualFields.reduce(
+            (acc, field) => ({ ...acc, [field.name]: state.year + 1 }),
+            {},
+          ),
+        },
+      };
+      const yearlyConsequences = calculateYearlyConsequences(tempState);
+
       newState = {
         ...state,
-        budget: state.budget - totalCost,
-        score: state.score + Math.floor(totalEmissionsSaved / 1000),
+        budget:
+          state.budget -
+          totalCost +
+          yearlyConsequences.yearlyOilRevenue -
+          yearlyConsequences.climateCostIncrease,
+        score: state.score + calculateScore(totalEmissionsSaved),
         globalTemperature: Math.max(
           1.1,
-          state.globalTemperature - totalEmissionsReduction * 0.001,
+          state.globalTemperature -
+            calculateTemperatureReduction(totalEmissionsReduction),
         ),
         gameFields: state.gameFields.map((field) => {
           const isBeingPhasedOut = actualFields.some(
@@ -280,16 +317,9 @@ export const gameReducer = (
         selectedFields: [],
         multiPhaseOutMode: false,
         nextPhaseOutDiscount: undefined,
+        climateDamage:
+          state.climateDamage + yearlyConsequences.climateCostIncrease,
       };
-
-      // Apply yearly consequences
-      const yearlyConsequences = calculateYearlyConsequences(newState);
-      newState.budget += yearlyConsequences.yearlyOilRevenue;
-      newState.budget = Math.max(
-        0,
-        newState.budget - yearlyConsequences.climateCostIncrease,
-      );
-      newState.climateDamage += yearlyConsequences.climateCostIncrease;
 
       // Check for random events
       const randomEvent = getRandomEvent(newState);
@@ -559,13 +589,40 @@ export const gameReducer = (
       const totalEmissionsSaved = calculateEmissionsSaved(actualFields);
       const totalEmissionsReduction = calculateEmissionsReduction(actualFields);
 
+      // Calculate yearly consequences BEFORE updating state
+      const tempState = {
+        ...state,
+        gameFields: state.gameFields.map((field) => {
+          const isBeingPhasedOut = actualFields.some(
+            (f) => f.name === field.name,
+          );
+          return isBeingPhasedOut
+            ? { ...field, status: "closed" as const, production: 0 }
+            : field;
+        }),
+        year: state.year + 1,
+        shutdowns: {
+          ...state.shutdowns,
+          ...actualFields.reduce(
+            (acc, field) => ({ ...acc, [field.name]: state.year + 1 }),
+            {},
+          ),
+        },
+      };
+      const yearlyConsequences = calculateYearlyConsequences(tempState);
+
       newState = {
         ...state,
-        budget: state.budget - totalCost,
-        score: state.score + Math.floor(totalEmissionsSaved / 1000),
+        budget:
+          state.budget -
+          totalCost +
+          yearlyConsequences.yearlyOilRevenue -
+          yearlyConsequences.climateCostIncrease,
+        score: state.score + calculateScore(totalEmissionsSaved),
         globalTemperature: Math.max(
           1.1,
-          state.globalTemperature - totalEmissionsReduction * 0.001,
+          state.globalTemperature -
+            calculateTemperatureReduction(totalEmissionsReduction),
         ),
         gameFields: state.gameFields.map((field) => {
           const isBeingPhasedOut = actualFields.some(
@@ -593,6 +650,8 @@ export const gameReducer = (
           ),
         },
         nextPhaseOutDiscount: undefined,
+        climateDamage:
+          state.climateDamage + yearlyConsequences.climateCostIncrease,
       };
 
       // Update selectedFields to reflect new field statuses
@@ -602,15 +661,6 @@ export const gameReducer = (
         );
         return updatedField || field;
       });
-
-      // Apply yearly consequences
-      const yearlyConsequences = calculateYearlyConsequences(newState);
-      newState.budget += yearlyConsequences.yearlyOilRevenue;
-      newState.budget = Math.max(
-        0,
-        newState.budget - yearlyConsequences.climateCostIncrease,
-      );
-      newState.climateDamage += yearlyConsequences.climateCostIncrease;
 
       // Check for random events
       const randomEvent = getRandomEvent(newState);
@@ -710,10 +760,7 @@ export const gameReducer = (
         (sum, f) => sum + f.emissions[0],
         0,
       );
-      const climateDamage = Math.max(
-        0,
-        totalEmissions / 1000, // Base climate damage on current emissions (convert Mt to thousands)
-      );
+      const climateDamage = calculateClimateDamage(totalEmissions);
 
       return {
         ...state,

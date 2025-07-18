@@ -1,5 +1,6 @@
 import { GameState } from "./interfaces/GameState";
 import { INITIAL_YEAR } from "./constants";
+import { calculateTotalGoodTechInvestment } from "./components/game/GameUtils";
 
 // Enhanced badge system with educational messages
 export const ACHIEVEMENT_BADGES = {
@@ -110,7 +111,7 @@ export const checkAndAwardAchievements = (state: GameState): string[] => {
 
   // KLIMABEVISST - Holdt temperatur under 1.5°C og faset ut 5+ felt
   if (
-    state.globalTemperature <= 1.2 &&
+    state.globalTemperature <= 1.5 &&
     phasedOutFields >= 5 &&
     !state.achievements.includes("Klimabevisst")
   ) {
@@ -118,8 +119,11 @@ export const checkAndAwardAchievements = (state: GameState): string[] => {
   }
 
   // TECH-PIONER - 200+ milliarder i tech-investeringer (økt krav)
+  const totalGoodTechInvestment = calculateTotalGoodTechInvestment(
+    state.investments,
+  );
   if (
-    totalTechInvestment >= 200 &&
+    totalGoodTechInvestment >= 200 &&
     !state.achievements.includes("Tech-Pioner")
   ) {
     newAchievements.push("Tech-Pioner");

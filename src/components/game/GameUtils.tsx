@@ -63,6 +63,52 @@ export const calculateEmissionsReduction = (fields: any[]): number => {
   return fields.reduce((sum, field) => sum + (field.emissions[0] || 0), 0);
 };
 
+// Fix score calculation - use a more reasonable scoring system
+export const calculateScore = (totalLifetimeEmissions: number): number => {
+  // Score based on emissions prevented, with a more reasonable scale
+  // 1 Mt CO2 = 100 points, so a field with 10 Mt lifetime emissions = 1000 points
+  return Math.floor(totalLifetimeEmissions * 100);
+};
+
+// Fix temperature calculation - use more realistic scale
+export const calculateTemperatureReduction = (
+  yearlyEmissions: number,
+): number => {
+  // More realistic temperature reduction: 1 Mt CO2 = 0.01°C reduction
+  // This means phasing out a field with 1 Mt emissions reduces temperature by 0.01°C
+  return yearlyEmissions * 0.01;
+};
+
+// Fix climate damage calculation
+export const calculateClimateDamage = (totalEmissions: number): number => {
+  // More reasonable climate damage calculation
+  // Base damage on current emissions with a realistic scale
+  return Math.max(0, totalEmissions * 50); // 1 Mt = 50 damage points
+};
+
+// Fix achievement checking for tech investments
+export const calculateTotalGoodTechInvestment = (
+  investments: Record<Investment, number>,
+): number => {
+  return (
+    investments.green_tech +
+    investments.ai_research +
+    investments.renewable_energy +
+    investments.carbon_capture +
+    investments.hydrogen_tech +
+    investments.quantum_computing +
+    investments.battery_tech +
+    investments.offshore_wind +
+    investments.geothermal_energy +
+    investments.space_tech
+  );
+};
+
+// Fix progressive data unlocks - use correct property
+export const getPhasedOutFieldsCount = (gameState: GameState): number => {
+  return Object.keys(gameState.shutdowns).length;
+};
+
 // The following components are not defined in the provided code.
 // These are placeholders to resolve compilation errors.
 

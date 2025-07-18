@@ -4,14 +4,8 @@
 // Adjust thresholds and logic as needed for game balance and pacing.
 
 import { DataLayer } from "./ProgressiveDataLayers";
-
-// Example GameState type (adjust as needed)
-export interface GameState {
-  fieldsPhasedOut: number;
-  score: number;
-  year: number;
-  achievements: string[];
-}
+import { GameState } from "../interfaces/GameState";
+import { getPhasedOutFieldsCount } from "./game/GameUtils";
 
 // Thresholds for unlocking layers
 const INTERMEDIATE_FIELDS = 4; // Number of fields to phase out for intermediate
@@ -34,7 +28,8 @@ export function getUnlockedLayers(gameState: GameState): DataLayer[] {
   const unlocked: DataLayer[] = ["basic"];
 
   // Intermediate: Unlock after 4 fields phased out
-  if (gameState.fieldsPhasedOut >= INTERMEDIATE_FIELDS) {
+  const phasedOutFields = getPhasedOutFieldsCount(gameState);
+  if (phasedOutFields >= INTERMEDIATE_FIELDS) {
     unlocked.push("intermediate");
   }
 
