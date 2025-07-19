@@ -1,5 +1,5 @@
 import { Link, Outlet } from "@tanstack/react-router";
-import React from "react";
+import React, { useState } from "react";
 
 export function Application() {
   const [year, setYear] = useState(2025);
