@@ -19,7 +19,12 @@ export function Application() {
             <button onClick={() => setYear((y) => y + 1)}>Neste</button>
           </div>
         </div>
-        <div>Oljefelter avviklet: 0</div>
+        <div>
+          Oljefelter avviklet: 0
+          <div>
+            <button>Velg felter for avvikling</button>
+          </div>
+        </div>
         <div>Utslipp til 2040: 200 (0% redusjon)</div>
         <div>Produksjon til 2040: 200 (0% redusjon)</div>
       </header>
