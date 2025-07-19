@@ -1,9 +1,44 @@
+* {
+  margin: 0;
+}
+
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 td {
   text-align: center;
+}
+
+#app {
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+}
+
+#app nav {
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+#app header {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  > * {
+    padding: 1em;
+  }
+}
+
+#app main {
+  overflow-y: auto;
 }
 
 .projected {

@@ -64,8 +64,6 @@ export function FlatApplication() {
 
   return (
     <div>
-      <h1>Chill, baby! Chill!</h1>
-      <OilFieldMap />
       <div>
         <h2>Inntektsberegning</h2>
         <PriceControls

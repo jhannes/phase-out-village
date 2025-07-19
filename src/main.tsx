@@ -12,3 +12,8 @@ function Application() {
 }
 
 createRoot(document.getElementById("app")!).render(<Application />);
+
+if (window.location.search === "?debug") {
+  localStorage.setItem("debug", "true");
+  window.location.search = "";
+}

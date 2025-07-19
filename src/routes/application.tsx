@@ -1,11 +1,11 @@
 import { Link, Outlet } from "@tanstack/react-router";
-import React, { useState } from "react";
+import React from "react";
 
 export function Application() {
   const [year, setYear] = useState(2025);
 
   return (
-    <div>
+    <>
       <nav>
         <Link to="/">Home</Link>
         <Link to="/map">Map</Link>
@@ -26,6 +26,6 @@ export function Application() {
       <main>
         <Outlet />
       </main>
-    </div>
+    </>
   );
 }

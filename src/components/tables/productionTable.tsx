@@ -4,6 +4,7 @@ import { useState } from "react";
 import { productionProjections } from "../../utils/projections";
 
 export function ProductionTable() {
+  const debug = localStorage.getItem("debug") === "true";
   const [view, setView] = useState<"oil" | "gas" | "both">("oil");
 
   const oilFields = Object.keys(data);
@@ -37,6 +38,7 @@ export function ProductionTable() {
           Gass
         </button>
       </div>
+      {debug && <button>Last ned</button>}
       <table>
         <thead>
           <tr>
