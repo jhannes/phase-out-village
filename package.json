@@ -28,6 +28,7 @@
     "vite": "^7.0.0"
   },
   "dependencies": {
+    "@tanstack/react-router": "^1.128.4",
     "chart.js": "^4.5.0",
     "chartjs-plugin-annotation": "^3.1.0",
     "ol": "^10.6.1",

@@ -1753,4 +1753,4 @@ export const data: Record<
       emissionIntensity: 12.57,
     },
   },
-};
+} as const;

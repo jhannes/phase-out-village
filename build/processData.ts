@@ -52,5 +52,6 @@ const compactJson = JSON.stringify(result, null, 2).replace(
 
 console.log(
   "export const data: Record<string, Record<string, { productionOil?: number; productionGas?: number; emission?: number; emissionIntensity?: number; }>> = " +
-    compactJson,
+    compactJson +
+    " as const",
 );
