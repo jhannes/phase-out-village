@@ -40,7 +40,7 @@ const map = new Map({
   view,
 });
 
-export function OilFieldMap({ slug }: { slug: Slugify<OilfieldName> }) {
+export function OilFieldMap({ slug }: { slug?: Slugify<OilfieldName> }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     map.setTarget(mapRef.current!);

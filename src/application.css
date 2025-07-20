@@ -2,6 +2,10 @@
   margin: 0;
 }
 
+dialog {
+  margin: revert;
+}
+
 :root {
   color-scheme: light dark;
 }

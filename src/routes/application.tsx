@@ -1,13 +1,17 @@
 import { Link, Outlet } from "@tanstack/react-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import { ApplicationContext } from "../applicationContext";
+import { generateCompleteData } from "../utils/projections";
+import { data } from "../generated/data";
 
 export function Application() {
   const [year, setYear] = useState(2025);
+  const fullData = useMemo(() => generateCompleteData(data), [data]);
 
   return (
-    <>
+    <ApplicationContext value={{ year, fullData }}>
       <nav>
-        <Link to="/">Home</Link>
+        <Link to="/">Hjem</Link>
         <Link to="/map">Map</Link>
         <Link to="/emissions">Utslipp</Link>
         <Link to="/production">Produksjon</Link>
@@ -22,15 +26,23 @@ export function Application() {
         <div>
           Oljefelter avviklet: 0
           <div>
-            <button>Velg felter for avvikling</button>
+            <Link to={"/phaseout"}>
+              <button>Velg felter for avvikling</button>
+            </Link>
           </div>
         </div>
         <div>Utslipp til 2040: 200 (0% redusjon)</div>
         <div>Produksjon til 2040: 200 (0% redusjon)</div>
+        <div>
+          <p>
+            <a href="https://mdg.no/politikk/utfasing">MDG</a>
+          </p>
+          <p>Det ER mulig</p>
+        </div>
       </header>
       <main>
         <Outlet />
       </main>
-    </>
+    </ApplicationContext>
   );
 }

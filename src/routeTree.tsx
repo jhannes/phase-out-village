@@ -12,6 +12,7 @@ import { ProductionTable } from "./components/tables/productionTable";
 import { FlatApplication } from "./components/app/flatApplication";
 import { OilfieldMap } from "./routes/oilfieldMap";
 import { MapRoute } from "./routes/mapRoute";
+import { PhaseOutRoute } from "./routes/phaseOutRoute";
 
 export const routeTree = createRootRoute({
   component: Application,
@@ -28,6 +29,11 @@ routeTree.addChildren([
     path: "/",
     getParentRoute: () => routeTree,
     component: FrontPage,
+  }),
+  createRoute({
+    path: "/phaseout",
+    getParentRoute: () => routeTree,
+    component: PhaseOutRoute,
   }),
   mapRoute.addChildren([
     createRoute({
