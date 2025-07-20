@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from "react";
-import { Map, View } from "ol";
+import React, { useEffect, useRef, useState } from "react";
+import { Feature, Map, View } from "ol";
 import { OSM } from "ol/source";
 import TileLayer from "ol/layer/Tile";
 import { useGeographic } from "ol/proj";
@@ -8,9 +8,11 @@ import "ol/ol.css";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import { GeoJSON } from "ol/format";
-import { Fill, Stroke, Style, Text } from "ol/style";
+import { Fill, Style, Text } from "ol/style";
 import { OilfieldName, slugify, Slugify } from "../../data";
-import { SimpleGeometry } from "ol/geom";
+import { Point, SimpleGeometry } from "ol/geom";
+import { FeatureLike } from "ol/Feature";
+import { getCenter } from "ol/extent";
 
 useGeographic();
 
@@ -28,7 +30,6 @@ const map = new Map({
       style: (f) =>
         new Style({
           fill: new Fill({ color: "red" }),
-          stroke: new Stroke({ color: "black", width: 2 }),
           text: new Text({
             font: "9pt sans-serif",
             text: f.getProperties()["fldName"],
@@ -40,31 +41,53 @@ const map = new Map({
   view,
 });
 
+function focusStyle(f: FeatureLike) {
+  return [
+    new Style({
+      fill: new Fill({ color: "blue" }),
+    }),
+    new Style({
+      text: new Text({
+        font: "9pt sans-serif",
+        text: f.getProperties()["fldName"],
+        overflow: true,
+        placement: "point",
+      }),
+      geometry: new Point(getCenter(f.getGeometry()!.getExtent())),
+    }),
+  ];
+}
+
 export function OilFieldMap({ slug }: { slug?: Slugify<OilfieldName> }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     map.setTarget(mapRef.current!);
     map.on("click", (e) => {
       const features = map.getFeaturesAtPixel(e.pixel);
-      console.log({ features });
       if (features.length === 1) {
         const { geometry, ...properties } = features[0].getProperties();
         alert(JSON.stringify(properties));
       }
     });
-    oilfieldSource.on("featuresloadend", () => focusOnOilfield());
+    oilfieldSource.once("featuresloadend", () => selectOilField());
   }, []);
+  const [selectedFeature, setSelectedFeature] = useState<Feature>();
+  function selectOilField() {
+    setSelectedFeature(
+      oilfieldSource
+        .getFeatures()
+        .find((f) => slugify(f.getProperties().fldName) === slug),
+    );
+  }
+  useEffect(() => selectOilField(), [slug]);
 
-  function focusOnOilfield() {
-    console.log("Finding " + slug);
-    const field = oilfieldSource
-      .getFeatures()
-      .find((f) => slugify(f.getProperties().fldName) === slug);
-    const geometry = field?.getGeometry();
+  useEffect(() => {
+    selectedFeature?.setStyle(focusStyle);
+    const geometry = selectedFeature?.getGeometry();
     if (geometry) {
       console.log({ geometry });
       view.fit(geometry as SimpleGeometry, {
-        maxZoom: 6,
+        maxZoom: 9,
         duration: 500,
       });
     } else if (oilfieldSource.getFeatures().length > 0) {
@@ -73,8 +96,8 @@ export function OilFieldMap({ slug }: { slug?: Slugify<OilfieldName> }) {
         padding: [10, 10, 10, 10],
       });
     }
-  }
-  useEffect(() => focusOnOilfield(), [slug]);
+    return () => selectedFeature?.setStyle(undefined);
+  }, [selectedFeature]);
 
   return <div ref={mapRef}></div>;
 }
