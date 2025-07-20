@@ -2,9 +2,7 @@ import { Link, Outlet } from "@tanstack/react-router";
 import React, { useMemo, useState } from "react";
 import { ApplicationContext } from "../applicationContext";
 import { generateCompleteData } from "../utils/projections";
-import { calculateTotalYearlyOilProduction } from "../utils/calculations";
 import { data } from "../generated/data";
-import { exportDataSet } from "../utils/excel";
 
 export function Application() {
   const [year, setYear] = useState(2025);
@@ -43,9 +41,6 @@ export function Application() {
         </div>
       </header>
       <main>
-        <button onClick={() => exportDataSet(fullData)}>
-          Last ned som Excel
-        </button>
         <Outlet />
       </main>
     </ApplicationContext>
