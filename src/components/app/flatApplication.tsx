@@ -6,11 +6,11 @@ import {
 } from "../../types/interface";
 import { ShutdownMap } from "../../types/types";
 import {
-  calculateTotalYearlyEmission,
-  calculateTotalYearlyIncome,
   extractEmissionIntensities,
   generateCompleteData,
 } from "../../utils/projections";
+import { calculateTotalYearlyEmission } from "../../utils/calculations";
+import { calculateTotalYearlyIncome } from "../../utils/calculations";
 import { data } from "../../generated/data";
 import { OilFieldMap } from "../map/oilFieldMap";
 import { PriceControls } from "../sliders/priceControlSliders";
