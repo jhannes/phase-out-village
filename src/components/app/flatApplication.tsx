@@ -6,18 +6,20 @@ import {
 } from "../../types/interface";
 import { ShutdownMap } from "../../types/types";
 import {
-  calculateTotalYearlyEmission,
-  calculateTotalYearlyIncome,
   extractEmissionIntensities,
   generateCompleteData,
 } from "../../utils/projections";
+import {
+  calculateTotalYearlyEmission,
+  calculateTotalYearlyIncome,
+} from "../../utils/calculations";
 import { data } from "../../generated/data";
-import { OilFieldMap } from "../map/oilFieldMap";
 import { PriceControls } from "../sliders/priceControlSliders";
 import { ShutdownControls } from "../controls/shutdownControls";
 import { YearlyEmissionChart } from "../charts/yearlyEmissionChart";
 import { EmissionIntensityChart } from "../charts/emissionIntensityYear";
 import { EmissionEfficiencyScatterChart } from "../charts/emissionEfficiencyScatter";
+import { exportDataSet } from "../../utils/excel";
 
 export function FlatApplication() {
   const [price, setPrice] = useState({ oil: 80, gas: 50 });
@@ -65,6 +67,9 @@ export function FlatApplication() {
   return (
     <div>
       <div>
+        <button onClick={() => exportDataSet(fullData)}>
+          Last ned som Excel
+        </button>
         <h2>Inntektsberegning</h2>
         <PriceControls
           price={price}

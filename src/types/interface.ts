@@ -25,6 +25,16 @@ export interface YearlyEmission {
   totalEmission: number;
 }
 
+export interface YearlyOilProduction {
+  year: string;
+  totalOilProduction: number;
+}
+
+export interface YearlyGasProduction {
+  year: string;
+  totalGasProduction: number;
+}
+
 export interface EmissionIntensity {
   fieldName: string;
   year: number;
