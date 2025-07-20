@@ -1,7 +1,10 @@
 import { Link, Outlet } from "@tanstack/react-router";
 import React, { useMemo, useState } from "react";
 import { ApplicationContext } from "../applicationContext";
-import { generateCompleteData } from "../utils/projections";
+import {
+  calculateTotalYearlyOilProduction,
+  generateCompleteData,
+} from "../utils/projections";
 import { data } from "../generated/data";
 
 export function Application() {

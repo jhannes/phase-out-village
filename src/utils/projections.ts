@@ -2,7 +2,9 @@ import {
   EmissionIntensity,
   Projection,
   YearlyEmission,
+  YearlyGasProduction,
   YearlyIncome,
+  YearlyOilProduction,
 } from "../types/interface";
 import { OilFieldDataset, ShutdownMap } from "../types/types";
 
@@ -160,6 +162,8 @@ export function generateCompleteData(data: OilFieldDataset): OilFieldDataset {
   return combined;
 }
 
+export function exportDataSet(data: OilFieldDataset) {}
+
 export function calculateTotalYearlyIncome(
   data: OilFieldDataset,
   oilPrice: number,
@@ -230,6 +234,56 @@ export function calculateTotalYearlyEmission(
     .map(([year, emission]) => ({
       year,
       totalEmission: parseFloat(emission.toFixed(2)),
+    }));
+}
+
+export function calculateTotalYearlyOilProduction(
+  data: OilFieldDataset,
+  shutdowns: ShutdownMap,
+): YearlyOilProduction[] {
+  const yearlyTotals: Record<string, number> = {};
+
+  for (const [fieldname, field] of Object.entries(data)) {
+    const shutdownYear = shutdowns[fieldname] ?? 2040;
+
+    for (const [year, record] of Object.entries(field)) {
+      if (parseInt(year) > shutdownYear) continue;
+
+      const oil = record.productionOil ?? 0;
+      yearlyTotals[year] = (yearlyTotals[year] ?? 0) + oil;
+    }
+  }
+
+  return Object.entries(yearlyTotals)
+    .sort(([a], [b]) => Number(a) - Number(b))
+    .map(([year, totalOil]) => ({
+      year,
+      totalOilProduction: parseFloat(totalOil.toFixed(2)),
+    }));
+}
+
+export function calculateTotalYearlyGasProduction(
+  data: OilFieldDataset,
+  shutdowns: ShutdownMap,
+): YearlyGasProduction[] {
+  const yearlyTotals: Record<string, number> = {};
+
+  for (const [fieldname, field] of Object.entries(data)) {
+    const shutdownYear = shutdowns[fieldname] ?? 2040;
+
+    for (const [year, record] of Object.entries(field)) {
+      if (parseInt(year) > shutdownYear) continue;
+
+      const gas = record.productionGas ?? 0;
+      yearlyTotals[year] = (yearlyTotals[year] ?? 0) + gas;
+    }
+  }
+
+  return Object.entries(yearlyTotals)
+    .sort(([a], [b]) => Number(a) - Number(b))
+    .map(([year, totalGas]) => ({
+      year,
+      totalGasProduction: parseFloat(totalGas.toFixed(2)),
     }));
 }
 
