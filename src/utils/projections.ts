@@ -55,7 +55,6 @@ export function productionProjections(data: OilFieldDataset): Projection[] {
   const projectionStart = 2023;
   const projectionEnd = 2040;
   const annualDeclineRate = 0.1;
-  const constantIncrease = 0.03;
 
   for (const [fieldName, yearlyData] of Object.entries(data)) {
     const oilActive = isStillProducing(yearlyData, "productionOil");
@@ -71,11 +70,25 @@ export function productionProjections(data: OilFieldDataset): Projection[] {
     let projectedEmission = shouldProjectEmission
       ? calculateAverage(yearlyData, "emission")
       : null;
-    let projectedEmissionIntensity = shouldProjectEmission
-      ? calculateAverage(yearlyData, "emissionIntensity")
-      : null;
 
     for (let year = projectionStart; year <= projectionEnd; year++) {
+      let projectedEmissionIntensity: number | null = null;
+
+      if (
+        shouldProjectEmission &&
+        projectedEmission !== null &&
+        projectedOil !== null &&
+        projectedGas !== null
+      ) {
+        const oilBoe = projectedOil * 1_000_000 * 6.29;
+        const gasBoe = projectedGas * 1_000_000 * 1.1 * 6.29;
+        const totalBoe = oilBoe + gasBoe;
+        const emissionKg = projectedEmission * 1000;
+
+        projectedEmissionIntensity =
+          totalBoe > 0 ? emissionKg / totalBoe : null;
+      }
+
       projections.push({
         oilFieldName: fieldName,
         year,
@@ -102,13 +115,6 @@ export function productionProjections(data: OilFieldDataset): Projection[] {
         projectedGas *= 1 - annualDeclineRate;
         if (projectedGas < 0.01) projectedGas = 0;
       }
-
-      /*
-      if (projectedEmission !== null) {
-        projectedEmission *= 1 + constantIncrease;
-        if (projectedEmission < 0.01) projectedEmission = 0;
-      }
-      */
     }
   }
 
