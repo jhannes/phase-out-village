@@ -8,8 +8,13 @@ export type Slugify<S extends string> =
       ? `${T}-${Slugify<U>}`
       : L
     : never;
+
+export function slugify<T extends string>(name: T): Slugify<T> {
+  return name.toLowerCase().replace(/\s+/g, "-") as Slugify<T>;
+}
+
 export const oilfields = Object.keys(data).map((name) =>
-  name.toLowerCase().replace(/\s+/g, "-"),
+  slugify(name),
 ) as Slugify<OilfieldName>[];
 export const oilfieldNames = Object.fromEntries(
   Object.keys(data).map((name) => [

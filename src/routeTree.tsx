@@ -1,7 +1,6 @@
 import {
   createRootRoute,
   createRoute,
-  Outlet,
   useParams,
 } from "@tanstack/react-router";
 import React from "react";
@@ -10,22 +9,18 @@ import { OilFieldMapList } from "./routes/oilFieldMapList";
 import { Application } from "./routes/application";
 import { OilfieldName, Slugify } from "./data";
 import { ProductionTable } from "./components/tables/productionTable";
-import { OilFieldMap } from "./components/map/oilFieldMap";
 import { FlatApplication } from "./components/app/flatApplication";
 import { OilfieldMap } from "./routes/oilfieldMap";
+import { MapRoute } from "./routes/mapRoute";
 
 export const routeTree = createRootRoute({
   component: Application,
 });
+
 export const mapRoute = createRoute({
   path: "/map",
   getParentRoute: () => routeTree,
-  component: () => (
-    <div>
-      <OilFieldMap />
-      <Outlet />
-    </div>
-  ),
+  component: () => <MapRoute />,
 });
 
 routeTree.addChildren([

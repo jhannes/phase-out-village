@@ -9,17 +9,21 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import { GeoJSON } from "ol/format";
 import { Fill, Stroke, Style, Text } from "ol/style";
+import { OilfieldName, slugify, Slugify } from "../../data";
+import { SimpleGeometry } from "ol/geom";
 
 useGeographic();
 
+const oilfieldSource = new VectorSource({
+  url: "/phase-out-village/geojson/oilfields.geojson",
+  format: new GeoJSON(),
+});
+const view = new View({ center: [10, 65], zoom: 2 });
 const map = new Map({
   layers: [
     new TileLayer({ source: new OSM() }),
     new VectorLayer({
-      source: new VectorSource({
-        url: "/phase-out-village/geojson/oilfields.geojson",
-        format: new GeoJSON(),
-      }),
+      source: oilfieldSource,
       style: (f) =>
         new Style({
           fill: new Fill({ color: "red" }),
@@ -27,15 +31,15 @@ const map = new Map({
           text: new Text({
             font: "9pt sans-serif",
             text: f.getProperties()["fldName"],
-            overflow: true,
+            //overflow: true,
           }),
         }),
     }),
   ],
-  view: new View({ center: [10, 65], zoom: 6 }),
+  view,
 });
 
-export function OilFieldMap() {
+export function OilFieldMap({ slug }: { slug: Slugify<OilfieldName> }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     map.setTarget(mapRef.current!);
@@ -47,7 +51,26 @@ export function OilFieldMap() {
         alert(JSON.stringify(properties));
       }
     });
+    oilfieldSource.on("featuresloadend", () => focusOnOilfield());
   }, []);
+
+  function focusOnOilfield() {
+    console.log("Finding " + slug);
+    const field = oilfieldSource
+      .getFeatures()
+      .find((f) => slugify(f.getProperties().fldName) === slug);
+    const geometry = field?.getGeometry();
+    if (geometry) {
+      console.log({ geometry });
+      view.fit(geometry as SimpleGeometry, {
+        maxZoom: 6,
+        duration: 500,
+      });
+    } else {
+      view.animate({ center: [10, 65], zoom: 3 });
+    }
+  }
+  useEffect(() => focusOnOilfield(), [slug]);
 
   return <div ref={mapRef} style={{ width: "100%", height: "50vh" }}></div>;
 }

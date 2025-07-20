@@ -41,6 +41,21 @@ td {
   overflow-y: auto;
 }
 
+#app main:has(.oilfield-map) {
+  overflow-y: hidden;
+  height: 100%;
+}
+
+.oilfield-map {
+  display: grid;
+  height: 100%;
+  grid-template-rows: 1fr 1fr;
+
+  .details {
+    overflow-y: scroll;
+  }
+}
+
 .projected {
   color: red;
   font-style: italic;
