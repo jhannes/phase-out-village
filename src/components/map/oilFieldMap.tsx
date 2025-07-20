@@ -18,7 +18,8 @@ const oilfieldSource = new VectorSource({
   url: "/phase-out-village/geojson/oilfields.geojson",
   format: new GeoJSON(),
 });
-const view = new View({ center: [10, 65], zoom: 2 });
+const defaultViewport = { center: [10, 65], zoom: 4 };
+const view = new View(defaultViewport);
 const map = new Map({
   layers: [
     new TileLayer({ source: new OSM() }),
@@ -67,10 +68,10 @@ export function OilFieldMap({ slug }: { slug: Slugify<OilfieldName> }) {
         duration: 500,
       });
     } else {
-      view.animate({ center: [10, 65], zoom: 3 });
+      view.animate(defaultViewport);
     }
   }
   useEffect(() => focusOnOilfield(), [slug]);
 
-  return <div ref={mapRef} style={{ width: "100%", height: "50vh" }}></div>;
+  return <div ref={mapRef}></div>;
 }

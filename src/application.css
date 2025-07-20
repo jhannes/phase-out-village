@@ -54,6 +54,11 @@ td {
   .details {
     overflow-y: scroll;
   }
+
+  @media (width > 600px) {
+    grid-template-rows: unset;
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .projected {
