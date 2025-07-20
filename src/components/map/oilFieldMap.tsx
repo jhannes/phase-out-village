@@ -67,8 +67,11 @@ export function OilFieldMap({ slug }: { slug: Slugify<OilfieldName> }) {
         maxZoom: 6,
         duration: 500,
       });
-    } else {
-      view.animate(defaultViewport);
+    } else if (oilfieldSource.getFeatures().length > 0) {
+      view.fit(oilfieldSource.getExtent(), {
+        duration: 500,
+        padding: [10, 10, 10, 10],
+      });
     }
   }
   useEffect(() => focusOnOilfield(), [slug]);
