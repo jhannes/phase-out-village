@@ -2,13 +2,23 @@ import { Link, Outlet } from "@tanstack/react-router";
 import React, { useMemo, useState } from "react";
 import { ApplicationContext } from "../applicationContext";
 import { generateCompleteData } from "../utils/projections";
-import { calculateTotalYearlyOilProduction } from "../utils/calculations";
+import {
+  calculateTotalYearlyGasProduction,
+  calculateTotalYearlyOilProduction,
+} from "../utils/calculations";
 import { data } from "../generated/data";
 import { exportDataSet } from "../utils/excel";
+import { ShutdownMap } from "../types/types";
+import { YearlyTotalOilProductionChart } from "../components/charts/yearlyTotalOilProduction";
+import { YearlyTotalGasProductionChart } from "../components/charts/yearlyTotalGasProduction";
+import { YearlyTotalProductionChart } from "../components/charts/yearlyOilAndGasProductionBarChart";
 
 export function Application() {
   const [year, setYear] = useState(2025);
   const fullData = useMemo(() => generateCompleteData(data), [data]);
+  // const shutdowns: ShutdownMap = {};
+  // const totalOilProduction = calculateTotalYearlyOilProduction(fullData, shutdowns);
+  // const totalGasProduction = calculateTotalYearlyGasProduction(fullData, shutdowns);
 
   return (
     <ApplicationContext value={{ year, fullData }}>
@@ -46,6 +56,11 @@ export function Application() {
         <button onClick={() => exportDataSet(fullData)}>
           Last ned som Excel
         </button>
+        {/*
+        <YearlyTotalOilProductionChart data={totalOilProduction} />
+        <YearlyTotalGasProductionChart data={totalGasProduction} />
+        <YearlyTotalProductionChart oilData={totalOilProduction} gasData={totalGasProduction} />
+        */}
         <Outlet />
       </main>
     </ApplicationContext>
