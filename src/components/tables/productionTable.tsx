@@ -1,14 +1,34 @@
 import { data } from "../../generated/data";
-import React from "react";
+import React, { useContext } from "react";
 import { useState } from "react";
 import { productionProjections } from "../../utils/projections";
+import { YearlyTotalOilProductionChart } from "../charts/yearlyTotalOilProduction";
+import { YearlyTotalGasProductionChart } from "../charts/yearlyTotalGasProduction";
+import { YearlyTotalProductionChart } from "../charts/yearlyOilAndGasProductionBarChart";
+import {
+  calculateTotalYearlyGasProduction,
+  calculateTotalYearlyOilProduction,
+} from "../../utils/calculations";
+import { ShutdownMap } from "../../types/types";
+import { ApplicationContext } from "../../applicationContext";
 
 export function ProductionTable() {
   const debug = localStorage.getItem("debug") === "true";
   const [view, setView] = useState<"oil" | "gas" | "both">("oil");
+  const { fullData } = useContext(ApplicationContext);
 
   const oilFields = Object.keys(data);
   const projections = productionProjections(data);
+
+  const shutdowns: ShutdownMap = {};
+  const totalOilProduction = calculateTotalYearlyOilProduction(
+    fullData,
+    shutdowns,
+  );
+  const totalGasProduction = calculateTotalYearlyGasProduction(
+    fullData,
+    shutdowns,
+  );
 
   const years = new Set<string>();
   for (const oilField of oilFields) {
@@ -23,6 +43,12 @@ export function ProductionTable() {
 
   return (
     <div>
+      <YearlyTotalOilProductionChart data={totalOilProduction} />
+      <YearlyTotalGasProductionChart data={totalGasProduction} />
+      <YearlyTotalProductionChart
+        oilData={totalOilProduction}
+        gasData={totalGasProduction}
+      />
       <h2>Årlige produksjonstall</h2>
       <div className="production-view-toggle-button">
         <button
