@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
-  Chart as ChartJS,
   CategoryScale,
+  Chart as ChartJS,
+  Legend,
   LinearScale,
-  PointElement,
   LineElement,
+  PointElement,
   Title,
   Tooltip,
-  Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { YearlyOilProduction } from "../../types/interface";
+import { ApplicationContext } from "../../applicationContext";
+import { OilFieldDataset, ShutdownMap } from "../../types/types";
+import { calculateTotalYearlyOilProduction } from "../../utils/calculations";
 
 ChartJS.register(
   CategoryScale,
@@ -22,13 +24,14 @@ ChartJS.register(
   Legend,
 );
 
-interface YearlyOilProductionProps {
-  data: YearlyOilProduction[];
+function totalYearlyProduction(fullData: OilFieldDataset) {
+  return [];
 }
 
-export function YearlyTotalOilProductionChart({
-  data,
-}: YearlyOilProductionProps) {
+export function YearlyTotalOilProductionChart() {
+  const { fullData } = useContext(ApplicationContext);
+  const shutdowns: ShutdownMap = {};
+  const data = calculateTotalYearlyOilProduction(fullData, shutdowns);
   const chartData = {
     labels: data.map((entry) => entry.year),
     datasets: [

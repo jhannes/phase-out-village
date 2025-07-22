@@ -2,7 +2,6 @@ import { data } from "../../generated/data";
 import React, { useContext } from "react";
 import { useState } from "react";
 import { productionProjections } from "../../utils/projections";
-import { YearlyTotalOilProductionChart } from "../charts/yearlyTotalOilProduction";
 import { YearlyTotalGasProductionChart } from "../charts/yearlyTotalGasProduction";
 import { YearlyTotalProductionChart } from "../charts/yearlyOilAndGasProductionBarChart";
 import {
@@ -11,6 +10,8 @@ import {
 } from "../../utils/calculations";
 import { ShutdownMap } from "../../types/types";
 import { ApplicationContext } from "../../applicationContext";
+import { Link } from "react-router-dom";
+import { YearlyTotalOilProductionChart } from "../production/yearlyTotalOilProduction";
 
 export function ProductionTable() {
   const debug = localStorage.getItem("debug") === "true";
@@ -43,7 +44,11 @@ export function ProductionTable() {
 
   return (
     <div>
-      <YearlyTotalOilProductionChart data={totalOilProduction} />
+      <nav>
+        <Link to={"./totalOil"}>Total produksjon olje</Link>
+        <Link to={"./oilPerField"}>Oljeproduksjon per felt</Link>
+      </nav>
+      <YearlyTotalOilProductionChart />
       <YearlyTotalGasProductionChart data={totalGasProduction} />
       <YearlyTotalProductionChart
         oilData={totalOilProduction}
