@@ -1,8 +1,26 @@
-import { Link, Outlet } from "@tanstack/react-router";
 import React, { useMemo, useState } from "react";
-import { ApplicationContext } from "../applicationContext";
-import { generateCompleteData } from "../utils/projections";
-import { data } from "../generated/data";
+import { Link, Route, Routes } from "react-router-dom";
+import { MapRoute } from "../map/mapRoute";
+import { FlatApplication } from "./flatApplication";
+import { ProductionTable } from "../tables/productionTable";
+import { generateCompleteData } from "../../utils/projections";
+import { data } from "../../generated/data";
+import { ApplicationContext } from "../../applicationContext";
+import { FrontPage } from "./frontPage";
+import { PhaseOutRoute } from "../phaseout/phaseOutRoute";
+
+function ApplicationRoutes() {
+  return (
+    <Routes>
+      <Route path={"/"} element={<FrontPage />} />
+      <Route path={"/phaseout"} element={<PhaseOutRoute />} />
+      <Route path={"/map/*"} element={<MapRoute />} />
+      <Route path={"/emissions"} element={<FlatApplication />} />
+      <Route path={"/production"} element={<ProductionTable />} />
+      <Route path={"*"} element={<h2>Not Found</h2>} />
+    </Routes>
+  );
+}
 
 export function Application() {
   const [year, setYear] = useState(2025);
@@ -41,7 +59,7 @@ export function Application() {
         </div>
       </header>
       <main>
-        <Outlet />
+        <ApplicationRoutes />
       </main>
     </ApplicationContext>
   );
