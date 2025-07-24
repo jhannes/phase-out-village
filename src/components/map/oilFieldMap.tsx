@@ -13,6 +13,7 @@ import { OilfieldName, slugify, Slugify } from "../../data";
 import { Point, SimpleGeometry } from "ol/geom";
 import { FeatureLike } from "ol/Feature";
 import { getCenter } from "ol/extent";
+import { useNavigate } from "react-router-dom";
 
 useGeographic();
 
@@ -60,13 +61,14 @@ function focusStyle(f: FeatureLike) {
 
 export function OilFieldMap({ slug }: { slug?: Slugify<OilfieldName> }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
   useEffect(() => {
     map.setTarget(mapRef.current!);
     map.on("click", (e) => {
       const features = map.getFeaturesAtPixel(e.pixel);
       if (features.length === 1) {
         const { geometry, ...properties } = features[0].getProperties();
-        alert(JSON.stringify(properties));
+        navigate(`/map/${slugify(properties.fldName)}`);
       }
     });
     oilfieldSource.once("featuresloadend", () => selectOilField());

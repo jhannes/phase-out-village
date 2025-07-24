@@ -7,20 +7,31 @@ import { OilfieldName, Slugify } from "../../data";
 
 export function MapRoute() {
   return (
-    <div className="oilfield-map">
-      <OilFieldMap />
-
-      <div className="details">
-        <Routes>
-          <Route path={""} element={<OilFieldMapList />} />
-          <Route path={":slug"} element={<SlugWrapper />} />
-        </Routes>
-      </div>
-    </div>
+    <Routes>
+      <Route
+        path={""}
+        element={
+          <div className="oilfield-map">
+            <OilFieldMap />
+            <div className="details">
+              <OilFieldMapList />
+            </div>
+          </div>
+        }
+      />
+      <Route path={":slug"} element={<SlugWrapper />} />
+    </Routes>
   );
 }
 
 const SlugWrapper = () => {
   const { slug } = useParams();
-  return <OilfieldDetails slug={slug as Slugify<OilfieldName>} />;
+  return (
+    <div className="oilfield-map">
+      <OilFieldMap slug={slug as Slugify<OilfieldName>} />
+      <div className="details">
+        <OilfieldDetails slug={slug as Slugify<OilfieldName>} />
+      </div>
+    </div>
+  );
 };
