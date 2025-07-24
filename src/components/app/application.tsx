@@ -27,7 +27,7 @@ export function Application() {
   const fullData = useMemo(() => generateCompleteData(data), [data]);
 
   return (
-    <ApplicationContext value={{ year, fullData }}>
+    <ApplicationContext value={{ year, fullData, data }}>
       <nav>
         <Link to="/">Hjem</Link>
         <Link to="/map">Map</Link>
