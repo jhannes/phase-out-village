@@ -59,16 +59,16 @@ export function Application() {
         </div>
         <div>Utslipp til 2040: 200 (0% redusjon)</div>
         <div>Produksjon til 2040: 200 (0% redusjon)</div>
-        <div>
-          <p>
-            <a href="https://mdg.no/politikk/utfasing">MDG</a>
-          </p>
-          <p>Det ER mulig</p>
-        </div>
       </header>
       <main>
         <ApplicationRoutes />
       </main>
+      <footer>
+        <div>
+          <a href="https://mdg.no/politikk/utfasing">MDG</a>
+        </div>
+        <div>Det ER mulig</div>
+      </footer>
     </ApplicationContext>
   );
 }
