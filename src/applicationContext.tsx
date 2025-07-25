@@ -1,14 +1,18 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { OilFieldDataset } from "./types/types";
 import { data } from "./generated/data";
+import { OilfieldName, PhaseOutSchedule, Year } from "./data";
 
 export const ApplicationContext = React.createContext<{
-  year: number;
+  year: Year;
+  nextYear: () => void;
+  phaseOut: PhaseOutSchedule;
+  setPhaseOut: Dispatch<SetStateAction<PhaseOutSchedule>>;
   fullData: OilFieldDataset;
   data: Record<
-    string,
+    OilfieldName,
     Record<
-      string,
+      Year,
       {
         productionOil?: number;
         productionGas?: number;
@@ -18,7 +22,10 @@ export const ApplicationContext = React.createContext<{
     >
   >;
 }>({
-  year: 2025,
+  year: "2025",
+  nextYear: () => {},
+  phaseOut: {},
+  setPhaseOut: () => {},
   fullData: {},
   data: data,
 });

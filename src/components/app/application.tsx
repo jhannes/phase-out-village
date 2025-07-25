@@ -8,6 +8,7 @@ import { ApplicationContext } from "../../applicationContext";
 import { FrontPage } from "./frontPage";
 import { PhaseOutRoute } from "../phaseout/phaseOutRoute";
 import { ProductionRoute } from "../production/productionRoute";
+import { PhaseOutSchedule, Year } from "../../data";
 
 function ApplicationRoutes() {
   return (
@@ -23,11 +24,18 @@ function ApplicationRoutes() {
 }
 
 export function Application() {
-  const [year, setYear] = useState(2025);
+  const [year, setYear] = useState<Year>("2025");
+  const [phaseOut, setPhaseOut] = useState<PhaseOutSchedule>({});
   const fullData = useMemo(() => generateCompleteData(data), [data]);
 
+  function nextYear() {
+    setYear((y) => (parseInt(y) + 1).toString() as Year);
+  }
+
   return (
-    <ApplicationContext value={{ year, fullData, data }}>
+    <ApplicationContext
+      value={{ year, nextYear, fullData, data, phaseOut, setPhaseOut }}
+    >
       <nav>
         <Link to="/">Hjem</Link>
         <Link to="/map">Map</Link>
@@ -38,11 +46,11 @@ export function Application() {
         <div>
           År: {year}
           <div>
-            <button onClick={() => setYear((y) => y + 1)}>Neste</button>
+            <button onClick={nextYear}>Neste</button>
           </div>
         </div>
         <div>
-          Oljefelter avviklet: 0
+          Oljefelter avviklet: {Object.keys(phaseOut).length}
           <div>
             <Link to={"/phaseout"}>
               <button>Velg felter for avvikling</button>

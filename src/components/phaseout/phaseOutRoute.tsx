@@ -11,7 +11,7 @@ export function PhaseOutRoute() {
 
   return (
     <div className="oilfield-map">
-      <Dialog open={open} onClose={() => navigate("/emissions")}>
+      <Dialog open={open} onClose={() => navigate("/production")}>
         <PhaseOutDialog close={() => setOpen(false)} />
       </Dialog>
       <OilFieldMap />

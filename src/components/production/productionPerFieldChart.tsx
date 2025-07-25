@@ -14,13 +14,12 @@ import {
 import { Line } from "react-chartjs-2";
 
 import { ApplicationContext } from "../../applicationContext";
-import { OilfieldName } from "../../data";
-
-type DataValue = { value: number; estimate?: boolean };
-type YearlyDataset = Partial<Record<Year, DataValue>>;
-type EstimatedYearlyDataset = Partial<
-  Record<Year, DataValue & { estimate: true }>
->;
+import {
+  estimatedOilProduction,
+  measuredOilProduction,
+  OilfieldName,
+  YearlyDataset,
+} from "../../data";
 
 ChartJS.register(
   CategoryScale,
@@ -31,51 +30,6 @@ ChartJS.register(
   Tooltip,
   Legend,
 );
-
-type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-
-type Year = `19${Digit}${Digit}` | `20${Digit}${Digit}`;
-
-function measuredOilProduction(
-  data: Record<Year, { productionOil?: number }>,
-): YearlyDataset {
-  const result: YearlyDataset = {};
-  for (let y = 1990; y < 2040; y++) {
-    const year = y.toString() as Year;
-    const { productionOil } = data[year] || {};
-    if (productionOil) result[year] = { value: productionOil };
-  }
-  return result;
-}
-
-const allYears = Array.from({ length: 200 }, (_, i) =>
-  String(1900 + i),
-) as Year[];
-
-function estimatedOilProduction(
-  measured: YearlyDataset,
-): EstimatedYearlyDataset {
-  const values = allYears
-    .toReversed()
-    .map((y) => [y, measured[y]?.value])
-    .filter(([_, v]) => v)
-    .slice(0, 5) as [Year, number][];
-
-  if (values.length == 0) return {};
-  const average =
-    values.map(([_, v]) => v).reduce((a, b) => a + b, 0) / values.length;
-
-  const result: EstimatedYearlyDataset = {};
-  let current = average;
-  for (let y = parseInt(values[0][0]) + 1; y < 2040; y++) {
-    current *= 0.9;
-    result[y.toString() as Year] = {
-      value: current,
-      estimate: true,
-    };
-  }
-  return result;
-}
 
 function isEstimated(point: object | (object & { raw: unknown })) {
   return (
@@ -144,12 +98,12 @@ function ProductionTable({
 export function ProductionPerFieldChart() {
   const [visibleField, setVisibleField] = useState<string | undefined>();
 
-  const { data } = useContext(ApplicationContext);
+  const { data, phaseOut } = useContext(ApplicationContext);
   const dataSeries: Record<OilfieldName, YearlyDataset> = Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
       key,
       {
-        ...estimatedOilProduction(measuredOilProduction(value)),
+        ...estimatedOilProduction(measuredOilProduction(value), phaseOut[key]),
         ...measuredOilProduction(value),
       },
     ]),
