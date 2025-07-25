@@ -16,6 +16,12 @@ import { Line } from "react-chartjs-2";
 import { ApplicationContext } from "../../applicationContext";
 import { OilfieldName } from "../../data";
 
+type DataValue = { value: number; estimate?: boolean };
+type YearlyDataset = Partial<Record<Year, DataValue>>;
+type EstimatedYearlyDataset = Partial<
+  Record<Year, DataValue & { estimate: true }>
+>;
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -32,8 +38,8 @@ type Year = `19${Digit}${Digit}` | `20${Digit}${Digit}`;
 
 function measuredOilProduction(
   data: Record<Year, { productionOil?: number }>,
-): Partial<Record<Year, { value: number }>> {
-  const result: Partial<Record<Year, { value: number }>> = {};
+): YearlyDataset {
+  const result: YearlyDataset = {};
   for (let y = 1990; y < 2040; y++) {
     const year = y.toString() as Year;
     const { productionOil } = data[year] || {};
@@ -47,30 +53,25 @@ const allYears = Array.from({ length: 200 }, (_, i) =>
 ) as Year[];
 
 function estimatedOilProduction(
-  data: Record<Year, { productionOil?: number }>,
-): Partial<Record<Year, { value: number; estimate: true; average: number }>> {
-  const values = (
-    allYears.toReversed().map((y) => [y, data[y]?.productionOil]) as [
-      Year,
-      number?,
-    ][]
-  )
-    .filter(([_, v]) => v && v > 0)
+  measured: YearlyDataset,
+): EstimatedYearlyDataset {
+  const values = allYears
+    .toReversed()
+    .map((y) => [y, measured[y]?.value])
+    .filter(([_, v]) => v)
     .slice(0, 5) as [Year, number][];
-  if (values.length == 0) return {};
-  const sum = values.map(([_, v]) => v).reduce((a, b) => a + b, 0);
-  const average = sum / values.length;
 
-  const result: Partial<
-    Record<Year, { value: number; estimate: true; average: number }>
-  > = {};
+  if (values.length == 0) return {};
+  const average =
+    values.map(([_, v]) => v).reduce((a, b) => a + b, 0) / values.length;
+
+  const result: EstimatedYearlyDataset = {};
   let current = average;
   for (let y = parseInt(values[0][0]) + 1; y < 2040; y++) {
     current *= 0.9;
     result[y.toString() as Year] = {
       value: current,
       estimate: true,
-      average,
     };
   }
   return result;
@@ -113,16 +114,7 @@ function ProductionTable({
   dataseries,
 }: {
   field: string;
-  dataseries: Partial<
-    Record<
-      Year,
-      {
-        value: number;
-        estimate?: boolean;
-        average?: number;
-      }
-    >
-  >;
+  dataseries: YearlyDataset;
 }) {
   return (
     <>
@@ -141,7 +133,6 @@ function ProductionTable({
               <td className={value.estimate ? "projected" : ""}>
                 {value.value.toFixed(2)}
               </td>
-              <td>{value.average}</td>
             </tr>
           ))}
         </tbody>
@@ -154,29 +145,15 @@ export function ProductionPerFieldChart() {
   const [visibleField, setVisibleField] = useState<string | undefined>();
 
   const { data } = useContext(ApplicationContext);
-  const dataSeries: Record<
-    OilfieldName,
-    Partial<Record<Year, { value: number; estimate?: boolean }>>
-  > = Object.fromEntries(
+  const dataSeries: Record<OilfieldName, YearlyDataset> = Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
       key,
       {
-        ...estimatedOilProduction(value),
+        ...estimatedOilProduction(measuredOilProduction(value)),
         ...measuredOilProduction(value),
       },
     ]),
   );
-
-  const values = (
-    allYears.toReversed().map((y) => [y, data["Troll"]![y]?.productionOil]) as [
-      Year,
-      number?,
-    ][]
-  )
-    .filter(([_, v]) => v && v > 0)
-    .slice(0, 5) as [Year, number][];
-
-  console.log(values);
 
   const datasets = Object.entries(
     Object.fromEntries(
