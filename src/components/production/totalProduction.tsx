@@ -4,9 +4,8 @@ import { ApplicationContext } from "../../applicationContext";
 import { Line } from "react-chartjs-2";
 import {
   allYears,
-  estimatedOilProduction,
-  measuredOilProduction,
   OilfieldName,
+  oilProduction,
   Year,
   YearlyDataset,
 } from "../../data";
@@ -17,10 +16,7 @@ export function TotalProduction() {
   const dataSeries: Record<OilfieldName, YearlyDataset> = Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
       key,
-      {
-        ...estimatedOilProduction(measuredOilProduction(value), phaseOut[key]),
-        ...measuredOilProduction(value),
-      },
+      oilProduction(value, phaseOut, key),
     ]),
   );
 

@@ -31,6 +31,12 @@ type EstimatedYearlyDataset = Partial<
   Record<Year, DataValue & { estimate: true }>
 >;
 
+export type TimeSerieValue = [Year, number, { estimate: true }?];
+
+export const allYears = Array.from({ length: 200 }, (_, i) =>
+  String(1900 + i),
+) as Year[];
+
 export function measuredOilProduction(
   data: Record<Year, { productionOil?: number }>,
 ): YearlyDataset {
@@ -43,10 +49,6 @@ export function measuredOilProduction(
   return result;
 }
 
-export const allYears = Array.from({ length: 200 }, (_, i) =>
-  String(1900 + i),
-) as Year[];
-
 export function estimatedOilProduction(
   measured: YearlyDataset,
   phaseOut: Year | undefined,
@@ -58,8 +60,7 @@ export function estimatedOilProduction(
     .slice(0, 5) as [Year, number][];
 
   if (values.length == 0) return {};
-  const average =
-    values.map(([_, v]) => v).reduce((a, b) => a + b, 0) / values.length;
+  const average = computeAverage(values);
 
   const result: EstimatedYearlyDataset = {};
   let current = average;
@@ -73,4 +74,85 @@ export function estimatedOilProduction(
     result[year] = { value: current, estimate: true };
   }
   return result;
+}
+
+export function oilProduction(
+  value: Record<Year, { productionOil?: number }>,
+  phaseOut: PhaseOutSchedule,
+  key: string,
+) {
+  return {
+    ...estimatedOilProduction(measuredOilProduction(value), phaseOut[key]),
+    ...measuredOilProduction(value),
+  };
+}
+
+export function calculateGasProduction(
+  dataset: Record<Year, { productionGas?: number }>,
+  phaseOut: Year | undefined,
+): TimeSerieValue[] {
+  const result: TimeSerieValue[] = allYears
+    .filter((y) => dataset[y]?.productionGas)
+    .map((y) => [y, dataset[y]?.productionGas!, undefined]);
+
+  if (result.length == 0) return result;
+  let current = computeAverage(result.toReversed().slice(0, 5));
+  for (let y = parseInt(result.at(-1)![0]) + 1; y < 2040; y++) {
+    const year = y.toString() as Year;
+    if (year === phaseOut) {
+      result.push([year, 0, { estimate: true }]);
+      break;
+    }
+    current *= 0.9;
+    result.push([year, Math.round(current * 100) / 100, { estimate: true }]);
+  }
+  return result;
+}
+
+export function calculateOilProduction(
+  dataset: Record<Year, { productionOil?: number }>,
+  phaseOut: Year | undefined,
+): TimeSerieValue[] {
+  const result: TimeSerieValue[] = allYears
+    .filter((y) => dataset[y]?.productionOil)
+    .map((y) => [y, dataset[y]?.productionOil!, undefined]);
+
+  if (result.length == 0) return result;
+  let current = computeAverage(result.toReversed().slice(0, 5));
+  for (let y = parseInt(result.at(-1)![0]) + 1; y < 2040; y++) {
+    const year = y.toString() as Year;
+    if (year === phaseOut) {
+      result.push([year, 0, { estimate: true }]);
+      break;
+    }
+    current *= 0.9;
+    result.push([year, Math.round(current * 100) / 100, { estimate: true }]);
+  }
+  return result;
+}
+
+export function calculateEmissions(
+  dataset: Record<Year, { emission?: number }>,
+  phaseOut: Year | undefined,
+): TimeSerieValue[] {
+  const result: TimeSerieValue[] = allYears
+    .filter((y) => dataset[y]?.emission)
+    .map((y) => [y, dataset[y]?.emission!, undefined]);
+
+  if (result.length == 0) return result;
+  const average = Math.round(computeAverage(result.toReversed().slice(0, 5)));
+
+  for (let y = parseInt(result.at(-1)![0]) + 1; y < 2040; y++) {
+    const year = y.toString() as Year;
+    if (year === phaseOut) {
+      result.push([year, 0, { estimate: true }]);
+      break;
+    }
+    result.push([year, average, { estimate: true }]);
+  }
+  return result;
+}
+
+function computeAverage(values: TimeSerieValue[]) {
+  return values.map(([_, v]) => v).reduce((a, b) => a + b, 0) / values.length;
 }

@@ -20,6 +20,7 @@ import {
   OilfieldName,
   YearlyDataset,
 } from "../../data";
+import { isEstimated } from "../charts/isEstimated";
 
 ChartJS.register(
   CategoryScale,
@@ -30,15 +31,6 @@ ChartJS.register(
   Tooltip,
   Legend,
 );
-
-function isEstimated(point: object | (object & { raw: unknown })) {
-  return (
-    "raw" in point &&
-    typeof point.raw === "object" &&
-    "estimate" in point.raw! &&
-    point.raw.estimate
-  );
-}
 
 function focusOnClicked(
   legendItem: LegendItem,
