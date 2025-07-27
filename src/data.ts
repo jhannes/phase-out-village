@@ -33,9 +33,13 @@ type EstimatedYearlyDataset = Partial<
 
 export type TimeSerieValue = [Year, number, { estimate: true }?];
 
-export const allYears = Array.from({ length: 200 }, (_, i) =>
-  String(1900 + i),
-) as Year[];
+export function yearsInRange(first: number, last: number) {
+  return Array.from({ length: last - first + 1 }, (_, i) =>
+    String(first + i),
+  ) as Year[];
+}
+
+export const allYears = yearsInRange(1900, 2099);
 
 export function measuredOilProduction(
   data: Record<Year, { productionOil?: number }>,
@@ -155,4 +159,15 @@ export function calculateEmissions(
 
 function computeAverage(values: TimeSerieValue[]) {
   return values.map(([_, v]) => v).reduce((a, b) => a + b, 0) / values.length;
+}
+
+export function computeSumForYears(
+  production: TimeSerieValue[],
+  years: Set<Year>,
+) {
+  let result = 0;
+  for (const [year, value] of production) {
+    if (years.has(year)) result += value;
+  }
+  return result;
 }

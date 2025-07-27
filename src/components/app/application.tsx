@@ -10,6 +10,8 @@ import { PhaseOutRoute } from "../phaseout/phaseOutRoute";
 import { ProductionRoute } from "../production/productionRoute";
 import { PhaseOutSchedule, Year } from "../../data";
 import { useSessionState } from "../../hooks/useSessionState";
+import { EmissionSummaryCard } from "../emissions/emissionSummaryCard";
+import { ProductionSummaryCard } from "../production/productionSummaryCard";
 
 function ApplicationRoutes() {
   return (
@@ -61,8 +63,8 @@ export function Application() {
             </Link>
           </div>
         </div>
-        <div>Utslipp 2025-2040: 200 (0% redusjon)</div>
-        <div>Produksjon 2025-2040: 200 (0% redusjon)</div>
+        <EmissionSummaryCard />
+        <ProductionSummaryCard />
       </header>
       <main>
         <ApplicationRoutes />
