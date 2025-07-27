@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import { MapRoute } from "../map/mapRoute";
 import { FlatApplication } from "./flatApplication";
@@ -9,6 +9,7 @@ import { FrontPage } from "./frontPage";
 import { PhaseOutRoute } from "../phaseout/phaseOutRoute";
 import { ProductionRoute } from "../production/productionRoute";
 import { PhaseOutSchedule, Year } from "../../data";
+import { useSessionState } from "../../hooks/useSessionState";
 
 function ApplicationRoutes() {
   return (
@@ -24,8 +25,11 @@ function ApplicationRoutes() {
 }
 
 export function Application() {
-  const [year, setYear] = useState<Year>("2025");
-  const [phaseOut, setPhaseOut] = useState<PhaseOutSchedule>({});
+  const [year, setYear] = useSessionState<Year>("year", "2025");
+  const [phaseOut, setPhaseOut] = useSessionState<PhaseOutSchedule>(
+    "phaseOutSchedule",
+    {},
+  );
   const fullData = useMemo(() => generateCompleteData(data), [data]);
 
   function nextYear() {
@@ -57,8 +61,8 @@ export function Application() {
             </Link>
           </div>
         </div>
-        <div>Utslipp til 2040: 200 (0% redusjon)</div>
-        <div>Produksjon til 2040: 200 (0% redusjon)</div>
+        <div>Utslipp 2025-2040: 200 (0% redusjon)</div>
+        <div>Produksjon 2025-2040: 200 (0% redusjon)</div>
       </header>
       <main>
         <ApplicationRoutes />
