@@ -14,11 +14,12 @@ import { Point, SimpleGeometry } from "ol/geom";
 import { FeatureLike } from "ol/Feature";
 import { getCenter } from "ol/extent";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../../../config";
 
 useGeographic();
 
 const oilfieldSource = new VectorSource({
-  url: "/phase-out-village/geojson/oilfields.geojson",
+  url: `${BASE_URL}/geojson/oilfields.geojson`,
   format: new GeoJSON(),
 });
 const defaultViewport = { center: [10, 65], zoom: 4 };

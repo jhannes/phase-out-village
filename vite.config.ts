@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
+import { BASE_URL } from "./config";
 
 export default defineConfig({
-  base: "/phase-out-village",
+  base: BASE_URL,
 });
