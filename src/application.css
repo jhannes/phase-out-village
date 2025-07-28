@@ -174,3 +174,21 @@ td {
   padding: 1rem;
   align-items: start;
 }
+
+.pagination {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.pagination button {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid grey;
+  cursor: pointer;
+}
+.pagination button.active {
+  font-weight: bold;
+  text-decoration: underline;
+  background: grey;
+}
