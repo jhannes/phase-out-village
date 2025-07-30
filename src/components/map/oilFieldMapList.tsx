@@ -7,7 +7,7 @@ export function OilFieldMapList() {
   const { phaseOut } = useContext(ApplicationContext);
   return (
     <div>
-      <h1>Map</h1>
+      <h1>Oljefelter</h1>
       {oilfields.map((o) => (
         <li key={o}>
           <Link to={`/map/${o}`}>{oilfieldNames[o]}</Link>

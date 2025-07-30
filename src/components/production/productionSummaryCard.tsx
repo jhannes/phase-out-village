@@ -5,6 +5,7 @@ import {
   yearsInRange,
 } from "../../data";
 import { ApplicationContext } from "../../applicationContext";
+import { Link } from "react-router-dom";
 
 export function ProductionSummaryCard() {
   const years = yearsInRange(2025, 2040);
@@ -25,7 +26,8 @@ export function ProductionSummaryCard() {
   const reduction = Math.round(((baseline - result) / baseline) * 100);
   return (
     <div>
-      Oljeproduksjon {years.at(0)}-{years.at(-1)}: {result.toFixed(2)}{" "}
+      <Link to="/production">Oljeproduksjon</Link> {years.at(0)}-{years.at(-1)}:{" "}
+      {result.toFixed(2)}{" "}
       <span title={baseline.toFixed(2)}>({reduction}% redusjon)</span>
     </div>
   );

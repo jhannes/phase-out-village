@@ -42,12 +42,6 @@ export function Application() {
     <ApplicationContext
       value={{ year, nextYear, fullData, data, phaseOut, setPhaseOut }}
     >
-      <nav>
-        <Link to="/">Hjem</Link>
-        <Link to="/map">Map</Link>
-        <Link to="/emissions">Utslipp</Link>
-        <Link to="/production">Produksjon</Link>
-      </nav>
       <header>
         <div>
           År: {year}
@@ -56,7 +50,8 @@ export function Application() {
           </div>
         </div>
         <div>
-          Oljefelter avviklet: {Object.keys(phaseOut).length}
+          <Link to="/map">Oljefelter</Link> avviklet:{" "}
+          {Object.keys(phaseOut).length}
           <div>
             <Link to={"/phaseout"}>
               <button>Velg felter for avvikling</button>
@@ -70,10 +65,14 @@ export function Application() {
         <ApplicationRoutes />
       </main>
       <footer>
-        <div>
-          <a href="https://mdg.no/politikk/utfasing">MDG</a>
-        </div>
-        <div>Det ER mulig</div>
+        <a href="https://mdg.no/politikk/utfasing">
+          <img
+            src={
+              "https://d1nizz91i54auc.cloudfront.net/_service/505811/display/img_version/8880781/t/1750686348/img_name/68683_505811_ba2eeb201a.png.webp"
+            }
+            alt={"MDG - det ER mulig"}
+          />
+        </a>
       </footer>
     </ApplicationContext>
   );
