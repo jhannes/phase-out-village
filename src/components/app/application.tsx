@@ -38,6 +38,11 @@ export function Application() {
     setYear((y) => (parseInt(y) + 1).toString() as Year);
   }
 
+  function reset() {
+    setYear("2025");
+    setPhaseOut({});
+  }
+
   return (
     <ApplicationContext
       value={{ year, nextYear, fullData, data, phaseOut, setPhaseOut }}
@@ -47,6 +52,9 @@ export function Application() {
           År: {year}
           <div>
             <button onClick={nextYear}>Neste</button>
+          </div>
+          <div>
+            <button onClick={reset}>Start på nytt</button>
           </div>
         </div>
         <div>
