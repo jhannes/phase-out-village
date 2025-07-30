@@ -12,6 +12,7 @@ import { PhaseOutSchedule, Year } from "../../data";
 import { useSessionState } from "../../hooks/useSessionState";
 import { EmissionSummaryCard } from "../emissions/emissionSummaryCard";
 import { ProductionSummaryCard } from "../production/productionSummaryCard";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function ApplicationRoutes() {
   return (
@@ -33,6 +34,8 @@ export function Application() {
     {},
   );
   const fullData = useMemo(() => generateCompleteData(data), [data]);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   function nextYear() {
     setYear((y) => (parseInt(y) + 1).toString() as Year);
@@ -58,9 +61,13 @@ export function Application() {
         <div>
           Oljefelter avviklet: {Object.keys(phaseOut).length}
           <div>
-            <Link to={"/phaseout"}>
-              <button>Velg felter for avvikling</button>
-            </Link>
+            <button
+              onClick={() =>
+                navigate("/phaseout", { state: { from: location } })
+              }
+            >
+              Velg felter for avvikling
+            </button>
           </div>
         </div>
         <EmissionSummaryCard />
