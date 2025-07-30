@@ -1,1 +1,1 @@
-export const BASE_URL = "/phase-out-village";
+export const BASE_URL = "";
