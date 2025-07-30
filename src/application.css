@@ -174,3 +174,45 @@ td {
   padding: 1rem;
   align-items: start;
 }
+
+.phaseout-dialog {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: flex-start;
+  padding: 1.5rem;
+}
+
+.phaseout-checkboxes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.phaseout-checkboxes ul {
+  padding: 0;
+  margin: 0;
+}
+
+.phaseout-checkboxes li {
+  margin-bottom: 0.5rem;
+}
+
+.dialog-information-container {
+  padding: 1rem;
+}
+
+.phaseout-latest-oilfield {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.phaseout-total-production {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
