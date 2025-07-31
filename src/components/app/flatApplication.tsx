@@ -77,6 +77,7 @@ export function FlatApplication() {
           onPriceUpdate={handlePriceUpdate}
         />
         <div className="income-display">
+          <YearlyEmissionChart data={emission} />
           <ShutdownControls
             data={fullData}
             shutdowns={shutdowns}
@@ -84,7 +85,6 @@ export function FlatApplication() {
           />
           {/*<IncomeChart data={incomeByYear} />*/}
           {/*<YearlyIncomeList data={incomeByYear} /> */}
-          <YearlyEmissionChart data={emission} />
         </div>
         <div className="totalEmission-chart">
           <EmissionIntensityChart data={intensityData} />

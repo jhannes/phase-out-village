@@ -52,6 +52,7 @@ export function EmissionIntensityChart({ data }: Props) {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "top" as const,
@@ -95,7 +96,11 @@ export function EmissionIntensityChart({ data }: Props) {
     },
   };
 
-  return <Line options={options} data={chartData} />;
+  return (
+    <div style={{ height: 500 }}>
+      <Line options={options} data={chartData} />
+    </div>
+  );
 }
 
 function randomColor() {
