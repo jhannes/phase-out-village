@@ -114,7 +114,7 @@ export function ProductionPerFieldChart() {
     ),
   );
   return (
-    <>
+    <div style={{height: 500}}>
       <Line
         options={{
           maintainAspectRatio: false,
@@ -180,7 +180,7 @@ export function ProductionPerFieldChart() {
           dataseries={dataSeries[visibleField]}
         />
       )}
-    </>
+    </div>
   );
 }
 
