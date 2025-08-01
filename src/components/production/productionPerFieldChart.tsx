@@ -117,7 +117,6 @@ export function ProductionPerFieldChart() {
     <div style={{height: 500}}>
       <Line
         options={{
-          responsive: true,
           maintainAspectRatio: false,
           plugins: {
             title: { display: true, text: "Produksjon per oljefelt" },

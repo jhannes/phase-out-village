@@ -1,5 +1,6 @@
 * {
   margin: 0;
+  font-family: bureau-sans, helvetica, sans-serif;
 }
 
 dialog {
@@ -10,11 +11,6 @@ dialog {
   color-scheme: light dark;
 }
 
-html,
-body {
-  height: 100%;
-}
-
 td {
   text-align: center;
 }
@@ -22,7 +18,7 @@ td {
 #app {
   height: 100dvh;
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto 1fr auto;
 }
 
 #app nav,
@@ -37,9 +33,22 @@ td {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
+  padding-inline: 1em;
   > * {
-    padding: 1em;
+    margin: 0.25em;
+    padding: 0.1em 0.3em;
+    border: 1px solid #e0ffb2;
+    border-radius: 0.25rem;
+    background-color: #133600;
+    color: #e0ffb2;
+    a {
+      color: #e0ffb2;
+    }
   }
+}
+
+#app footer {
+  background-color: #133600;
 }
 
 #app main {
@@ -58,6 +67,7 @@ td {
 
   .details {
     overflow-y: scroll;
+    padding-bottom: 5em;
   }
 
   @media (width > 600px) {
@@ -176,7 +186,52 @@ td {
   padding: 1rem;
   align-items: start;
 }
+.phaseout-dialog {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: flex-start;
+  padding: 1.5rem;
+}
+
+.phaseout-checkboxes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.phaseout-checkboxes ul {
+  padding: 0;
+  margin: 0;
+}
+
+.phaseout-checkboxes li {
+  margin-bottom: 0.5rem;
+}
+
+.dialog-information-container {
+  padding: 1rem;
+}
+
+.phaseout-latest-oilfield {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.phaseout-total-production {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.welcome p {
+  max-width: 60ch;
+  margin-bottom: 1em;
+}
 
 #oilfield-title {
   text-align: center;
-}
